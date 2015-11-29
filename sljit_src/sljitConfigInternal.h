@@ -202,10 +202,6 @@
    external functions are needed:
 */
 
-#ifndef SLJIT_MALLOC
-#define SLJIT_MALLOC(size) malloc(size)
-#endif
-
 #ifndef SLJIT_MEMMOVE
 #define SLJIT_MEMMOVE(dest, src, len) memmove(dest, src, len)
 #endif

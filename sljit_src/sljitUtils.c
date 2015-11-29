@@ -232,7 +232,7 @@ struct sljit_stack* SLJIT_CALL sljit_allocate_stack(sljit_uw limit, sljit_uw max
 	/* Align limit and max_limit. */
 	max_limit = (max_limit + sljit_page_align) & ~sljit_page_align;
 
-	stack = (struct sljit_stack*)SLJIT_MALLOC(sizeof(struct sljit_stack));
+	stack = (struct sljit_stack*)malloc(sizeof(struct sljit_stack));
 	if (!stack)
 		return NULL;
 
