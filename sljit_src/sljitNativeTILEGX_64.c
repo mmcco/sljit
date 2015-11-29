@@ -2331,7 +2331,8 @@ struct sljit_label * sljit_emit_label(struct sljit_compiler *compiler)
 		return compiler->last_label;
 
 	label = ensure_abuf(compiler, sizeof(struct sljit_label));
-	PTR_FAIL_IF(!label);
+	if (!label)
+		return NULL;
 	set_label(label, compiler);
 	return label;
 }
@@ -2435,7 +2436,8 @@ struct sljit_jump * sljit_emit_jump(struct sljit_compiler *compiler, sljit_si ty
 	check_sljit_emit_jump(compiler, type);
 
 	jump = ensure_abuf(compiler, sizeof(struct sljit_jump));
-	PTR_FAIL_IF(!jump);
+	if (!jump)
+		return NULL;
 	set_jump(jump, compiler, type & SLJIT_REWRITABLE_JUMP);
 	type &= 0xff;
 
@@ -2494,20 +2496,25 @@ struct sljit_jump * sljit_emit_jump(struct sljit_compiler *compiler, sljit_si ty
 
 	if (inst) {
 		inst = inst | ((type <= SLJIT_JUMP) ? BOFF_X1(5) : BOFF_X1(6));
-		PTR_FAIL_IF(PI(inst));
+		if (PI(inst))
+			return NULL;
 	}
 
-	PTR_FAIL_IF(emit_const(compiler, TMP_REG2_mapped, 0, 1));
+	if (emit_const(compiler, TMP_REG2_mapped, 0, 1))
+		return NULL;
 	if (type <= SLJIT_JUMP) {
 		jump->addr = compiler->size;
-		PTR_FAIL_IF(JR_SOLO(TMP_REG2_mapped));
+		if (JR_SOLO(TMP_REG2_mapped))
+			return NULL;
 	} else {
 		SLJIT_ASSERT(reg_map[PIC_ADDR_REG] == 16 && PIC_ADDR_REG == TMP_REG2);
 		/* Cannot be optimized out if type is >= CALL0. */
 		jump->flags |= IS_JAL | (type >= SLJIT_CALL0 ? SLJIT_REWRITABLE_JUMP : 0);
-		PTR_FAIL_IF(ADD_SOLO(0, reg_map[SLJIT_R0], ZERO));
+		if (ADD_SOLO(0, reg_map[SLJIT_R0], ZERO))
+			return NULL;
 		jump->addr = compiler->size;
-		PTR_FAIL_IF(JALR_SOLO(TMP_REG2_mapped));
+		if (JALR_SOLO(TMP_REG2_mapped))
+			return NULL;
 	}
 
 	return jump;
@@ -2540,15 +2547,19 @@ struct sljit_const * sljit_emit_const(struct sljit_compiler *compiler, sljit_si 
 	ADJUST_LOCAL_OFFSET(dst, dstw);
 
 	const_ = ensure_abuf(compiler, sizeof(struct sljit_const));
-	PTR_FAIL_IF(!const_);
+	if (!const_)
+		return NULL;
 	set_const(const_, compiler);
 
 	reg = FAST_IS_REG(dst) ? dst : TMP_REG2;
 
-	PTR_FAIL_IF(emit_const_64(compiler, reg, init_value, 1));
+	if (emit_const_64(compiler, reg, init_value, 1))
+		return NULL;
 
-	if (dst & SLJIT_MEM)
-		PTR_FAIL_IF(emit_op(compiler, SLJIT_MOV, WORD_DATA, dst, dstw, TMP_REG1, 0, TMP_REG2, 0));
+	if (dst & SLJIT_MEM) {
+		if (emit_op(compiler, SLJIT_MOV, WORD_DATA, dst, dstw, TMP_REG1, 0, TMP_REG2, 0))
+			return NULL;
+	}
 	return const_;
 }
 

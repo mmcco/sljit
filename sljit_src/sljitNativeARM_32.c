@@ -2375,7 +2375,8 @@ struct sljit_label* sljit_emit_label(struct sljit_compiler *compiler)
 		return compiler->last_label;
 
 	label = ensure_abuf(compiler, sizeof(struct sljit_label));
-	PTR_FAIL_IF(!label);
+	if (!label)
+		return NULL;
 	set_label(label, compiler);
 	return label;
 }
@@ -2388,16 +2389,18 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 	CHECK_PTR(check_sljit_emit_jump(compiler, type));
 
 	jump = ensure_abuf(compiler, sizeof(struct sljit_jump));
-	PTR_FAIL_IF(!jump);
+	if (!jump)
+		return NULL;
 	set_jump(jump, compiler, type & SLJIT_REWRITABLE_JUMP);
 	type &= 0xff;
 
 	/* In ARM, we don't need to touch the arguments. */
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5)
-	if (type >= SLJIT_FAST_CALL)
-		PTR_FAIL_IF(prepare_blx(compiler));
-	PTR_FAIL_IF(push_inst_with_unique_literal(compiler, ((EMIT_DATA_TRANSFER(WORD_DATA | LOAD_DATA, 1, 0,
-		type <= SLJIT_JUMP ? TMP_PC : TMP_REG1, TMP_PC, 0)) & ~COND_MASK) | get_cc(type), 0));
+	if (type >= SLJIT_FAST_CALL && prepare_blx(compiler))
+		return NULL;
+	if (push_inst_with_unique_literal(compiler, ((EMIT_DATA_TRANSFER(WORD_DATA | LOAD_DATA, 1, 0,
+		type <= SLJIT_JUMP ? TMP_PC : TMP_REG1, TMP_PC, 0)) & ~COND_MASK) | get_cc(type), 0))
+		return NULL;
 
 	if (jump->flags & SLJIT_REWRITABLE_JUMP) {
 		jump->addr = compiler->size;
@@ -2406,7 +2409,8 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 
 	if (type >= SLJIT_FAST_CALL) {
 		jump->flags |= IS_BL;
-		PTR_FAIL_IF(emit_blx(compiler));
+		if (emit_blx(compiler))
+			return NULL;
 	}
 
 	if (!(jump->flags & SLJIT_REWRITABLE_JUMP))
@@ -2414,8 +2418,10 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 #else
 	if (type >= SLJIT_FAST_CALL)
 		jump->flags |= IS_BL;
-	PTR_FAIL_IF(emit_imm(compiler, TMP_REG1, 0));
-	PTR_FAIL_IF(push_inst(compiler, (((type <= SLJIT_JUMP ? BX : BLX) | RM(TMP_REG1)) & ~COND_MASK) | get_cc(type)));
+	if (emit_imm(compiler, TMP_REG1, 0))
+		return NULL;
+	if (push_inst(compiler, (((type <= SLJIT_JUMP ? BX : BLX) | RM(TMP_REG1)) & ~COND_MASK) | get_cc(type)))
+		return NULL;
 	jump->addr = compiler->size;
 #endif
 	return jump;
@@ -2521,20 +2527,24 @@ struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, sljit_si d
 	ADJUST_LOCAL_OFFSET(dst, dstw);
 
 	const_ = ensure_abuf(compiler, sizeof(struct sljit_const));
-	PTR_FAIL_IF(!const_);
+	if (!const_)
+		return NULL;
 
 	reg = SLOW_IS_REG(dst) ? dst : TMP_REG2;
 
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5)
-	PTR_FAIL_IF(push_inst_with_unique_literal(compiler, EMIT_DATA_TRANSFER(WORD_DATA | LOAD_DATA, 1, 0, reg, TMP_PC, 0), init_value));
+	if (push_inst_with_unique_literal(compiler, EMIT_DATA_TRANSFER(WORD_DATA | LOAD_DATA, 1, 0, reg, TMP_PC, 0), init_value))
+		return NULL;
 	compiler->patches++;
 #else
-	PTR_FAIL_IF(emit_imm(compiler, reg, init_value));
+	if (emit_imm(compiler, reg, init_value))
+		return NULL;
 #endif
 	set_const(const_, compiler);
 
 	if (dst & SLJIT_MEM)
-		PTR_FAIL_IF(emit_op_mem(compiler, WORD_DATA, TMP_REG2, dst, dstw));
+		if (emit_op_mem(compiler, WORD_DATA, TMP_REG2, dst, dstw))
+			return NULL;
 	return const_;
 }
 

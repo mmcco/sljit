@@ -1220,7 +1220,8 @@ struct sljit_label* sljit_emit_label(struct sljit_compiler *compiler)
 		return compiler->last_label;
 
 	label = ensure_abuf(compiler, sizeof(struct sljit_label));
-	PTR_FAIL_IF(!label);
+	if (!label)
+		return NULL;
 	set_label(label, compiler);
 	compiler->delay_slot = UNMOVABLE_INS;
 	return label;
@@ -1289,7 +1290,8 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 	CHECK_PTR(check_sljit_emit_jump(compiler, type));
 
 	jump = ensure_abuf(compiler, sizeof(struct sljit_jump));
-	PTR_FAIL_IF(!jump);
+	if (!jump)
+		return NULL;
 	set_jump(jump, compiler, type & SLJIT_REWRITABLE_JUMP);
 	type &= 0xff;
 
@@ -1298,7 +1300,8 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 		if (((compiler->delay_slot & DST_INS_MASK) != UNMOVABLE_INS) && !(compiler->delay_slot & ICC_IS_SET))
 			jump->flags |= IS_MOVABLE;
 #if (defined SLJIT_CONFIG_SPARC_32 && SLJIT_CONFIG_SPARC_32)
-		PTR_FAIL_IF(push_inst(compiler, BICC | get_cc(type ^ 1) | 5, UNMOVABLE_INS));
+		if (push_inst(compiler, BICC | get_cc(type ^ 1) | 5, UNMOVABLE_INS))
+			return NULL;
 #else
 #error "Implementation required"
 #endif
@@ -1308,7 +1311,8 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 		if (((compiler->delay_slot & DST_INS_MASK) != UNMOVABLE_INS) && !(compiler->delay_slot & FCC_IS_SET))
 			jump->flags |= IS_MOVABLE;
 #if (defined SLJIT_CONFIG_SPARC_32 && SLJIT_CONFIG_SPARC_32)
-		PTR_FAIL_IF(push_inst(compiler, FBFCC | get_cc(type ^ 1) | 5, UNMOVABLE_INS));
+		if (push_inst(compiler, FBFCC | get_cc(type ^ 1) | 5, UNMOVABLE_INS))
+			return NULL;
 #else
 #error "Implementation required"
 #endif
@@ -1319,10 +1323,13 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 			jump->flags |= IS_CALL;
 	}
 
-	PTR_FAIL_IF(emit_const(compiler, TMP_REG2, 0));
-	PTR_FAIL_IF(push_inst(compiler, JMPL | D(type >= SLJIT_FAST_CALL ? TMP_LINK : 0) | S1(TMP_REG2) | IMM(0), UNMOVABLE_INS));
+	if (emit_const(compiler, TMP_REG2, 0))
+		return NULL;
+	if (push_inst(compiler, JMPL | D(type >= SLJIT_FAST_CALL ? TMP_LINK : 0) | S1(TMP_REG2) | IMM(0), UNMOVABLE_INS))
+		return NULL;
 	jump->addr = compiler->size;
-	PTR_FAIL_IF(push_inst(compiler, NOP, UNMOVABLE_INS));
+	if (push_inst(compiler, NOP, UNMOVABLE_INS))
+		return NULL;
 
 	return jump;
 }
@@ -1417,14 +1424,18 @@ struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, sljit_si d
 	ADJUST_LOCAL_OFFSET(dst, dstw);
 
 	const_ = ensure_abuf(compiler, sizeof(struct sljit_const));
-	PTR_FAIL_IF(!const_);
+	if (!const_)
+		return NULL;
 	set_const(const_, compiler);
 
 	reg = SLOW_IS_REG(dst) ? dst : TMP_REG2;
 
-	PTR_FAIL_IF(emit_const(compiler, reg, init_value));
+	if (emit_const(compiler, reg, init_value))
+		return NULL;
 
-	if (dst & SLJIT_MEM)
-		PTR_FAIL_IF(emit_op_mem(compiler, WORD_DATA, TMP_REG2, dst, dstw));
+	if (dst & SLJIT_MEM) {
+		if (emit_op_mem(compiler, WORD_DATA, TMP_REG2, dst, dstw))
+			return NULL;
+	}
 	return const_;
 }

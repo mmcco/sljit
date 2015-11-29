@@ -2519,18 +2519,22 @@ struct sljit_label* sljit_emit_label(struct sljit_compiler *compiler)
 
 	/* We should restore the flags before the label,
 	   since other taken jumps has their own flags as well. */
-	if (compiler->flags_saved)
-		PTR_FAIL_IF(emit_restore_flags(compiler, 0));
+	if (compiler->flags_saved) {
+		if (emit_restore_flags(compiler, 0))
+			return NULL;
+	}
 
 	if (compiler->last_label && compiler->last_label->size == compiler->size)
 		return compiler->last_label;
 
 	label = ensure_abuf(compiler, sizeof(struct sljit_label));
-	PTR_FAIL_IF(!label);
+	if (!label)
+		return NULL;
 	set_label(label, compiler);
 
 	inst = ensure_buf(compiler, 2);
-	PTR_FAIL_IF(!inst);
+	if (!inst)
+		return NULL;
 
 	*inst++ = 0;
 	*inst++ = 0;
@@ -2547,8 +2551,10 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 	CHECK_PTR(check_sljit_emit_jump(compiler, type));
 
 	if (compiler->flags_saved) {
-		if ((type & 0xff) <= SLJIT_JUMP)
-			PTR_FAIL_IF(emit_restore_flags(compiler, 0));
+		if ((type & 0xff) <= SLJIT_JUMP) {
+			if (emit_restore_flags(compiler, 0))
+				return NULL;
+		}
 		compiler->flags_saved = 0;
 	}
 
@@ -2557,8 +2563,10 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 	set_jump(jump, compiler, type & SLJIT_REWRITABLE_JUMP);
 	type &= 0xff;
 
-	if (type >= SLJIT_CALL1)
-		PTR_FAIL_IF(call_with_args(compiler, type));
+	if (type >= SLJIT_CALL1) {
+		if (call_with_args(compiler, type))
+			return NULL;
+	}
 
 	/* Worst case size. */
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
@@ -2877,7 +2885,8 @@ struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, sljit_si d
 	CHECK_EXTRA_REGS(dst, dstw, (void)0);
 
 	const_ = ensure_abuf(compiler, sizeof(struct sljit_const));
-	PTR_FAIL_IF(!const_);
+	if (!const_)
+		return NULL;
 	set_const(const_, compiler);
 
 #if (defined SLJIT_CONFIG_X86_64 && SLJIT_CONFIG_X86_64)
@@ -2895,7 +2904,8 @@ struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, sljit_si d
 #endif
 
 	inst = ensure_buf(compiler, 2);
-	PTR_FAIL_IF(!inst);
+	if (!inst)
+		return NULL;
 
 	*inst++ = 0;
 	*inst++ = 1;

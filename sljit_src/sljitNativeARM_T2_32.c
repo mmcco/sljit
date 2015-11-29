@@ -1874,7 +1874,8 @@ struct sljit_label* sljit_emit_label(struct sljit_compiler *compiler)
 		return compiler->last_label;
 
 	label = ensure_abuf(compiler, sizeof(struct sljit_label));
-	PTR_FAIL_IF(!label);
+	if (!label)
+		return NULL;
 	set_label(label, compiler);
 	return label;
 }
@@ -1888,25 +1889,29 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 	CHECK_PTR(check_sljit_emit_jump(compiler, type));
 
 	jump = ensure_abuf(compiler, sizeof(struct sljit_jump));
-	PTR_FAIL_IF(!jump);
+	if (!jump)
+		return NULL;
 	set_jump(jump, compiler, type & SLJIT_REWRITABLE_JUMP);
 	type &= 0xff;
 
 	/* In ARM, we don't need to touch the arguments. */
-	PTR_FAIL_IF(emit_imm32_const(compiler, TMP_REG1, 0));
+	if (emit_imm32_const(compiler, TMP_REG1, 0))
+		return NULL;
 	if (type < SLJIT_JUMP) {
 		jump->flags |= IS_COND;
 		cc = get_cc(type);
 		jump->flags |= cc << 8;
-		PTR_FAIL_IF(push_inst16(compiler, IT | (cc << 4) | 0x8));
+		if (push_inst16(compiler, IT | (cc << 4) | 0x8))
+			return NULL;
 	}
 
 	jump->addr = compiler->size;
-	if (type <= SLJIT_JUMP)
-		PTR_FAIL_IF(push_inst16(compiler, BX | RN3(TMP_REG1)));
+	if (type <= SLJIT_JUMP && push_inst16(compiler, BX | RN3(TMP_REG1)))
+			return NULL;
 	else {
 		jump->flags |= IS_BL;
-		PTR_FAIL_IF(push_inst16(compiler, BLX | RN3(TMP_REG1)));
+		if (push_inst16(compiler, BLX | RN3(TMP_REG1)))
+			return NULL;
 	}
 
 	return jump;
@@ -2032,14 +2037,18 @@ struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, sljit_si d
 	ADJUST_LOCAL_OFFSET(dst, dstw);
 
 	const_ = ensure_abuf(compiler, sizeof(struct sljit_const));
-	PTR_FAIL_IF(!const_);
+	if (!const_)
+		return NULL;
 	set_const(const_, compiler);
 
 	dst_r = SLOW_IS_REG(dst) ? dst : TMP_REG1;
-	PTR_FAIL_IF(emit_imm32_const(compiler, dst_r, init_value));
+	if (emit_imm32_const(compiler, dst_r, init_value))
+		return NULL;
 
-	if (dst & SLJIT_MEM)
-		PTR_FAIL_IF(emit_op_mem(compiler, WORD_SIZE | STORE, dst_r, dst, dstw));
+	if (dst & SLJIT_MEM &&
+	    emit_op_mem(compiler, WORD_SIZE | STORE, dst_r, dst, dstw)) {
+			return NULL;
+	}
 	return const_;
 }
 

@@ -457,7 +457,8 @@ static sljit_ub* emit_x86_instruction(struct sljit_compiler *compiler, sljit_si 
 		inst_size++;
 
 	inst = ensure_buf(compiler, 1 + inst_size);
-	PTR_FAIL_IF(!inst);
+	if (!inst)
+		return NULL;
 
 	/* Encoding the byte. */
 	INC_SIZE(inst_size);

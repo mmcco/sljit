@@ -46,12 +46,6 @@
 			return compiler->error; \
 	} while (0)
 
-#define PTR_FAIL_IF(expr) \
-	do { \
-		if (expr) \
-			return NULL; \
-	} while (0)
-
 #define FAIL_IF_NULL(ptr) \
 	do { \
 		if (!(ptr)) { \
@@ -1633,8 +1627,9 @@ struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, sljit_si type
 		|| (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	compiler->skip_checks = 1;
 #endif
-	PTR_FAIL_IF(sljit_emit_op2(compiler, SLJIT_SUB | flags | (type & SLJIT_INT_OP),
-		SLJIT_UNUSED, 0, src1, src1w, src2, src2w));
+	if (sljit_emit_op2(compiler, SLJIT_SUB | flags | (type & SLJIT_INT_OP),
+	    SLJIT_UNUSED, 0, src1, src1w, src2, src2w))
+		return NULL;
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE) \
 		|| (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	compiler->skip_checks = 1;
