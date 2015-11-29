@@ -10049,8 +10049,8 @@ get_tilegx_spr_name (int num)
   struct tilegx_spr key;
 
   key.number = num;
-  result = bsearch((const void *) &key, (const void *) tilegx_sprs,
-                   tilegx_num_sprs, sizeof (struct tilegx_spr),
+  result = bsearch(&key, tilegx_sprs,
+                   tilegx_num_sprs, sizeof(struct tilegx_spr),
                    tilegx_spr_compare);
 
   if (result == NULL)
@@ -10073,7 +10073,7 @@ print_insn_tilegx (unsigned char * memaddr)
   int i, num_instructions, num_printed;
   tilegx_mnemonic padding_mnemonic;
 
-  memcpy((void *)opbuf, (void *)memaddr, TILEGX_BUNDLE_SIZE_IN_BYTES);
+  memcpy(opbuf, memaddr, TILEGX_BUNDLE_SIZE_IN_BYTES);
 
   /* Parse the instructions in the bundle. */
   num_instructions =
