@@ -31,7 +31,7 @@ SLJIT_CONST char* sljit_get_platform_name(void)
 
 /* Length of an instruction word
    Both for sparc-32 and sparc-64 */
-typedef sljit_ui sljit_ins;
+typedef unsigned int sljit_ins;
 
 static void sparc_cache_flush(sljit_ins *from, sljit_ins *to)
 {

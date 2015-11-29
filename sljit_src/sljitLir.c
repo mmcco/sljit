@@ -331,7 +331,7 @@ struct sljit_compiler* sljit_create_compiler(void)
 	SLJIT_COMPILE_ASSERT(
 		sizeof(sljit_sb) == 1 && sizeof(sljit_ub) == 1
 		&& sizeof(sljit_sh) == 2 && sizeof(sljit_uh) == 2
-		&& sizeof(sljit_si) == 4 && sizeof(sljit_ui) == 4
+		&& sizeof(sljit_si) == 4 && sizeof(unsigned int) == 4
 		&& (sizeof(sljit_p) == 4 || sizeof(sljit_p) == 8)
 		&& sizeof(sljit_p) <= sizeof(sljit_sw)
 		&& (sizeof(sljit_sw) == 4 || sizeof(sljit_sw) == 8)

@@ -31,7 +31,7 @@ SLJIT_CONST char* sljit_get_platform_name(void)
 
 /* Length of an instruction word.
    Both for ppc-32 and ppc-64. */
-typedef sljit_ui sljit_ins;
+typedef unsigned int sljit_ins;
 
 #if ((defined SLJIT_CONFIG_PPC_32 && SLJIT_CONFIG_PPC_32) && (defined _AIX)) \
 	|| (defined SLJIT_CONFIG_PPC_64 && SLJIT_CONFIG_PPC_64)
@@ -1349,7 +1349,7 @@ sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 
 #if (defined SLJIT_CONFIG_PPC_64 && SLJIT_CONFIG_PPC_64)
 	case SLJIT_MOV_UI:
-		return EMIT_MOV(SLJIT_MOV_UI, INT_DATA, (sljit_ui));
+		return EMIT_MOV(SLJIT_MOV_UI, INT_DATA, (unsigned int));
 
 	case SLJIT_MOV_SI:
 		return EMIT_MOV(SLJIT_MOV_SI, INT_DATA | SIGNED_DATA, (sljit_si));
@@ -1377,7 +1377,7 @@ sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 
 #if (defined SLJIT_CONFIG_PPC_64 && SLJIT_CONFIG_PPC_64)
 	case SLJIT_MOVU_UI:
-		return EMIT_MOV(SLJIT_MOV_UI, INT_DATA | WRITE_BACK, (sljit_ui));
+		return EMIT_MOV(SLJIT_MOV_UI, INT_DATA | WRITE_BACK, (unsigned int));
 
 	case SLJIT_MOVU_SI:
 		return EMIT_MOV(SLJIT_MOV_SI, INT_DATA | SIGNED_DATA | WRITE_BACK, (sljit_si));

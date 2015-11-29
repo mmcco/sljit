@@ -33,7 +33,6 @@
    Types:
      sljit_sb, sljit_ub : signed and unsigned 8 bit byte
      sljit_sh, sljit_uh : signed and unsigned 16 bit half-word (short) type
-     sljit_si, sljit_ui : signed and unsigned 32 bit integer type
      sljit_sw, sljit_uw : signed and unsigned machine word, enough to store a pointer
      sljit_p : unsgined pointer value (usually the same as sljit_uw, but
                some 64 bit ABIs may use 32 bit pointers)
@@ -272,7 +271,6 @@ typedef unsigned short int sljit_uh;
 typedef signed short int sljit_sh;
 
 /* 32 bit integer type. */
-typedef unsigned int sljit_ui;
 typedef signed int sljit_si;
 
 /* Machine word type. Enough for storing a pointer.

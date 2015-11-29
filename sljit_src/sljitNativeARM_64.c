@@ -30,7 +30,7 @@ SLJIT_CONST char* sljit_get_platform_name(void)
 }
 
 /* Length of an instruction word */
-typedef sljit_ui sljit_ins;
+typedef unsigned int sljit_ins;
 
 #define TMP_ZERO	(0)
 
@@ -827,7 +827,7 @@ static sljit_si emit_set_delta(struct sljit_compiler *compiler, sljit_si dst, sl
 /* Can perform an operation using at most 1 instruction. */
 static sljit_si getput_arg_fast(struct sljit_compiler *compiler, sljit_si flags, sljit_si reg, sljit_si arg, sljit_sw argw)
 {
-	sljit_ui shift = MEM_SIZE_SHIFT(flags);
+	unsigned int shift = MEM_SIZE_SHIFT(flags);
 
 	SLJIT_ASSERT(arg & SLJIT_MEM);
 
@@ -909,7 +909,7 @@ static sljit_si can_cache(sljit_si arg, sljit_sw argw, sljit_si next_arg, sljit_
 static sljit_si getput_arg(struct sljit_compiler *compiler, sljit_si flags, sljit_si reg,
 	sljit_si arg, sljit_sw argw, sljit_si next_arg, sljit_sw next_argw)
 {
-	sljit_ui shift = MEM_SIZE_SHIFT(flags);
+	unsigned int shift = MEM_SIZE_SHIFT(flags);
 	sljit_si tmp_r, other_r;
 	sljit_sw diff;
 
@@ -1291,7 +1291,7 @@ sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 		case SLJIT_MOV_UI:
 			flags = INT_SIZE;
 			if (src & SLJIT_IMM)
-				srcw = (sljit_ui)srcw;
+				srcw = (unsigned int)srcw;
 			break;
 		case SLJIT_MOV_SI:
 			flags = INT_SIZE | SIGNED;
@@ -1325,7 +1325,7 @@ sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 		case SLJIT_MOVU_UI:
 			flags = INT_SIZE | UPDATE;
 			if (src & SLJIT_IMM)
-				srcw = (sljit_ui)srcw;
+				srcw = (unsigned int)srcw;
 			break;
 		case SLJIT_MOVU_SI:
 			flags = INT_SIZE | SIGNED | UPDATE;
@@ -1518,7 +1518,7 @@ sljit_si sljit_is_fpu_available(void)
 
 static sljit_si emit_fop_mem(struct sljit_compiler *compiler, sljit_si flags, sljit_si reg, sljit_si arg, sljit_sw argw)
 {
-	sljit_ui shift = MEM_SIZE_SHIFT(flags);
+	unsigned int shift = MEM_SIZE_SHIFT(flags);
 	sljit_ins ins_bits = (shift << 30);
 	sljit_si other_r;
 	sljit_sw diff;

@@ -30,7 +30,7 @@ SLJIT_CONST char* sljit_get_platform_name(void)
 }
 
 /* Length of an instruction word. */
-typedef sljit_ui sljit_ins;
+typedef unsigned int sljit_ins;
 
 /* Last register + 1. */
 #define TMP_REG1	(SLJIT_NUMBER_OF_REGISTERS + 2)

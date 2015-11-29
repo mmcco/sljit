@@ -279,13 +279,13 @@ static sljit_si cpu_has_cmov = -1;
 
 static void get_cpu_features(void)
 {
-	sljit_ui features;
+	unsigned int features;
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
 
 	int CPUInfo[4];
 	__cpuid(CPUInfo, 1);
-	features = (sljit_ui)CPUInfo[3];
+	features = (unsigned int)CPUInfo[3];
 
 #elif defined(__GNUC__) || defined(__INTEL_COMPILER) || defined(__SUNPRO_C)
 
@@ -1314,7 +1314,7 @@ sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 				break;
 #if (defined SLJIT_CONFIG_X86_64 && SLJIT_CONFIG_X86_64)
 			case SLJIT_MOV_UI:
-				srcw = (sljit_ui)srcw;
+				srcw = (unsigned int)srcw;
 				break;
 			case SLJIT_MOV_SI:
 				srcw = (sljit_si)srcw;

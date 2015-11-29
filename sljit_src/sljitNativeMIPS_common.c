@@ -42,7 +42,7 @@ SLJIT_CONST char* sljit_get_platform_name(void)
 
 /* Length of an instruction word
    Both for mips-32 and mips-64 */
-typedef sljit_ui sljit_ins;
+typedef unsigned int sljit_ins;
 
 #define TMP_REG1	(SLJIT_NUMBER_OF_REGISTERS + 2)
 #define TMP_REG2	(SLJIT_NUMBER_OF_REGISTERS + 3)
@@ -1108,7 +1108,7 @@ sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 #if (defined SLJIT_CONFIG_MIPS_32 && SLJIT_CONFIG_MIPS_32)
 		return emit_op(compiler, SLJIT_MOV_UI, INT_DATA, dst, dstw, TMP_REG1, 0, src, srcw);
 #else
-		return emit_op(compiler, SLJIT_MOV_UI, INT_DATA, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (sljit_ui)srcw : srcw);
+		return emit_op(compiler, SLJIT_MOV_UI, INT_DATA, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (unsigned int)srcw : srcw);
 #endif
 
 	case SLJIT_MOV_SI:
@@ -1138,7 +1138,7 @@ sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 #if (defined SLJIT_CONFIG_MIPS_32 && SLJIT_CONFIG_MIPS_32)
 		return emit_op(compiler, SLJIT_MOV_UI, INT_DATA | WRITE_BACK, dst, dstw, TMP_REG1, 0, src, srcw);
 #else
-		return emit_op(compiler, SLJIT_MOV_UI, INT_DATA | WRITE_BACK, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (sljit_ui)srcw : srcw);
+		return emit_op(compiler, SLJIT_MOV_UI, INT_DATA | WRITE_BACK, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (unsigned int)srcw : srcw);
 #endif
 
 	case SLJIT_MOVU_SI:
