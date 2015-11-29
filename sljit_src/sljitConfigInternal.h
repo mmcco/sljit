@@ -31,7 +31,6 @@
    SLJIT defines the following architecture dependent types and macros:
 
    Types:
-     sljit_sb, sljit_ub : signed and unsigned 8 bit byte
      sljit_sh, sljit_uh : signed and unsigned 16 bit half-word (short) type
      sljit_sw, sljit_uw : signed and unsigned machine word, enough to store a pointer
      sljit_p : unsgined pointer value (usually the same as sljit_uw, but
@@ -262,13 +261,11 @@
  * Used to maintain sanity/brevity. Admittedly a BSDism.
  */
 typedef unsigned char	u_char;
+typedef signed char	s_char;
 
 /******************************************************/
 /* Byte/half/int/word/single/double type definitions. */
 /******************************************************/
-
-/* 8 bit byte type. */
-typedef signed char sljit_sb;
 
 /* 16 bit half-word type. */
 typedef unsigned short int sljit_uh;

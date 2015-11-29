@@ -329,7 +329,7 @@ struct sljit_compiler* sljit_create_compiler(void)
 	memset(compiler, 0, sizeof(struct sljit_compiler));
 
 	SLJIT_COMPILE_ASSERT(
-		sizeof(sljit_sb) == 1 && sizeof(u_char) == 1
+		sizeof(s_char) == 1 && sizeof(u_char) == 1
 		&& sizeof(sljit_sh) == 2 && sizeof(sljit_uh) == 2
 		&& sizeof(int) == 4 && sizeof(unsigned int) == 4
 		&& (sizeof(sljit_p) == 4 || sizeof(sljit_p) == 8)

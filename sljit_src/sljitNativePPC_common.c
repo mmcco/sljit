@@ -1359,7 +1359,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 		return EMIT_MOV(SLJIT_MOV_UB, BYTE_DATA, (u_char));
 
 	case SLJIT_MOV_SB:
-		return EMIT_MOV(SLJIT_MOV_SB, BYTE_DATA | SIGNED_DATA, (sljit_sb));
+		return EMIT_MOV(SLJIT_MOV_SB, BYTE_DATA | SIGNED_DATA, (s_char));
 
 	case SLJIT_MOV_UH:
 		return EMIT_MOV(SLJIT_MOV_UH, HALF_DATA, (sljit_uh));
@@ -1387,7 +1387,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 		return EMIT_MOV(SLJIT_MOV_UB, BYTE_DATA | WRITE_BACK, (u_char));
 
 	case SLJIT_MOVU_SB:
-		return EMIT_MOV(SLJIT_MOV_SB, BYTE_DATA | SIGNED_DATA | WRITE_BACK, (sljit_sb));
+		return EMIT_MOV(SLJIT_MOV_SB, BYTE_DATA | SIGNED_DATA | WRITE_BACK, (s_char));
 
 	case SLJIT_MOVU_UH:
 		return EMIT_MOV(SLJIT_MOV_UH, HALF_DATA | WRITE_BACK, (sljit_uh));

@@ -430,7 +430,7 @@ static u_char* generate_near_jump_code(struct sljit_jump *jump, u_char *code_ptr
 
 	if (short_jump) {
 		jump->flags |= PATCH_MB;
-		code_ptr += sizeof(sljit_sb);
+		code_ptr += sizeof(s_char);
 	} else {
 		jump->flags |= PATCH_MW;
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
@@ -524,8 +524,8 @@ void* sljit_generate_code(struct sljit_compiler *compiler)
 	jump = compiler->jumps;
 	while (jump) {
 		if (jump->flags & PATCH_MB) {
-			SLJIT_ASSERT((sljit_sw)(jump->u.label->addr - (jump->addr + sizeof(sljit_sb))) >= -128 && (sljit_sw)(jump->u.label->addr - (jump->addr + sizeof(sljit_sb))) <= 127);
-			*(u_char*)jump->addr = (u_char)(jump->u.label->addr - (jump->addr + sizeof(sljit_sb)));
+			SLJIT_ASSERT((sljit_sw)(jump->u.label->addr - (jump->addr + sizeof(s_char))) >= -128 && (sljit_sw)(jump->u.label->addr - (jump->addr + sizeof(s_char))) <= 127);
+			*(u_char*)jump->addr = (u_char)(jump->u.label->addr - (jump->addr + sizeof(s_char)));
 		} else if (jump->flags & PATCH_MW) {
 			if (jump->flags & JUMP_LABEL) {
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
@@ -621,7 +621,7 @@ static SLJIT_INLINE int emit_restore_flags(struct sljit_compiler *compiler, int 
 	*inst++ = LEA_r_m; /* lea esp/rsp, [esp/rsp - sizeof(sljit_sw)] */
 	*inst++ = 0x64;
 	*inst++ = 0x24;
-	*inst++ = (u_char)-(sljit_sb)sizeof(sljit_sw);
+	*inst++ = (u_char)-(s_char)sizeof(sljit_sw);
 	compiler->flags_saved = keep_flags;
 	return SLJIT_SUCCESS;
 }
@@ -1304,7 +1304,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 				srcw = (u_char)srcw;
 				break;
 			case SLJIT_MOV_SB:
-				srcw = (sljit_sb)srcw;
+				srcw = (s_char)srcw;
 				break;
 			case SLJIT_MOV_UH:
 				srcw = (sljit_uh)srcw;
@@ -1678,7 +1678,7 @@ static int emit_mul(struct sljit_compiler *compiler,
 			inst = ensure_buf(compiler, 1 + 1);
 			FAIL_IF(!inst);
 			INC_SIZE(1);
-			*inst = (sljit_sb)src1w;
+			*inst = (s_char)src1w;
 		}
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 		else {
@@ -1721,7 +1721,7 @@ static int emit_mul(struct sljit_compiler *compiler,
 			inst = ensure_buf(compiler, 1 + 1);
 			FAIL_IF(!inst);
 			INC_SIZE(1);
-			*inst = (sljit_sb)src2w;
+			*inst = (s_char)src2w;
 		}
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 		else {

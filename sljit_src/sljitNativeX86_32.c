@@ -310,7 +310,7 @@ static u_char* emit_x86_instruction(struct sljit_compiler *compiler, int size,
 		else if (immb != 0 && !(b & OFFS_REG_MASK)) {
 			/* Immediate operand. */
 			if (immb <= 127 && immb >= -128)
-				inst_size += sizeof(sljit_sb);
+				inst_size += sizeof(s_char);
 			else
 				inst_size += sizeof(sljit_sw);
 		}

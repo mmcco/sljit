@@ -408,12 +408,12 @@ static u_char* emit_x86_instruction(struct sljit_compiler *compiler, int size,
 			if (immb != 0 && (!(b & OFFS_REG_MASK) || (b & OFFS_REG_MASK) == TO_OFFS_REG(SLJIT_SP))) {
 				/* Immediate operand. */
 				if (immb <= 127 && immb >= -128)
-					inst_size += sizeof(sljit_sb);
+					inst_size += sizeof(s_char);
 				else
 					inst_size += sizeof(int);
 			}
 			else if (reg_lmap[b & REG_MASK] == 5)
-				inst_size += sizeof(sljit_sb);
+				inst_size += sizeof(s_char);
 
 			if ((b & OFFS_REG_MASK) != SLJIT_UNUSED) {
 				inst_size += 1; /* SIB byte. */
