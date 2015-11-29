@@ -327,7 +327,7 @@ static void init_compiler(void);
 
 struct sljit_compiler* sljit_create_compiler(void)
 {
-	struct sljit_compiler *compiler = (struct sljit_compiler*)malloc(sizeof(struct sljit_compiler));
+	struct sljit_compiler *compiler = malloc(sizeof(struct sljit_compiler));
 	if (!compiler)
 		return NULL;
 	SLJIT_ZEROMEM(compiler, sizeof(struct sljit_compiler));
@@ -349,8 +349,8 @@ struct sljit_compiler* sljit_create_compiler(void)
 	/* Only the non-zero members must be set. */
 	compiler->error = SLJIT_SUCCESS;
 
-	compiler->buf = (struct sljit_memory_fragment*)malloc(BUF_SIZE);
-	compiler->abuf = (struct sljit_memory_fragment*)malloc(ABUF_SIZE);
+	compiler->buf = malloc(BUF_SIZE);
+	compiler->abuf = malloc(ABUF_SIZE);
 
 	if (!compiler->buf || !compiler->abuf) {
 		if (compiler->buf)
@@ -377,7 +377,7 @@ struct sljit_compiler* sljit_create_compiler(void)
 #endif
 
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5)
-	compiler->cpool = (sljit_uw*)malloc(CPOOL_SIZE * sizeof(sljit_uw) + CPOOL_SIZE * sizeof(sljit_ub));
+	compiler->cpool = malloc(CPOOL_SIZE * sizeof(sljit_uw) + CPOOL_SIZE * sizeof(sljit_ub));
 	if (!compiler->cpool) {
 		free(compiler->buf);
 		free(compiler->abuf);
@@ -484,7 +484,7 @@ static void* ensure_buf(struct sljit_compiler *compiler, sljit_uw size)
 		compiler->buf->used_size += size;
 		return ret;
 	}
-	new_frag = (struct sljit_memory_fragment*)malloc(BUF_SIZE);
+	new_frag = malloc(BUF_SIZE);
 	PTR_FAIL_IF_NULL(new_frag);
 	new_frag->next = compiler->buf;
 	compiler->buf = new_frag;
@@ -503,7 +503,7 @@ static void* ensure_abuf(struct sljit_compiler *compiler, sljit_uw size)
 		compiler->abuf->used_size += size;
 		return ret;
 	}
-	new_frag = (struct sljit_memory_fragment*)malloc(ABUF_SIZE);
+	new_frag = malloc(ABUF_SIZE);
 	PTR_FAIL_IF_NULL(new_frag);
 	new_frag->next = compiler->abuf;
 	compiler->abuf = new_frag;

@@ -233,7 +233,7 @@ static int stack_push(struct stack *stack, int type, int value)
 		if (stack->index >= STACK_FRAGMENT_SIZE) {
 			stack->index = 0;
 			if (!stack->last->data.next) {
-				stack->last->data.next = (struct stack_fragment*)malloc(sizeof(struct stack_fragment));
+				stack->last->data.next = malloc(sizeof(struct stack_fragment));
 				if (!stack->last->data.next)
 					return 1;
 				stack->last->data.next->data.next = NULL;
@@ -243,7 +243,7 @@ static int stack_push(struct stack *stack, int type, int value)
 		}
 	}
 	else if (!stack->first) {
-		stack->last = (struct stack_fragment*)malloc(sizeof(struct stack_fragment));
+		stack->last = malloc(sizeof(struct stack_fragment));
 		if (!stack->last)
 			return 1;
 		stack->last->data.prev = NULL;
@@ -306,7 +306,7 @@ static int stack_push_copy(struct stack *stack, int items, int length)
 			counter -= STACK_FRAGMENT_SIZE - stack->index - 1 + 1;
 			stack->index = 0;
 			if (!stack->last->data.next) {
-				stack->last->data.next = (struct stack_fragment*)malloc(sizeof(struct stack_fragment));
+				stack->last->data.next = malloc(sizeof(struct stack_fragment));
 				if (!stack->last->data.next)
 					return 1;
 				stack->last->data.next->data.next = NULL;
@@ -1905,14 +1905,14 @@ struct regex_machine* regex_compile(const regex_char_t *regex_string, int length
 
 	BEGIN_GUARD
 
-	compiler_common.machine = (struct regex_machine*)malloc(sizeof(struct regex_machine) + (compiler_common.terms_size - 1) * sizeof(sljit_uw));
+	compiler_common.machine = malloc(sizeof(struct regex_machine) + (compiler_common.terms_size - 1) * sizeof(sljit_uw));
 	CHECK(!compiler_common.machine);
 
 	compiler_common.compiler = sljit_create_compiler();
 	CHECK(!compiler_common.compiler);
 
 	if (compiler_common.longest_range_size > 0) {
-		compiler_common.range_jump_list = (struct sljit_jump**)malloc(sizeof(struct sljit_jump*) * compiler_common.longest_range_size);
+		compiler_common.range_jump_list = malloc(sizeof(struct sljit_jump*) * compiler_common.longest_range_size);
 		CHECK(!compiler_common.range_jump_list);
 	}
 
@@ -2330,7 +2330,7 @@ struct regex_match* regex_begin_match(struct regex_machine *machine)
 	sljit_sw *end;
 	sljit_sw *entry_addrs;
 
-	struct regex_match *match = (struct regex_match*)malloc(sizeof(struct regex_match) + (machine->size * 2 - 1) * sizeof(sljit_sw));
+	struct regex_match *match = malloc(sizeof(struct regex_match) + (machine->size * 2 - 1) * sizeof(sljit_sw));
 	if (!match)
 		return NULL;
 

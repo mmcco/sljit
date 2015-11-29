@@ -347,7 +347,7 @@ static SLJIT_INLINE sljit_si resolve_const_pool_index(struct future_patch **firs
 
 	if (value >= 0) {
 		if ((sljit_uw)value > cpool_current_index) {
-			curr_patch = (struct future_patch*)malloc(sizeof(struct future_patch));
+			curr_patch = malloc(sizeof(struct future_patch));
 			if (!curr_patch) {
 				while (*first_patch) {
 					curr_patch = *first_patch;
