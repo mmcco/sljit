@@ -476,7 +476,7 @@ void* sljit_generate_code(struct sljit_compiler *compiler)
 			len = *buf_ptr++;
 			if (len > 0) {
 				/* The code is already generated. */
-				SLJIT_MEMMOVE(code_ptr, buf_ptr, len);
+				memmove(code_ptr, buf_ptr, len);
 				code_ptr += len;
 				buf_ptr += len;
 			}
@@ -2235,7 +2235,7 @@ sljit_si sljit_emit_op_custom(struct sljit_compiler *compiler,
 	inst = (sljit_ub*)ensure_buf(compiler, 1 + size);
 	FAIL_IF(!inst);
 	INC_SIZE(size);
-	SLJIT_MEMMOVE(inst, instruction, size);
+	memmove(inst, instruction, size);
 	return SLJIT_SUCCESS;
 }
 
