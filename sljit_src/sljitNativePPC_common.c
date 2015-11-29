@@ -238,7 +238,7 @@ void sljit_set_function_context(void** func_ptr, struct sljit_function_context* 
 
 static sljit_si push_inst(struct sljit_compiler *compiler, sljit_ins ins)
 {
-	sljit_ins *ptr = (sljit_ins*)ensure_buf(compiler, sizeof(sljit_ins));
+	sljit_ins *ptr = ensure_buf(compiler, sizeof(sljit_ins));
 	FAIL_IF(!ptr);
 	*ptr = ins;
 	compiler->size++;

@@ -139,13 +139,13 @@ static sljit_si push_cpool(struct sljit_compiler *compiler)
 		compiler->last_label->size += compiler->cpool_fill + (CONST_POOL_ALIGNMENT - 1) + 1;
 
 	SLJIT_ASSERT(compiler->cpool_fill > 0 && compiler->cpool_fill <= CPOOL_SIZE);
-	inst = (sljit_uw*)ensure_buf(compiler, sizeof(sljit_uw));
+	inst = ensure_buf(compiler, sizeof(sljit_uw));
 	FAIL_IF(!inst);
 	compiler->size++;
 	*inst = 0xff000000 | compiler->cpool_fill;
 
 	for (i = 0; i < CONST_POOL_ALIGNMENT - 1; i++) {
-		inst = (sljit_uw*)ensure_buf(compiler, sizeof(sljit_uw));
+		inst = ensure_buf(compiler, sizeof(sljit_uw));
 		FAIL_IF(!inst);
 		compiler->size++;
 		*inst = 0;
@@ -154,7 +154,7 @@ static sljit_si push_cpool(struct sljit_compiler *compiler)
 	cpool_ptr = compiler->cpool;
 	cpool_end = cpool_ptr + compiler->cpool_fill;
 	while (cpool_ptr < cpool_end) {
-		inst = (sljit_uw*)ensure_buf(compiler, sizeof(sljit_uw));
+		inst = ensure_buf(compiler, sizeof(sljit_uw));
 		FAIL_IF(!inst);
 		compiler->size++;
 		*inst = *cpool_ptr++;
@@ -171,7 +171,7 @@ static sljit_si push_inst(struct sljit_compiler *compiler, sljit_uw inst)
 	if (compiler->cpool_diff != CONST_POOL_EMPTY && compiler->size - compiler->cpool_diff >= MAX_DIFFERENCE(4092))
 		FAIL_IF(push_cpool(compiler));
 
-	ptr = (sljit_uw*)ensure_buf(compiler, sizeof(sljit_uw));
+	ptr = ensure_buf(compiler, sizeof(sljit_uw));
 	FAIL_IF(!ptr);
 	compiler->size++;
 	*ptr = inst;
@@ -216,7 +216,7 @@ static sljit_si push_inst_with_literal(struct sljit_compiler *compiler, sljit_uw
 	}
 
 	SLJIT_ASSERT((inst & 0xfff) == 0);
-	ptr = (sljit_uw*)ensure_buf(compiler, sizeof(sljit_uw));
+	ptr = ensure_buf(compiler, sizeof(sljit_uw));
 	FAIL_IF(!ptr);
 	compiler->size++;
 	*ptr = inst | cpool_index;
@@ -235,7 +235,7 @@ static sljit_si push_inst_with_unique_literal(struct sljit_compiler *compiler, s
 		FAIL_IF(push_cpool(compiler));
 
 	SLJIT_ASSERT(compiler->cpool_fill < CPOOL_SIZE && (inst & 0xfff) == 0);
-	ptr = (sljit_uw*)ensure_buf(compiler, sizeof(sljit_uw));
+	ptr = ensure_buf(compiler, sizeof(sljit_uw));
 	FAIL_IF(!ptr);
 	compiler->size++;
 	*ptr = inst | compiler->cpool_fill;
@@ -372,7 +372,7 @@ static sljit_si push_inst(struct sljit_compiler *compiler, sljit_uw inst)
 {
 	sljit_uw* ptr;
 
-	ptr = (sljit_uw*)ensure_buf(compiler, sizeof(sljit_uw));
+	ptr = ensure_buf(compiler, sizeof(sljit_uw));
 	FAIL_IF(!ptr);
 	compiler->size++;
 	*ptr = inst;

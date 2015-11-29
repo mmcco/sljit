@@ -334,7 +334,7 @@ static SLJIT_CONST tilegx_mnemonic data_transfer_insts[16] = {
 #ifdef TILEGX_JIT_DEBUG
 static sljit_si push_inst_debug(struct sljit_compiler *compiler, sljit_ins ins, int line)
 {
-	sljit_ins *ptr = (sljit_ins *)ensure_buf(compiler, sizeof(sljit_ins));
+	sljit_ins *ptr = ensure_buf(compiler, sizeof(sljit_ins));
 	FAIL_IF(!ptr);
 	*ptr = ins;
 	compiler->size++;
@@ -345,7 +345,7 @@ static sljit_si push_inst_debug(struct sljit_compiler *compiler, sljit_ins ins, 
 
 static sljit_si push_inst_nodebug(struct sljit_compiler *compiler, sljit_ins ins)
 {
-	sljit_ins *ptr = (sljit_ins *)ensure_buf(compiler, sizeof(sljit_ins));
+	sljit_ins *ptr = ensure_buf(compiler, sizeof(sljit_ins));
 	FAIL_IF(!ptr);
 	*ptr = ins;
 	compiler->size++;
@@ -356,7 +356,7 @@ static sljit_si push_inst_nodebug(struct sljit_compiler *compiler, sljit_ins ins
 #else
 static sljit_si push_inst(struct sljit_compiler *compiler, sljit_ins ins)
 {
-	sljit_ins *ptr = (sljit_ins *)ensure_buf(compiler, sizeof(sljit_ins));
+	sljit_ins *ptr = ensure_buf(compiler, sizeof(sljit_ins));
 	FAIL_IF(!ptr);
 	*ptr = ins;
 	compiler->size++;

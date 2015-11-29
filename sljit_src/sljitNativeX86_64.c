@@ -30,7 +30,7 @@ static sljit_si emit_load_imm64(struct sljit_compiler *compiler, sljit_si reg, s
 {
 	sljit_ub *inst;
 
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + 2 + sizeof(sljit_sw));
+	inst = ensure_buf(compiler, 1 + 2 + sizeof(sljit_sw));
 	FAIL_IF(!inst);
 	INC_SIZE(2 + sizeof(sljit_sw));
 	*inst++ = REX_W | ((reg_map[reg] <= 7) ? 0 : REX_B);
@@ -106,7 +106,7 @@ sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
 	tmp = saveds < SLJIT_NUMBER_OF_SAVED_REGISTERS ? (SLJIT_S0 + 1 - saveds) : SLJIT_FIRST_SAVED_REG;
 	for (i = SLJIT_S0; i >= tmp; i--) {
 		size = reg_map[i] >= 8 ? 2 : 1;
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + size);
+		inst = ensure_buf(compiler, 1 + size);
 		FAIL_IF(!inst);
 		INC_SIZE(size);
 		if (reg_map[i] >= 8)
@@ -116,7 +116,7 @@ sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
 
 	for (i = scratches; i >= SLJIT_FIRST_SAVED_REG; i--) {
 		size = reg_map[i] >= 8 ? 2 : 1;
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + size);
+		inst = ensure_buf(compiler, 1 + size);
 		FAIL_IF(!inst);
 		INC_SIZE(size);
 		if (reg_map[i] >= 8)
@@ -126,7 +126,7 @@ sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
 
 	if (args > 0) {
 		size = args * 3;
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + size);
+		inst = ensure_buf(compiler, 1 + size);
 		FAIL_IF(!inst);
 
 		INC_SIZE(size);
@@ -172,7 +172,7 @@ sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
 #ifdef _WIN64
 	if (local_size > 1024) {
 		/* Allocate stack for the callback, which grows the stack. */
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 4 + (3 + sizeof(sljit_si)));
+		inst = ensure_buf(compiler, 1 + 4 + (3 + sizeof(sljit_si)));
 		FAIL_IF(!inst);
 		INC_SIZE(4 + (3 + sizeof(sljit_si)));
 		*inst++ = REX_W;
@@ -204,7 +204,7 @@ sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
 
 	SLJIT_ASSERT(local_size > 0);
 	if (local_size <= 127) {
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 4);
+		inst = ensure_buf(compiler, 1 + 4);
 		FAIL_IF(!inst);
 		INC_SIZE(4);
 		*inst++ = REX_W;
@@ -213,7 +213,7 @@ sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
 		*inst++ = local_size;
 	}
 	else {
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 7);
+		inst = ensure_buf(compiler, 1 + 7);
 		FAIL_IF(!inst);
 		INC_SIZE(7);
 		*inst++ = REX_W;
@@ -226,7 +226,7 @@ sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
 #ifdef _WIN64
 	/* Save xmm6 register: movaps [rsp + 0x20], xmm6 */
 	if (fscratches >= 6 || fsaveds >= 1) {
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 5);
+		inst = ensure_buf(compiler, 1 + 5);
 		FAIL_IF(!inst);
 		INC_SIZE(5);
 		*inst++ = GROUP_0F;
@@ -267,7 +267,7 @@ sljit_si sljit_emit_return(struct sljit_compiler *compiler, sljit_si op, sljit_s
 #ifdef _WIN64
 	/* Restore xmm6 register: movaps xmm6, [rsp + 0x20] */
 	if (compiler->fscratches >= 6 || compiler->fsaveds >= 1) {
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 5);
+		inst = ensure_buf(compiler, 1 + 5);
 		FAIL_IF(!inst);
 		INC_SIZE(5);
 		*inst++ = GROUP_0F;
@@ -277,7 +277,7 @@ sljit_si sljit_emit_return(struct sljit_compiler *compiler, sljit_si op, sljit_s
 
 	SLJIT_ASSERT(compiler->local_size > 0);
 	if (compiler->local_size <= 127) {
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 4);
+		inst = ensure_buf(compiler, 1 + 4);
 		FAIL_IF(!inst);
 		INC_SIZE(4);
 		*inst++ = REX_W;
@@ -286,7 +286,7 @@ sljit_si sljit_emit_return(struct sljit_compiler *compiler, sljit_si op, sljit_s
 		*inst = compiler->local_size;
 	}
 	else {
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 7);
+		inst = ensure_buf(compiler, 1 + 7);
 		FAIL_IF(!inst);
 		INC_SIZE(7);
 		*inst++ = REX_W;
@@ -298,7 +298,7 @@ sljit_si sljit_emit_return(struct sljit_compiler *compiler, sljit_si op, sljit_s
 	tmp = compiler->scratches;
 	for (i = SLJIT_FIRST_SAVED_REG; i <= tmp; i++) {
 		size = reg_map[i] >= 8 ? 2 : 1;
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + size);
+		inst = ensure_buf(compiler, 1 + size);
 		FAIL_IF(!inst);
 		INC_SIZE(size);
 		if (reg_map[i] >= 8)
@@ -309,7 +309,7 @@ sljit_si sljit_emit_return(struct sljit_compiler *compiler, sljit_si op, sljit_s
 	tmp = compiler->saveds < SLJIT_NUMBER_OF_SAVED_REGISTERS ? (SLJIT_S0 + 1 - compiler->saveds) : SLJIT_FIRST_SAVED_REG;
 	for (i = tmp; i <= SLJIT_S0; i++) {
 		size = reg_map[i] >= 8 ? 2 : 1;
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + size);
+		inst = ensure_buf(compiler, 1 + size);
 		FAIL_IF(!inst);
 		INC_SIZE(size);
 		if (reg_map[i] >= 8)
@@ -317,7 +317,7 @@ sljit_si sljit_emit_return(struct sljit_compiler *compiler, sljit_si op, sljit_s
 		POP_REG(reg_lmap[i]);
 	}
 
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + 1);
+	inst = ensure_buf(compiler, 1 + 1);
 	FAIL_IF(!inst);
 	INC_SIZE(1);
 	RET();
@@ -333,7 +333,7 @@ static sljit_si emit_do_imm32(struct sljit_compiler *compiler, sljit_ub rex, slj
 	sljit_ub *inst;
 	sljit_si length = 1 + (rex ? 1 : 0) + sizeof(sljit_si);
 
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + length);
+	inst = ensure_buf(compiler, 1 + length);
 	FAIL_IF(!inst);
 	INC_SIZE(length);
 	if (rex)
@@ -456,7 +456,7 @@ static sljit_ub* emit_x86_instruction(struct sljit_compiler *compiler, sljit_si 
 	if (rex)
 		inst_size++;
 
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + inst_size);
+	inst = ensure_buf(compiler, 1 + inst_size);
 	PTR_FAIL_IF(!inst);
 
 	/* Encoding the byte. */
@@ -560,7 +560,7 @@ static SLJIT_INLINE sljit_si call_with_args(struct sljit_compiler *compiler, slj
 #ifndef _WIN64
 	SLJIT_COMPILE_ASSERT(reg_map[SLJIT_R1] == 6 && reg_map[SLJIT_R0] < 8 && reg_map[SLJIT_R2] < 8, args_registers);
 
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + ((type < SLJIT_CALL3) ? 3 : 6));
+	inst = ensure_buf(compiler, 1 + ((type < SLJIT_CALL3) ? 3 : 6));
 	FAIL_IF(!inst);
 	INC_SIZE((type < SLJIT_CALL3) ? 3 : 6);
 	if (type >= SLJIT_CALL3) {
@@ -574,7 +574,7 @@ static SLJIT_INLINE sljit_si call_with_args(struct sljit_compiler *compiler, slj
 #else
 	SLJIT_COMPILE_ASSERT(reg_map[SLJIT_R1] == 2 && reg_map[SLJIT_R0] < 8 && reg_map[SLJIT_R2] < 8, args_registers);
 
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + ((type < SLJIT_CALL3) ? 3 : 6));
+	inst = ensure_buf(compiler, 1 + ((type < SLJIT_CALL3) ? 3 : 6));
 	FAIL_IF(!inst);
 	INC_SIZE((type < SLJIT_CALL3) ? 3 : 6);
 	if (type >= SLJIT_CALL3) {
@@ -603,14 +603,14 @@ sljit_si sljit_emit_fast_enter(struct sljit_compiler *compiler, sljit_si dst, sl
 
 	if (FAST_IS_REG(dst)) {
 		if (reg_map[dst] < 8) {
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 1);
+			inst = ensure_buf(compiler, 1 + 1);
 			FAIL_IF(!inst);
 			INC_SIZE(1);
 			POP_REG(reg_lmap[dst]);
 			return SLJIT_SUCCESS;
 		}
 
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 2);
+		inst = ensure_buf(compiler, 1 + 2);
 		FAIL_IF(!inst);
 		INC_SIZE(2);
 		*inst++ = REX_B;
@@ -641,14 +641,14 @@ sljit_si sljit_emit_fast_return(struct sljit_compiler *compiler, sljit_si src, s
 
 	if (FAST_IS_REG(src)) {
 		if (reg_map[src] < 8) {
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 1 + 1);
+			inst = ensure_buf(compiler, 1 + 1 + 1);
 			FAIL_IF(!inst);
 
 			INC_SIZE(1 + 1);
 			PUSH_REG(reg_lmap[src]);
 		}
 		else {
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 2 + 1);
+			inst = ensure_buf(compiler, 1 + 2 + 1);
 			FAIL_IF(!inst);
 
 			INC_SIZE(2 + 1);
@@ -664,14 +664,14 @@ sljit_si sljit_emit_fast_return(struct sljit_compiler *compiler, sljit_si src, s
 		*inst++ = GROUP_FF;
 		*inst |= PUSH_rm;
 
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 1);
+		inst = ensure_buf(compiler, 1 + 1);
 		FAIL_IF(!inst);
 		INC_SIZE(1);
 	}
 	else {
 		SLJIT_ASSERT(IS_HALFWORD(srcw));
 		/* SLJIT_IMM. */
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 5 + 1);
+		inst = ensure_buf(compiler, 1 + 5 + 1);
 		FAIL_IF(!inst);
 
 		INC_SIZE(5 + 1);

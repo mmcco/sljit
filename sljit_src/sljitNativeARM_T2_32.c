@@ -186,7 +186,7 @@ static sljit_si push_inst16(struct sljit_compiler *compiler, sljit_ins inst)
 	sljit_uh *ptr;
 	SLJIT_ASSERT(!(inst & 0xffff0000));
 
-	ptr = (sljit_uh*)ensure_buf(compiler, sizeof(sljit_uh));
+	ptr = ensure_buf(compiler, sizeof(sljit_uh));
 	FAIL_IF(!ptr);
 	*ptr = inst;
 	compiler->size++;
@@ -195,7 +195,7 @@ static sljit_si push_inst16(struct sljit_compiler *compiler, sljit_ins inst)
 
 static sljit_si push_inst32(struct sljit_compiler *compiler, sljit_ins inst)
 {
-	sljit_uh *ptr = (sljit_uh*)ensure_buf(compiler, sizeof(sljit_ins));
+	sljit_uh *ptr = ensure_buf(compiler, sizeof(sljit_ins));
 	FAIL_IF(!ptr);
 	*ptr++ = inst >> 16;
 	*ptr = inst;

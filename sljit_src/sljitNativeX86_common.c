@@ -584,11 +584,11 @@ static SLJIT_INLINE sljit_si emit_save_flags(struct sljit_compiler *compiler)
 	sljit_ub *inst;
 
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + 5);
+	inst = ensure_buf(compiler, 1 + 5);
 	FAIL_IF(!inst);
 	INC_SIZE(5);
 #else
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + 6);
+	inst = ensure_buf(compiler, 1 + 6);
 	FAIL_IF(!inst);
 	INC_SIZE(6);
 	*inst++ = REX_W;
@@ -607,12 +607,12 @@ static SLJIT_INLINE sljit_si emit_restore_flags(struct sljit_compiler *compiler,
 	sljit_ub *inst;
 
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + 5);
+	inst = ensure_buf(compiler, 1 + 5);
 	FAIL_IF(!inst);
 	INC_SIZE(5);
 	*inst++ = POPF;
 #else
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + 6);
+	inst = ensure_buf(compiler, 1 + 6);
 	FAIL_IF(!inst);
 	INC_SIZE(6);
 	*inst++ = POPF;
@@ -729,13 +729,13 @@ sljit_si sljit_emit_op0(struct sljit_compiler *compiler, sljit_si op)
 
 	switch (GET_OPCODE(op)) {
 	case SLJIT_BREAKPOINT:
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 1);
+		inst = ensure_buf(compiler, 1 + 1);
 		FAIL_IF(!inst);
 		INC_SIZE(1);
 		*inst = INT3;
 		break;
 	case SLJIT_NOP:
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 1);
+		inst = ensure_buf(compiler, 1 + 1);
 		FAIL_IF(!inst);
 		INC_SIZE(1);
 		*inst = NOP;
@@ -780,18 +780,18 @@ sljit_si sljit_emit_op0(struct sljit_compiler *compiler, sljit_si op)
 #endif
 
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 1);
+			inst = ensure_buf(compiler, 1 + 1);
 			FAIL_IF(!inst);
 			INC_SIZE(1);
 			*inst = CDQ;
 #else
 			if (compiler->mode32) {
-				inst = (sljit_ub*)ensure_buf(compiler, 1 + 1);
+				inst = ensure_buf(compiler, 1 + 1);
 				FAIL_IF(!inst);
 				INC_SIZE(1);
 				*inst = CDQ;
 			} else {
-				inst = (sljit_ub*)ensure_buf(compiler, 1 + 2);
+				inst = ensure_buf(compiler, 1 + 2);
 				FAIL_IF(!inst);
 				INC_SIZE(2);
 				*inst++ = REX_W;
@@ -801,7 +801,7 @@ sljit_si sljit_emit_op0(struct sljit_compiler *compiler, sljit_si op)
 		}
 
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 2);
+		inst = ensure_buf(compiler, 1 + 2);
 		FAIL_IF(!inst);
 		INC_SIZE(2);
 		*inst++ = GROUP_F7;
@@ -812,7 +812,7 @@ sljit_si sljit_emit_op0(struct sljit_compiler *compiler, sljit_si op)
 #else
 		size = (!compiler->mode32) ? 3 : 2;
 #endif
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + size);
+		inst = ensure_buf(compiler, 1 + size);
 		FAIL_IF(!inst);
 		INC_SIZE(size);
 #ifdef _WIN64
@@ -854,7 +854,7 @@ sljit_si sljit_emit_op0(struct sljit_compiler *compiler, sljit_si op)
 
 #define ENCODE_PREFIX(prefix) \
 	do { \
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 1); \
+		inst = ensure_buf(compiler, 1 + 1); \
 		FAIL_IF(!inst); \
 		INC_SIZE(1); \
 		*inst = (prefix); \
@@ -1202,7 +1202,7 @@ static sljit_si emit_clz(struct sljit_compiler *compiler, sljit_si op_flags,
 		*inst = CMOVNE_r_rm;
 	} else {
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 4);
+		inst = ensure_buf(compiler, 1 + 4);
 		FAIL_IF(!inst);
 		INC_SIZE(4);
 
@@ -1211,7 +1211,7 @@ static sljit_si emit_clz(struct sljit_compiler *compiler, sljit_si op_flags,
 		*inst++ = MOV_r_rm;
 		*inst++ = MOD_REG | (reg_map[dst_r] << 3) | reg_map[TMP_REG1];
 #else
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 5);
+		inst = ensure_buf(compiler, 1 + 5);
 		FAIL_IF(!inst);
 		INC_SIZE(5);
 
@@ -1675,7 +1675,7 @@ static sljit_si emit_mul(struct sljit_compiler *compiler,
 			inst = emit_x86_instruction(compiler, 1, dst_r, 0, src2, src2w);
 			FAIL_IF(!inst);
 			*inst = IMUL_r_rm_i8;
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 1);
+			inst = ensure_buf(compiler, 1 + 1);
 			FAIL_IF(!inst);
 			INC_SIZE(1);
 			*inst = (sljit_sb)src1w;
@@ -1685,7 +1685,7 @@ static sljit_si emit_mul(struct sljit_compiler *compiler,
 			inst = emit_x86_instruction(compiler, 1, dst_r, 0, src2, src2w);
 			FAIL_IF(!inst);
 			*inst = IMUL_r_rm_i32;
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 4);
+			inst = ensure_buf(compiler, 1 + 4);
 			FAIL_IF(!inst);
 			INC_SIZE(4);
 			*(sljit_sw*)inst = src1w;
@@ -1695,7 +1695,7 @@ static sljit_si emit_mul(struct sljit_compiler *compiler,
 			inst = emit_x86_instruction(compiler, 1, dst_r, 0, src2, src2w);
 			FAIL_IF(!inst);
 			*inst = IMUL_r_rm_i32;
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 4);
+			inst = ensure_buf(compiler, 1 + 4);
 			FAIL_IF(!inst);
 			INC_SIZE(4);
 			*(sljit_si*)inst = (sljit_si)src1w;
@@ -1718,7 +1718,7 @@ static sljit_si emit_mul(struct sljit_compiler *compiler,
 			inst = emit_x86_instruction(compiler, 1, dst_r, 0, src1, src1w);
 			FAIL_IF(!inst);
 			*inst = IMUL_r_rm_i8;
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 1);
+			inst = ensure_buf(compiler, 1 + 1);
 			FAIL_IF(!inst);
 			INC_SIZE(1);
 			*inst = (sljit_sb)src2w;
@@ -1728,7 +1728,7 @@ static sljit_si emit_mul(struct sljit_compiler *compiler,
 			inst = emit_x86_instruction(compiler, 1, dst_r, 0, src1, src1w);
 			FAIL_IF(!inst);
 			*inst = IMUL_r_rm_i32;
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 4);
+			inst = ensure_buf(compiler, 1 + 4);
 			FAIL_IF(!inst);
 			INC_SIZE(4);
 			*(sljit_sw*)inst = src2w;
@@ -1738,7 +1738,7 @@ static sljit_si emit_mul(struct sljit_compiler *compiler,
 			inst = emit_x86_instruction(compiler, 1, dst_r, 0, src1, src1w);
 			FAIL_IF(!inst);
 			*inst = IMUL_r_rm_i32;
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 4);
+			inst = ensure_buf(compiler, 1 + 4);
 			FAIL_IF(!inst);
 			INC_SIZE(4);
 			*(sljit_si*)inst = (sljit_si)src2w;
@@ -2232,7 +2232,7 @@ sljit_si sljit_emit_op_custom(struct sljit_compiler *compiler,
 	CHECK_ERROR();
 	CHECK(check_sljit_emit_op_custom(compiler, instruction, size));
 
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + size);
+	inst = ensure_buf(compiler, 1 + size);
 	FAIL_IF(!inst);
 	INC_SIZE(size);
 	memmove(inst, instruction, size);
@@ -2529,7 +2529,7 @@ struct sljit_label* sljit_emit_label(struct sljit_compiler *compiler)
 	PTR_FAIL_IF(!label);
 	set_label(label, compiler);
 
-	inst = (sljit_ub*)ensure_buf(compiler, 2);
+	inst = ensure_buf(compiler, 2);
 	PTR_FAIL_IF(!inst);
 
 	*inst++ = 0;
@@ -2567,7 +2567,7 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 	compiler->size += (type >= SLJIT_JUMP) ? (10 + 3) : (2 + 10 + 3);
 #endif
 
-	inst = (sljit_ub*)ensure_buf(compiler, 2);
+	inst = ensure_buf(compiler, 2);
 	PTR_FAIL_IF_NULL(inst);
 
 	*inst++ = 0;
@@ -2625,7 +2625,7 @@ sljit_si sljit_emit_ijump(struct sljit_compiler *compiler, sljit_si type, sljit_
 		compiler->size += 10 + 3;
 #endif
 
-		inst = (sljit_ub*)ensure_buf(compiler, 2);
+		inst = ensure_buf(compiler, 2);
 		FAIL_IF_NULL(inst);
 
 		*inst++ = 0;
@@ -2676,7 +2676,7 @@ sljit_si sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_si op,
 
 #if (defined SLJIT_CONFIG_X86_64 && SLJIT_CONFIG_X86_64)
 	if (GET_OPCODE(op) == SLJIT_OR && !GET_ALL_FLAGS(op) && FAST_IS_REG(dst) && dst == src) {
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 4 + 3);
+		inst = ensure_buf(compiler, 1 + 4 + 3);
 		FAIL_IF(!inst);
 		INC_SIZE(4 + 3);
 		/* Set low register to conditional flag. */
@@ -2692,7 +2692,7 @@ sljit_si sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_si op,
 
 	reg = (op == SLJIT_MOV && FAST_IS_REG(dst)) ? dst : TMP_REG1;
 
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + 4 + 4);
+	inst = ensure_buf(compiler, 1 + 4 + 4);
 	FAIL_IF(!inst);
 	INC_SIZE(4 + 4);
 	/* Set low register to conditional flag. */
@@ -2721,7 +2721,7 @@ sljit_si sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_si op,
 	if (GET_OPCODE(op) < SLJIT_ADD && FAST_IS_REG(dst)) {
 		if (reg_map[dst] <= 4) {
 			/* Low byte is accessible. */
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 3 + 3);
+			inst = ensure_buf(compiler, 1 + 3 + 3);
 			FAIL_IF(!inst);
 			INC_SIZE(3 + 3);
 			/* Set low byte to conditional flag. */
@@ -2744,7 +2744,7 @@ sljit_si sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_si op,
 			/* a xor reg, reg operation would overwrite the flags. */
 			EMIT_MOV(compiler, dst, 0, SLJIT_IMM, 0);
 
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 3);
+			inst = ensure_buf(compiler, 1 + 3);
 			FAIL_IF(!inst);
 			INC_SIZE(3);
 
@@ -2755,7 +2755,7 @@ sljit_si sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_si op,
 			return SLJIT_SUCCESS;
 		}
 
-		inst = (sljit_ub*)ensure_buf(compiler, 1 + 1 + 3 + 3 + 1);
+		inst = ensure_buf(compiler, 1 + 1 + 3 + 3 + 1);
 		FAIL_IF(!inst);
 		INC_SIZE(1 + 3 + 3 + 1);
 		*inst++ = XCHG_EAX_r + reg_map[TMP_REG1];
@@ -2774,7 +2774,7 @@ sljit_si sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_si op,
 	if (GET_OPCODE(op) == SLJIT_OR && !GET_ALL_FLAGS(op) && FAST_IS_REG(dst) && dst == src && reg_map[dst] <= 4) {
 		SLJIT_COMPILE_ASSERT(reg_map[SLJIT_R0] == 0, scratch_reg1_must_be_eax);
 		if (dst != SLJIT_R0) {
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 1 + 3 + 2 + 1);
+			inst = ensure_buf(compiler, 1 + 1 + 3 + 2 + 1);
 			FAIL_IF(!inst);
 			INC_SIZE(1 + 3 + 2 + 1);
 			/* Set low register to conditional flag. */
@@ -2787,7 +2787,7 @@ sljit_si sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_si op,
 			*inst++ = XCHG_EAX_r + reg_map[TMP_REG1];
 		}
 		else {
-			inst = (sljit_ub*)ensure_buf(compiler, 1 + 2 + 3 + 2 + 2);
+			inst = ensure_buf(compiler, 1 + 2 + 3 + 2 + 2);
 			FAIL_IF(!inst);
 			INC_SIZE(2 + 3 + 2 + 2);
 			/* Set low register to conditional flag. */
@@ -2805,7 +2805,7 @@ sljit_si sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_si op,
 	}
 
 	/* Set TMP_REG1 to the bit. */
-	inst = (sljit_ub*)ensure_buf(compiler, 1 + 1 + 3 + 3 + 1);
+	inst = ensure_buf(compiler, 1 + 1 + 3 + 3 + 1);
 	FAIL_IF(!inst);
 	INC_SIZE(1 + 3 + 3 + 1);
 	*inst++ = XCHG_EAX_r + reg_map[TMP_REG1];
@@ -2894,7 +2894,7 @@ struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, sljit_si d
 		return NULL;
 #endif
 
-	inst = (sljit_ub*)ensure_buf(compiler, 2);
+	inst = ensure_buf(compiler, 2);
 	PTR_FAIL_IF(!inst);
 
 	*inst++ = 0;
