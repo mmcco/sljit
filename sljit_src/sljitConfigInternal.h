@@ -257,20 +257,6 @@
 /* Type of public API functions. */
 /*********************************/
 
-#if (defined SLJIT_CONFIG_STATIC && SLJIT_CONFIG_STATIC)
-/* Static ABI functions. For all-in-one programs. */
-
-#if defined(__GNUC__)
-/* Disable unused warnings in gcc. */
-#define SLJIT_API_FUNC_ATTRIBUTE static __attribute__((unused))
-#else
-#define SLJIT_API_FUNC_ATTRIBUTE static
-#endif
-
-#else
-#define SLJIT_API_FUNC_ATTRIBUTE
-#endif /* (defined SLJIT_CONFIG_STATIC && SLJIT_CONFIG_STATIC) */
-
 /****************************/
 /* Instruction cache flush. */
 /****************************/
@@ -515,9 +501,9 @@ determine the next executed instruction after return. */
 /***************************************************/
 
 #if (defined SLJIT_EXECUTABLE_ALLOCATOR && SLJIT_EXECUTABLE_ALLOCATOR)
-SLJIT_API_FUNC_ATTRIBUTE void* sljit_malloc_exec(sljit_uw size);
-SLJIT_API_FUNC_ATTRIBUTE void sljit_free_exec(void* ptr);
-SLJIT_API_FUNC_ATTRIBUTE void sljit_free_unused_memory_exec(void);
+void* sljit_malloc_exec(sljit_uw size);
+void sljit_free_exec(void* ptr);
+void sljit_free_unused_memory_exec(void);
 #define SLJIT_MALLOC_EXEC(size) sljit_malloc_exec(size)
 #define SLJIT_FREE_EXEC(ptr) sljit_free_exec(ptr)
 #endif

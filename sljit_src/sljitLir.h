@@ -411,10 +411,10 @@ struct sljit_compiler {
 
 /* Creates an sljit compiler.
    Returns NULL if failed. */
-SLJIT_API_FUNC_ATTRIBUTE struct sljit_compiler* sljit_create_compiler(void);
+struct sljit_compiler* sljit_create_compiler(void);
 
 /* Free everything except the compiled machine code. */
-SLJIT_API_FUNC_ATTRIBUTE void sljit_free_compiler(struct sljit_compiler *compiler);
+void sljit_free_compiler(struct sljit_compiler *compiler);
 
 /* Returns the current error code. If an error is occurred, future sljit
    calls which uses the same compiler argument returns early with the same
@@ -434,15 +434,15 @@ static SLJIT_INLINE sljit_si sljit_get_compiler_error(struct sljit_compiler *com
    indicate that there is no more memory (does not set the current error code
    of the compiler to out-of-memory status).
 */
-SLJIT_API_FUNC_ATTRIBUTE void* sljit_alloc_memory(struct sljit_compiler *compiler, sljit_si size);
+void* sljit_alloc_memory(struct sljit_compiler *compiler, sljit_si size);
 
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 /* Passing NULL disables verbose. */
-SLJIT_API_FUNC_ATTRIBUTE void sljit_compiler_verbose(struct sljit_compiler *compiler, FILE* verbose);
+void sljit_compiler_verbose(struct sljit_compiler *compiler, FILE* verbose);
 #endif
 
-SLJIT_API_FUNC_ATTRIBUTE void* sljit_generate_code(struct sljit_compiler *compiler);
-SLJIT_API_FUNC_ATTRIBUTE void sljit_free_code(void* code);
+void* sljit_generate_code(struct sljit_compiler *compiler);
+void sljit_free_code(void* code);
 
 /*
    After the machine code generation is finished we can retrieve the allocated
@@ -504,7 +504,7 @@ offset 0 is aligned to sljit_d. Otherwise it is aligned to sljit_uw. */
 /* The local_size must be >= 0 and <= SLJIT_MAX_LOCAL_SIZE. */
 #define SLJIT_MAX_LOCAL_SIZE	65536
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
+sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
 	sljit_si options, sljit_si args, sljit_si scratches, sljit_si saveds,
 	sljit_si fscratches, sljit_si fsaveds, sljit_si local_size);
 
@@ -518,7 +518,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_enter(struct sljit_compiler *compil
    Note: every call of sljit_emit_enter and sljit_set_context overwrites
          the previous context. */
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_set_context(struct sljit_compiler *compiler,
+sljit_si sljit_set_context(struct sljit_compiler *compiler,
 	sljit_si options, sljit_si args, sljit_si scratches, sljit_si saveds,
 	sljit_si fscratches, sljit_si fsaveds, sljit_si local_size);
 
@@ -528,7 +528,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_set_context(struct sljit_compiler *compi
    is SLJIT_UNUSED, otherwise see below the description about source and
    destination arguments. */
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_return(struct sljit_compiler *compiler, sljit_si op,
+sljit_si sljit_emit_return(struct sljit_compiler *compiler, sljit_si op,
 	sljit_si src, sljit_sw srcw);
 
 /* Fast calling mechanism for utility functions (see SLJIT_FAST_CALL). All registers and
@@ -546,8 +546,8 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_return(struct sljit_compiler *compi
 /* Note: although sljit_emit_fast_return could be replaced by an ijump, it is not suggested,
    since many architectures do clever branch prediction on call / return instruction pairs. */
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_fast_enter(struct sljit_compiler *compiler, sljit_si dst, sljit_sw dstw);
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_fast_return(struct sljit_compiler *compiler, sljit_si src, sljit_sw srcw);
+sljit_si sljit_emit_fast_enter(struct sljit_compiler *compiler, sljit_si dst, sljit_sw dstw);
+sljit_si sljit_emit_fast_return(struct sljit_compiler *compiler, sljit_si src, sljit_sw srcw);
 
 /*
    Source and destination values for arithmetical instructions
@@ -701,7 +701,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_fast_return(struct sljit_compiler *
 #define SLJIT_LSDIV			(SLJIT_OP0_BASE + 5)
 #define SLJIT_ILSDIV			(SLJIT_LSDIV | SLJIT_INT_OP)
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_op0(struct sljit_compiler *compiler, sljit_si op);
+sljit_si sljit_emit_op0(struct sljit_compiler *compiler, sljit_si op);
 
 /* Starting index of opcodes for sljit_emit_op1. */
 #define SLJIT_OP1_BASE			32
@@ -778,7 +778,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_op0(struct sljit_compiler *compiler
 #define SLJIT_CLZ			(SLJIT_OP1_BASE + 18)
 #define SLJIT_ICLZ			(SLJIT_CLZ | SLJIT_INT_OP)
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
+sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 	sljit_si dst, sljit_sw dstw,
 	sljit_si src, sljit_sw srcw);
 
@@ -832,7 +832,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_op1(struct sljit_compiler *compiler
 #define SLJIT_ASHR			(SLJIT_OP2_BASE + 10)
 #define SLJIT_IASHR			(SLJIT_ASHR | SLJIT_INT_OP)
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_op2(struct sljit_compiler *compiler, sljit_si op,
+sljit_si sljit_emit_op2(struct sljit_compiler *compiler, sljit_si op,
 	sljit_si dst, sljit_sw dstw,
 	sljit_si src1, sljit_sw src1w,
 	sljit_si src2, sljit_sw src2w);
@@ -843,14 +843,14 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_op2(struct sljit_compiler *compiler
 
    Note: it returns with -1 for virtual registers (only on x86-32). */
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_get_register_index(sljit_si reg);
+sljit_si sljit_get_register_index(sljit_si reg);
 
 /* The following function is a helper function for sljit_emit_op_custom.
    It returns with the real machine register index of any SLJIT_FLOAT register.
 
    Note: the index is always an even number on ARM (except ARM-64), MIPS, and SPARC. */
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_get_float_register_index(sljit_si reg);
+sljit_si sljit_get_float_register_index(sljit_si reg);
 
 /* Any instruction can be inserted into the instruction stream by
    sljit_emit_op_custom. It has a similar purpose as inline assembly.
@@ -862,12 +862,12 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_get_float_register_index(sljit_si reg);
               if size == 4, the instruction argument must be 4 byte aligned.
    Otherwise: size must be 4 and instruction argument must be 4 byte aligned. */
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_op_custom(struct sljit_compiler *compiler,
+sljit_si sljit_emit_op_custom(struct sljit_compiler *compiler,
 	void *instruction, sljit_si size);
 
 /* Returns with non-zero if fpu is available. */
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_is_fpu_available(void);
+sljit_si sljit_is_fpu_available(void);
 
 /* Starting index of opcodes for sljit_emit_fop1. */
 #define SLJIT_FOP1_BASE			128
@@ -906,7 +906,7 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_is_fpu_available(void);
 #define SLJIT_DABS			(SLJIT_FOP1_BASE + 8)
 #define SLJIT_SABS			(SLJIT_DABS | SLJIT_SINGLE_OP)
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_fop1(struct sljit_compiler *compiler, sljit_si op,
+sljit_si sljit_emit_fop1(struct sljit_compiler *compiler, sljit_si op,
 	sljit_si dst, sljit_sw dstw,
 	sljit_si src, sljit_sw srcw);
 
@@ -926,14 +926,14 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_fop1(struct sljit_compiler *compile
 #define SLJIT_DDIV			(SLJIT_FOP2_BASE + 3)
 #define SLJIT_SDIV			(SLJIT_DDIV | SLJIT_SINGLE_OP)
 
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_fop2(struct sljit_compiler *compiler, sljit_si op,
+sljit_si sljit_emit_fop2(struct sljit_compiler *compiler, sljit_si op,
 	sljit_si dst, sljit_sw dstw,
 	sljit_si src1, sljit_sw src1w,
 	sljit_si src2, sljit_sw src2w);
 
 /* Label and jump instructions. */
 
-SLJIT_API_FUNC_ATTRIBUTE struct sljit_label* sljit_emit_label(struct sljit_compiler *compiler);
+struct sljit_label* sljit_emit_label(struct sljit_compiler *compiler);
 
 /* Invert (negate) conditional type: xor (^) with 0x1 */
 
@@ -1010,7 +1010,7 @@ SLJIT_API_FUNC_ATTRIBUTE struct sljit_label* sljit_emit_label(struct sljit_compi
     type can be combined (or'ed) with SLJIT_REWRITABLE_JUMP
    Flags: - (never set any flags) for both conditional and unconditional jumps.
    Flags: destroy all flags for calls. */
-SLJIT_API_FUNC_ATTRIBUTE struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si type);
+struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si type);
 
 /* Basic arithmetic comparison. In most architectures it is implemented as
    an SLJIT_SUB operation (with SLJIT_UNUSED destination and setting
@@ -1020,7 +1020,7 @@ SLJIT_API_FUNC_ATTRIBUTE struct sljit_jump* sljit_emit_jump(struct sljit_compile
     type must be between SLJIT_EQUAL and SLJIT_I_SIG_LESS_EQUAL
     type can be combined (or'ed) with SLJIT_REWRITABLE_JUMP
    Flags: destroy flags. */
-SLJIT_API_FUNC_ATTRIBUTE struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, sljit_si type,
+struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, sljit_si type,
 	sljit_si src1, sljit_sw src1w,
 	sljit_si src2, sljit_sw src2w);
 
@@ -1034,14 +1034,14 @@ SLJIT_API_FUNC_ATTRIBUTE struct sljit_jump* sljit_emit_cmp(struct sljit_compiler
    Flags: destroy flags.
    Note: if either operand is NaN, the behaviour is undefined for
          types up to SLJIT_S_LESS_EQUAL. */
-SLJIT_API_FUNC_ATTRIBUTE struct sljit_jump* sljit_emit_fcmp(struct sljit_compiler *compiler, sljit_si type,
+struct sljit_jump* sljit_emit_fcmp(struct sljit_compiler *compiler, sljit_si type,
 	sljit_si src1, sljit_sw src1w,
 	sljit_si src2, sljit_sw src2w);
 
 /* Set the destination of the jump to this label. */
-SLJIT_API_FUNC_ATTRIBUTE void sljit_set_label(struct sljit_jump *jump, struct sljit_label* label);
+void sljit_set_label(struct sljit_jump *jump, struct sljit_label* label);
 /* Set the destination address of the jump to this label. */
-SLJIT_API_FUNC_ATTRIBUTE void sljit_set_target(struct sljit_jump *jump, sljit_uw target);
+void sljit_set_target(struct sljit_jump *jump, sljit_uw target);
 
 /* Call function or jump anywhere. Both direct and indirect form
     type must be between SLJIT_JUMP and SLJIT_CALL3
@@ -1049,7 +1049,7 @@ SLJIT_API_FUNC_ATTRIBUTE void sljit_set_target(struct sljit_jump *jump, sljit_uw
     Indirect form: any other valid addressing mode
    Flags: - (never set any flags) for unconditional jumps.
    Flags: destroy all flags for calls. */
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_ijump(struct sljit_compiler *compiler, sljit_si type, sljit_si src, sljit_sw srcw);
+sljit_si sljit_emit_ijump(struct sljit_compiler *compiler, sljit_si type, sljit_si src, sljit_sw srcw);
 
 /* Perform the operation using the conditional flags as the second argument.
    Type must always be between SLJIT_EQUAL and SLJIT_S_ORDERED. The value
@@ -1066,18 +1066,18 @@ SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_ijump(struct sljit_compiler *compil
      Important note: only dst=src and dstw=srcw is supported at the moment!
      Flags: I | E | K
    Note: sljit_emit_op_flags does nothing, if dst is SLJIT_UNUSED (regardless of op). */
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_si op,
+sljit_si sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_si op,
 	sljit_si dst, sljit_sw dstw,
 	sljit_si src, sljit_sw srcw,
 	sljit_si type);
 
 /* Copies the base address of SLJIT_SP + offset to dst.
    Flags: - (never set any flags) */
-SLJIT_API_FUNC_ATTRIBUTE sljit_si sljit_get_local_base(struct sljit_compiler *compiler, sljit_si dst, sljit_sw dstw, sljit_sw offset);
+sljit_si sljit_get_local_base(struct sljit_compiler *compiler, sljit_si dst, sljit_sw dstw, sljit_sw offset);
 
 /* The constant can be changed runtime (see: sljit_set_const)
    Flags: - (never set any flags) */
-SLJIT_API_FUNC_ATTRIBUTE struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, sljit_si dst, sljit_sw dstw, sljit_sw init_value);
+struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, sljit_si dst, sljit_sw dstw, sljit_sw init_value);
 
 /* After the code generation the address for label, jump and const instructions
    are computed. Since these structures are freed by sljit_free_compiler, the
@@ -1087,8 +1087,8 @@ static SLJIT_INLINE sljit_uw sljit_get_jump_addr(struct sljit_jump *jump) { retu
 static SLJIT_INLINE sljit_uw sljit_get_const_addr(struct sljit_const *const_) { return const_->addr; }
 
 /* Only the address is required to rewrite the code. */
-SLJIT_API_FUNC_ATTRIBUTE void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr);
-SLJIT_API_FUNC_ATTRIBUTE void sljit_set_const(sljit_uw addr, sljit_sw new_constant);
+void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr);
+void sljit_set_const(sljit_uw addr, sljit_sw new_constant);
 
 /* --------------------------------------------------------------------- */
 /*  Miscellaneous utility functions                                      */
@@ -1100,15 +1100,15 @@ SLJIT_API_FUNC_ATTRIBUTE void sljit_set_const(sljit_uw addr, sljit_sw new_consta
 /* Get the human readable name of the platform. Can be useful on platforms
    like ARM, where ARM and Thumb2 functions can be mixed, and
    it is useful to know the type of the code generator. */
-SLJIT_API_FUNC_ATTRIBUTE SLJIT_CONST char* sljit_get_platform_name(void);
+SLJIT_CONST char* sljit_get_platform_name(void);
 
 /* Portable helper function to get an offset of a member. */
 #define SLJIT_OFFSETOF(base, member) ((sljit_sw)(&((base*)0x10)->member) - 0x10)
 
 #if (defined SLJIT_UTIL_GLOBAL_LOCK && SLJIT_UTIL_GLOBAL_LOCK)
 /* This global lock is useful to compile common functions. */
-SLJIT_API_FUNC_ATTRIBUTE void SLJIT_CALL sljit_grab_lock(void);
-SLJIT_API_FUNC_ATTRIBUTE void SLJIT_CALL sljit_release_lock(void);
+void SLJIT_CALL sljit_grab_lock(void);
+void SLJIT_CALL sljit_release_lock(void);
 #endif
 
 #if (defined SLJIT_UTIL_STACK && SLJIT_UTIL_STACK)
@@ -1143,8 +1143,8 @@ struct sljit_stack {
 /* Returns NULL if unsuccessful.
    Note: limit and max_limit contains the size for stack allocation
    Note: the top field is initialized to base. */
-SLJIT_API_FUNC_ATTRIBUTE struct sljit_stack* SLJIT_CALL sljit_allocate_stack(sljit_uw limit, sljit_uw max_limit);
-SLJIT_API_FUNC_ATTRIBUTE void SLJIT_CALL sljit_free_stack(struct sljit_stack* stack);
+struct sljit_stack* SLJIT_CALL sljit_allocate_stack(sljit_uw limit, sljit_uw max_limit);
+void SLJIT_CALL sljit_free_stack(struct sljit_stack* stack);
 
 /* Can be used to increase (allocate) or decrease (free) the memory area.
    Returns with a non-zero value if unsuccessful. If new_limit is greater than
@@ -1152,7 +1152,7 @@ SLJIT_API_FUNC_ATTRIBUTE void SLJIT_CALL sljit_free_stack(struct sljit_stack* st
    since the growth ratio can be added to the current limit, and sljit_stack_resize
    will do all the necessary checks. The fields of the stack are not changed if
    sljit_stack_resize fails. */
-SLJIT_API_FUNC_ATTRIBUTE sljit_sw SLJIT_CALL sljit_stack_resize(struct sljit_stack* stack, sljit_uw new_limit);
+sljit_sw SLJIT_CALL sljit_stack_resize(struct sljit_stack* stack, sljit_uw new_limit);
 
 #endif /* (defined SLJIT_UTIL_STACK && SLJIT_UTIL_STACK) */
 
@@ -1177,7 +1177,7 @@ struct sljit_function_context {
 /* Fill the context arguments using the addr and the function.
    If func_ptr is NULL, it will not be set to the address of context
    If addr is NULL, the function address also comes from the func pointer. */
-SLJIT_API_FUNC_ATTRIBUTE void sljit_set_function_context(void** func_ptr, struct sljit_function_context* context, sljit_sw addr, void* func);
+void sljit_set_function_context(void** func_ptr, struct sljit_function_context* context, sljit_sw addr, void* func);
 
 #endif /* !(defined SLJIT_INDIRECT_CALL && SLJIT_INDIRECT_CALL) */
 

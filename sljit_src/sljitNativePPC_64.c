@@ -398,7 +398,7 @@ static SLJIT_INLINE sljit_si emit_const(struct sljit_compiler *compiler, sljit_s
 	return push_inst(compiler, ORI | S(reg) | A(reg) | IMM(init_value));
 }
 
-SLJIT_API_FUNC_ATTRIBUTE void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr)
+void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr)
 {
 	sljit_ins *inst = (sljit_ins*)addr;
 
@@ -409,7 +409,7 @@ SLJIT_API_FUNC_ATTRIBUTE void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_ad
 	SLJIT_CACHE_FLUSH(inst, inst + 5);
 }
 
-SLJIT_API_FUNC_ATTRIBUTE void sljit_set_const(sljit_uw addr, sljit_sw new_constant)
+void sljit_set_const(sljit_uw addr, sljit_sw new_constant)
 {
 	sljit_ins *inst = (sljit_ins*)addr;
 
