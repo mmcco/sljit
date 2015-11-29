@@ -81,13 +81,6 @@
 /*  Configuration                                                        */
 /* --------------------------------------------------------------------- */
 
-/* If SLJIT_STD_MACROS_DEFINED is not defined, the application should
-   define SLJIT_MEMMOVE, and NULL. */
-#ifndef SLJIT_STD_MACROS_DEFINED
-/* Disabled by default. */
-#define SLJIT_STD_MACROS_DEFINED 0
-#endif
-
 /* Executable code allocation:
    If SLJIT_EXECUTABLE_ALLOCATOR is not defined, the application should
    define both SLJIT_MALLOC_EXEC and SLJIT_FREE_EXEC. */

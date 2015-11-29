@@ -183,29 +183,6 @@
 #define SLJIT_CONFIG_SPARC 1
 #endif
 
-/**********************************/
-/* External function definitions. */
-/**********************************/
-
-#if !(defined SLJIT_STD_MACROS_DEFINED && SLJIT_STD_MACROS_DEFINED)
-
-/* These libraries are needed for the macros below. */
-#include <stdlib.h>
-#include <string.h>
-
-#endif /* SLJIT_STD_MACROS_DEFINED */
-
-/* General macros:
-   Note: SLJIT is designed to be independent from them as possible.
-
-   In release mode (SLJIT_DEBUG is not defined) only the following
-   external functions are needed:
-*/
-
-#ifndef SLJIT_ZEROMEM
-#define SLJIT_ZEROMEM(dest, len) memset(dest, 0, len)
-#endif
-
 /***************************/
 /* Compiler helper macros. */
 /***************************/

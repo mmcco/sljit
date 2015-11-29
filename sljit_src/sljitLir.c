@@ -330,7 +330,7 @@ struct sljit_compiler* sljit_create_compiler(void)
 	struct sljit_compiler *compiler = malloc(sizeof(struct sljit_compiler));
 	if (!compiler)
 		return NULL;
-	SLJIT_ZEROMEM(compiler, sizeof(struct sljit_compiler));
+	memset(compiler, 0, sizeof(struct sljit_compiler));
 
 	SLJIT_COMPILE_ASSERT(
 		sizeof(sljit_sb) == 1 && sizeof(sljit_ub) == 1
