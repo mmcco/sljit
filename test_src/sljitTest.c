@@ -57,7 +57,7 @@ static sljit_si verbose = 0;
 static sljit_si silent = 0;
 
 #define FAILED(cond, text) \
-	if (SLJIT_UNLIKELY(cond)) { \
+	if (cond) { \
 		printf(text); \
 		return; \
 	}
@@ -3201,7 +3201,7 @@ static void test36(void)
 	code.func2((sljit_sw)&buf, (sljit_sw)&data);
 
 	for (i = 0; i < TEST_CASES; ++i)
-		if (SLJIT_UNLIKELY(buf[i] != compare_buf[i])) {
+		if (buf[i] != compare_buf[i]) {
 			printf("test36 case %d failed\n", i + 1);
 			return;
 		}

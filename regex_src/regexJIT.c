@@ -1305,7 +1305,7 @@ static int trace_transitions(int from, struct compiler_common *compiler_common)
 /* CHECK depends on the use case. */
 
 #define CHECK(exp) \
-	if (SLJIT_UNLIKELY(exp)) \
+	if (exp) \
 		return REGEX_MEMORY_ERROR
 
 static int compile_uncond_tran(struct compiler_common *compiler_common, int reg)
@@ -1717,7 +1717,7 @@ static int compile_newline_check(struct compiler_common *compiler_common, sljit_
 #undef CHECK
 
 #define CHECK(exp) \
-	if (SLJIT_UNLIKELY(exp)) \
+	if (exp) \
 		return 0
 
 static SLJIT_INLINE void range_set_label(struct sljit_jump **range_jump_list, struct sljit_label *label)
@@ -1827,7 +1827,7 @@ static sljit_sw compile_range_check(struct compiler_common *compiler_common, slj
 	} while(0);
 
 #define CHECK(exp) \
-	if (SLJIT_UNLIKELY(exp)) \
+	if (exp) \
 		break;
 
 struct regex_machine* regex_compile(const regex_char_t *regex_string, int length, int re_flags, int *error)

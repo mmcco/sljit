@@ -523,7 +523,7 @@ static sljit_si emit_op_imm(struct sljit_compiler *compiler, sljit_si flags, slj
 	sljit_si reg;
 	sljit_sw imm, nimm;
 
-	if (SLJIT_UNLIKELY((flags & (ARG1_IMM | ARG2_IMM)) == (ARG1_IMM | ARG2_IMM))) {
+	if ((flags & (ARG1_IMM | ARG2_IMM)) == (ARG1_IMM | ARG2_IMM)) {
 		/* Both are immediates. */
 		flags &= ~ARG1_IMM;
 		if (arg1 == 0 && op != SLJIT_ADD && op != SLJIT_SUB)
@@ -831,9 +831,9 @@ static sljit_si getput_arg_fast(struct sljit_compiler *compiler, sljit_si flags,
 
 	SLJIT_ASSERT(arg & SLJIT_MEM);
 
-	if (SLJIT_UNLIKELY(flags & UPDATE)) {
+	if (flags & UPDATE) {
 		if ((arg & REG_MASK) && !(arg & OFFS_REG_MASK) && argw <= 255 && argw >= -256) {
-			if (SLJIT_UNLIKELY(flags & ARG_TEST))
+			if (flags & ARG_TEST)
 				return 1;
 
 			arg &= REG_MASK;
@@ -845,12 +845,12 @@ static sljit_si getput_arg_fast(struct sljit_compiler *compiler, sljit_si flags,
 		return 0;
 	}
 
-	if (SLJIT_UNLIKELY(arg & OFFS_REG_MASK)) {
+	if (arg & OFFS_REG_MASK) {
 		argw &= 0x3;
 		if (argw && argw != shift)
 			return 0;
 
-		if (SLJIT_UNLIKELY(flags & ARG_TEST))
+		if (flags & ARG_TEST)
 			return 1;
 
 		FAIL_IF(push_inst(compiler, sljit_mem_reg[flags & 0x3] | (shift << 30) | RT(reg)
@@ -860,7 +860,7 @@ static sljit_si getput_arg_fast(struct sljit_compiler *compiler, sljit_si flags,
 
 	arg &= REG_MASK;
 	if (argw >= 0 && (argw >> shift) <= 0xfff && (argw & ((1 << shift) - 1)) == 0) {
-		if (SLJIT_UNLIKELY(flags & ARG_TEST))
+		if (flags & ARG_TEST)
 			return 1;
 
 		FAIL_IF(push_inst(compiler, sljit_mem_imm[flags & 0x3] | (shift << 30)
@@ -871,7 +871,7 @@ static sljit_si getput_arg_fast(struct sljit_compiler *compiler, sljit_si flags,
 	if (argw > 255 || argw < -256)
 		return 0;
 
-	if (SLJIT_UNLIKELY(flags & ARG_TEST))
+	if (flags & ARG_TEST)
 		return 1;
 
 	FAIL_IF(push_inst(compiler, sljit_mem_simm[flags & 0x3] | (shift << 30)
@@ -921,7 +921,7 @@ static sljit_si getput_arg(struct sljit_compiler *compiler, sljit_si flags, slji
 
 	tmp_r = (flags & STORE) ? TMP_REG3 : reg;
 
-	if (SLJIT_UNLIKELY((flags & UPDATE) && (arg & REG_MASK))) {
+	if ((flags & UPDATE) && (arg & REG_MASK)) {
 		/* Update only applies if a base register exists. */
 		other_r = OFFS_REG(arg);
 		if (!other_r) {

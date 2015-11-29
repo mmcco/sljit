@@ -187,18 +187,6 @@
 /* Compiler helper macros. */
 /***************************/
 
-#if !defined(SLJIT_LIKELY) && !defined(SLJIT_UNLIKELY)
-
-#if defined(__GNUC__) && (__GNUC__ >= 3)
-#define SLJIT_LIKELY(x)		__builtin_expect((x), 1)
-#define SLJIT_UNLIKELY(x)	__builtin_expect((x), 0)
-#else
-#define SLJIT_LIKELY(x)		(x)
-#define SLJIT_UNLIKELY(x)	(x)
-#endif
-
-#endif /* !defined(SLJIT_LIKELY) && !defined(SLJIT_UNLIKELY) */
-
 #ifndef SLJIT_INLINE
 /* Inline functions. Some old compilers do not support them. */
 #if defined(__SUNPRO_C) && __SUNPRO_C <= 0x510
@@ -602,7 +590,7 @@ void sljit_free_unused_memory_exec(void);
 
 #define SLJIT_ASSERT(x) \
 	do { \
-		if (SLJIT_UNLIKELY(!(x))) { \
+		if (!(x)) { \
 			printf("Assertion failed at " __FILE__ ":%d\n", __LINE__); \
 			SLJIT_HALT_PROCESS(); \
 		} \

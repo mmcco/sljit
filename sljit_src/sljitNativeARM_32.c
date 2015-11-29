@@ -168,7 +168,7 @@ static sljit_si push_inst(struct sljit_compiler *compiler, sljit_uw inst)
 {
 	sljit_uw* ptr;
 
-	if (SLJIT_UNLIKELY(compiler->cpool_diff != CONST_POOL_EMPTY && compiler->size - compiler->cpool_diff >= MAX_DIFFERENCE(4092)))
+	if (compiler->cpool_diff != CONST_POOL_EMPTY && compiler->size - compiler->cpool_diff >= MAX_DIFFERENCE(4092))
 		FAIL_IF(push_cpool(compiler));
 
 	ptr = (sljit_uw*)ensure_buf(compiler, sizeof(sljit_uw));
@@ -186,7 +186,7 @@ static sljit_si push_inst_with_literal(struct sljit_compiler *compiler, sljit_uw
 	sljit_uw* cpool_end;
 	sljit_ub* cpool_unique_ptr;
 
-	if (SLJIT_UNLIKELY(compiler->cpool_diff != CONST_POOL_EMPTY && compiler->size - compiler->cpool_diff >= MAX_DIFFERENCE(4092)))
+	if (compiler->cpool_diff != CONST_POOL_EMPTY && compiler->size - compiler->cpool_diff >= MAX_DIFFERENCE(4092))
 		FAIL_IF(push_cpool(compiler));
 	else if (compiler->cpool_fill > 0) {
 		cpool_ptr = compiler->cpool;
@@ -231,7 +231,7 @@ static sljit_si push_inst_with_literal(struct sljit_compiler *compiler, sljit_uw
 static sljit_si push_inst_with_unique_literal(struct sljit_compiler *compiler, sljit_uw inst, sljit_uw literal)
 {
 	sljit_uw* ptr;
-	if (SLJIT_UNLIKELY((compiler->cpool_diff != CONST_POOL_EMPTY && compiler->size - compiler->cpool_diff >= MAX_DIFFERENCE(4092)) || compiler->cpool_fill >= CPOOL_SIZE))
+	if ((compiler->cpool_diff != CONST_POOL_EMPTY && compiler->size - compiler->cpool_diff >= MAX_DIFFERENCE(4092)) || compiler->cpool_fill >= CPOOL_SIZE)
 		FAIL_IF(push_cpool(compiler));
 
 	SLJIT_ASSERT(compiler->cpool_fill < CPOOL_SIZE && (inst & 0xfff) == 0);
@@ -251,7 +251,7 @@ static sljit_si push_inst_with_unique_literal(struct sljit_compiler *compiler, s
 static SLJIT_INLINE sljit_si prepare_blx(struct sljit_compiler *compiler)
 {
 	/* Place for at least two instruction (doesn't matter whether the first has a literal). */
-	if (SLJIT_UNLIKELY(compiler->cpool_diff != CONST_POOL_EMPTY && compiler->size - compiler->cpool_diff >= MAX_DIFFERENCE(4088)))
+	if (compiler->cpool_diff != CONST_POOL_EMPTY && compiler->size - compiler->cpool_diff >= MAX_DIFFERENCE(4088))
 		return push_cpool(compiler);
 	return SLJIT_SUCCESS;
 }
@@ -623,7 +623,7 @@ void* sljit_generate_code(struct sljit_compiler *compiler)
 					cpool_skip_alignment--;
 				}
 				else {
-					if (SLJIT_UNLIKELY(resolve_const_pool_index(&first_patch, cpool_current_index, cpool_start_address, buf_ptr))) {
+					if (resolve_const_pool_index(&first_patch, cpool_current_index, cpool_start_address, buf_ptr)) {
 						SLJIT_FREE_EXEC(code);
 						compiler->error = SLJIT_ERR_ALLOC_FAILED;
 						return NULL;
@@ -713,7 +713,7 @@ void* sljit_generate_code(struct sljit_compiler *compiler)
 		buf_end = buf_ptr + compiler->cpool_fill;
 		cpool_current_index = 0;
 		while (buf_ptr < buf_end) {
-			if (SLJIT_UNLIKELY(resolve_const_pool_index(&first_patch, cpool_current_index, cpool_start_address, buf_ptr))) {
+			if (resolve_const_pool_index(&first_patch, cpool_current_index, cpool_start_address, buf_ptr)) {
 				SLJIT_FREE_EXEC(code);
 				compiler->error = SLJIT_ERR_ALLOC_FAILED;
 				return NULL;
@@ -1078,7 +1078,7 @@ static SLJIT_INLINE sljit_si emit_single_op(struct sljit_compiler *compiler, slj
 	case SLJIT_MUL:
 		SLJIT_ASSERT(!(flags & INV_IMM));
 		SLJIT_ASSERT(!(src2 & SRC2_IMM));
-		if (SLJIT_UNLIKELY(op & SLJIT_SET_O))
+		if (op & SLJIT_SET_O)
 			mul_inst = SMULL | (reg_map[TMP_REG3] << 16) | (reg_map[dst] << 12);
 		else
 			mul_inst = MUL | (reg_map[dst] << 16);
@@ -1618,7 +1618,7 @@ static sljit_si emit_op(struct sljit_compiler *compiler, sljit_si op, sljit_si i
 	compiler->cache_argw = 0;
 
 	/* Destination check. */
-	if (SLJIT_UNLIKELY(dst == SLJIT_UNUSED)) {
+	if (dst == SLJIT_UNUSED) {
 		if (op >= SLJIT_MOV && op <= SLJIT_MOVU_SI && !(src2 & SLJIT_MEM))
 			return SLJIT_SUCCESS;
 		dst_r = TMP_REG2;
@@ -2030,7 +2030,7 @@ static sljit_si emit_fop_mem(struct sljit_compiler *compiler, sljit_si flags, sl
 	sljit_sw inst = VSTR_F32 | (flags & (SLJIT_SINGLE_OP | FPU_LOAD));
 	SLJIT_ASSERT(arg & SLJIT_MEM);
 
-	if (SLJIT_UNLIKELY(arg & OFFS_REG_MASK)) {
+	if (arg & OFFS_REG_MASK) {
 		FAIL_IF(push_inst(compiler, EMIT_DATA_PROCESS_INS(ADD_DP, 0, TMP_REG1, arg & REG_MASK, RM(OFFS_REG(arg)) | ((argw & 0x3) << 7))));
 		arg = SLJIT_MEM | TMP_REG1;
 		argw = 0;

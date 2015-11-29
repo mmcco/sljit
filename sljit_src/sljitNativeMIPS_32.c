@@ -131,7 +131,7 @@ static SLJIT_INLINE sljit_si emit_single_op(struct sljit_compiler *compiler, slj
 		if (CHECK_FLAGS(SLJIT_SET_E))
 			FAIL_IF(push_inst(compiler, CLZ | S(src2) | T(dst) | D(dst), DR(dst)));
 #else
-		if (SLJIT_UNLIKELY(flags & UNUSED_DEST)) {
+		if (flags & UNUSED_DEST) {
 			FAIL_IF(push_inst(compiler, SRL | T(src2) | DA(EQUAL_FLAG) | SH_IMM(31), EQUAL_FLAG));
 			return push_inst(compiler, XORI | SA(EQUAL_FLAG) | TA(EQUAL_FLAG) | IMM(1), EQUAL_FLAG);
 		}

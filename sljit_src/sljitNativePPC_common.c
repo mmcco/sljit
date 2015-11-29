@@ -861,7 +861,7 @@ static sljit_si getput_arg_fast(struct sljit_compiler *compiler, sljit_si inp_fl
 		return -1;
 	}
 
-	if (SLJIT_UNLIKELY(!(arg & REG_MASK)))
+	if (!(arg & REG_MASK))
 		inp_flags &= ~WRITE_BACK;
 
 #if (defined SLJIT_CONFIG_PPC_64 && SLJIT_CONFIG_PPC_64)
@@ -956,7 +956,7 @@ static sljit_si getput_arg(struct sljit_compiler *compiler, sljit_si inp_flags, 
 	if ((arg & REG_MASK) == tmp_r)
 		tmp_r = TMP_REG1;
 
-	if (SLJIT_UNLIKELY(arg & OFFS_REG_MASK)) {
+	if (arg & OFFS_REG_MASK) {
 		argw &= 0x3;
 		/* Otherwise getput_arg_fast would capture it. */
 		SLJIT_ASSERT(argw);
@@ -980,7 +980,7 @@ static sljit_si getput_arg(struct sljit_compiler *compiler, sljit_si inp_flags, 
 		return push_inst(compiler, INST_CODE_AND_DST(inst, inp_flags, reg) | A(arg & REG_MASK) | B(tmp_r));
 	}
 
-	if (SLJIT_UNLIKELY(!(arg & REG_MASK)))
+	if (!(arg & REG_MASK))
 		inp_flags &= ~WRITE_BACK;
 
 	inst = data_transfer_insts[inp_flags & MEM_MASK];
@@ -1028,7 +1028,7 @@ static sljit_si getput_arg(struct sljit_compiler *compiler, sljit_si inp_flags, 
 	}
 
 	/* Everything else is PPC-64 only. */
-	if (SLJIT_UNLIKELY(!(arg & REG_MASK))) {
+	if (!(arg & REG_MASK)) {
 		diff = argw - compiler->cache_argw;
 		if ((compiler->cache_arg & SLJIT_IMM) && diff <= SIMM_MAX && diff >= SIMM_MIN) {
 			ADJUST_CACHED_IMM(diff);
@@ -1135,7 +1135,7 @@ static sljit_si emit_op(struct sljit_compiler *compiler, sljit_si op, sljit_si i
 	}
 
 	/* Destination check. */
-	if (SLJIT_UNLIKELY(dst == SLJIT_UNUSED)) {
+	if (dst == SLJIT_UNUSED) {
 		if (op >= SLJIT_MOV && op <= SLJIT_MOVU_SI && !(src2 & SLJIT_MEM))
 			return SLJIT_SUCCESS;
 		dst_r = TMP_REG2;

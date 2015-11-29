@@ -1143,7 +1143,7 @@ static sljit_si emit_clz(struct sljit_compiler *compiler, sljit_si op_flags,
 	sljit_si dst_r;
 
 	SLJIT_UNUSED_ARG(op_flags);
-	if (SLJIT_UNLIKELY(dst == SLJIT_UNUSED)) {
+	if (dst == SLJIT_UNUSED) {
 		/* Just set the zero flag. */
 		EMIT_MOV(compiler, TMP_REG1, 0, src, srcw);
 		inst = emit_x86_instruction(compiler, 1, 0, 0, TMP_REG1, 0);
@@ -1160,7 +1160,7 @@ static sljit_si emit_clz(struct sljit_compiler *compiler, sljit_si op_flags,
 		return SLJIT_SUCCESS;
 	}
 
-	if (SLJIT_UNLIKELY(src & SLJIT_IMM)) {
+	if (src & SLJIT_IMM) {
 		EMIT_MOV(compiler, TMP_REG1, 0, SLJIT_IMM, srcw);
 		src = TMP_REG1;
 		srcw = 0;
@@ -1322,12 +1322,12 @@ sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 #endif
 			}
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
-			if (SLJIT_UNLIKELY(dst_is_ereg))
+			if (dst_is_ereg)
 				return emit_mov(compiler, dst, dstw, src, srcw);
 #endif
 		}
 
-		if (SLJIT_UNLIKELY(update) && (src & SLJIT_MEM) && !src_is_ereg && (src & REG_MASK) && (srcw != 0 || (src & OFFS_REG_MASK) != 0)) {
+		if (update && (src & SLJIT_MEM) && !src_is_ereg && (src & REG_MASK) && (srcw != 0 || (src & OFFS_REG_MASK) != 0)) {
 			inst = emit_x86_instruction(compiler, 1, src & REG_MASK, 0, src, srcw);
 			FAIL_IF(!inst);
 			*inst = LEA_r_m;
@@ -1336,7 +1336,7 @@ sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 		}
 
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
-		if (SLJIT_UNLIKELY(dst_is_ereg) && (!(op == SLJIT_MOV || op == SLJIT_MOV_UI || op == SLJIT_MOV_SI || op == SLJIT_MOV_P) || (src & SLJIT_MEM))) {
+		if (dst_is_ereg && (!(op == SLJIT_MOV || op == SLJIT_MOV_UI || op == SLJIT_MOV_SI || op == SLJIT_MOV_P) || (src & SLJIT_MEM))) {
 			SLJIT_ASSERT(dst == SLJIT_MEM1(SLJIT_SP));
 			dst = TMP_REG1;
 		}
@@ -1374,11 +1374,11 @@ sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 		}
 
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
-		if (SLJIT_UNLIKELY(dst_is_ereg) && dst == TMP_REG1)
+		if (dst_is_ereg && dst == TMP_REG1)
 			return emit_mov(compiler, SLJIT_MEM1(SLJIT_SP), dstw, TMP_REG1, 0);
 #endif
 
-		if (SLJIT_UNLIKELY(update) && (dst & SLJIT_MEM) && (dst & REG_MASK) && (dstw != 0 || (dst & OFFS_REG_MASK) != 0)) {
+		if (update && (dst & SLJIT_MEM) && (dst & REG_MASK) && (dstw != 0 || (dst & OFFS_REG_MASK) != 0)) {
 			inst = emit_x86_instruction(compiler, 1, dst & REG_MASK, 0, dst, dstw);
 			FAIL_IF(!inst);
 			*inst = LEA_r_m;
@@ -1386,22 +1386,22 @@ sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 		return SLJIT_SUCCESS;
 	}
 
-	if (SLJIT_UNLIKELY(GET_FLAGS(op_flags)))
+	if (GET_FLAGS(op_flags))
 		compiler->flags_saved = 0;
 
 	switch (op) {
 	case SLJIT_NOT:
-		if (SLJIT_UNLIKELY(op_flags & SLJIT_SET_E))
+		if (op_flags & SLJIT_SET_E)
 			return emit_not_with_flags(compiler, dst, dstw, src, srcw);
 		return emit_unary(compiler, NOT_rm, dst, dstw, src, srcw);
 
 	case SLJIT_NEG:
-		if (SLJIT_UNLIKELY(op_flags & SLJIT_KEEP_FLAGS) && !compiler->flags_saved)
+		if (op_flags & SLJIT_KEEP_FLAGS && !compiler->flags_saved)
 			FAIL_IF(emit_save_flags(compiler));
 		return emit_unary(compiler, NEG_rm, dst, dstw, src, srcw);
 
 	case SLJIT_CLZ:
-		if (SLJIT_UNLIKELY(op_flags & SLJIT_KEEP_FLAGS) && !compiler->flags_saved)
+		if (op_flags & SLJIT_KEEP_FLAGS && !compiler->flags_saved)
 			FAIL_IF(emit_save_flags(compiler));
 		return emit_clz(compiler, op_flags, dst, dstw, src, srcw);
 	}
@@ -2132,9 +2132,9 @@ sljit_si sljit_emit_op2(struct sljit_compiler *compiler, sljit_si op,
 #endif
 
 	if (GET_OPCODE(op) >= SLJIT_MUL) {
-		if (SLJIT_UNLIKELY(GET_FLAGS(op)))
+		if (GET_FLAGS(op))
 			compiler->flags_saved = 0;
-		else if (SLJIT_UNLIKELY(op & SLJIT_KEEP_FLAGS) && !compiler->flags_saved)
+		else if (op & SLJIT_KEEP_FLAGS && !compiler->flags_saved)
 			FAIL_IF(emit_save_flags(compiler));
 	}
 
@@ -2146,16 +2146,16 @@ sljit_si sljit_emit_op2(struct sljit_compiler *compiler, sljit_si op,
 		}
 		else
 			compiler->flags_saved = 0;
-		if (SLJIT_UNLIKELY(op & SLJIT_KEEP_FLAGS) && !compiler->flags_saved)
+		if (op & SLJIT_KEEP_FLAGS && !compiler->flags_saved)
 			FAIL_IF(emit_save_flags(compiler));
 		return emit_cum_binary(compiler, ADD_r_rm, ADD_rm_r, ADD, ADD_EAX_i32,
 			dst, dstw, src1, src1w, src2, src2w);
 	case SLJIT_ADDC:
-		if (SLJIT_UNLIKELY(compiler->flags_saved)) /* C flag must be restored. */
+		if (compiler->flags_saved) /* C flag must be restored. */
 			FAIL_IF(emit_restore_flags(compiler, 1));
-		else if (SLJIT_UNLIKELY(op & SLJIT_KEEP_FLAGS))
+		else if (op & SLJIT_KEEP_FLAGS)
 			FAIL_IF(emit_save_flags(compiler));
-		if (SLJIT_UNLIKELY(GET_FLAGS(op)))
+		if (GET_FLAGS(op))
 			compiler->flags_saved = 0;
 		return emit_cum_binary(compiler, ADC_r_rm, ADC_rm_r, ADC, ADC_EAX_i32,
 			dst, dstw, src1, src1w, src2, src2w);
@@ -2166,18 +2166,18 @@ sljit_si sljit_emit_op2(struct sljit_compiler *compiler, sljit_si op,
 		}
 		else
 			compiler->flags_saved = 0;
-		if (SLJIT_UNLIKELY(op & SLJIT_KEEP_FLAGS) && !compiler->flags_saved)
+		if (op & SLJIT_KEEP_FLAGS && !compiler->flags_saved)
 			FAIL_IF(emit_save_flags(compiler));
 		if (dst == SLJIT_UNUSED)
 			return emit_cmp_binary(compiler, src1, src1w, src2, src2w);
 		return emit_non_cum_binary(compiler, SUB_r_rm, SUB_rm_r, SUB, SUB_EAX_i32,
 			dst, dstw, src1, src1w, src2, src2w);
 	case SLJIT_SUBC:
-		if (SLJIT_UNLIKELY(compiler->flags_saved)) /* C flag must be restored. */
+		if (compiler->flags_saved) /* C flag must be restored. */
 			FAIL_IF(emit_restore_flags(compiler, 1));
-		else if (SLJIT_UNLIKELY(op & SLJIT_KEEP_FLAGS))
+		else if (op & SLJIT_KEEP_FLAGS)
 			FAIL_IF(emit_save_flags(compiler));
-		if (SLJIT_UNLIKELY(GET_FLAGS(op)))
+		if (GET_FLAGS(op))
 			compiler->flags_saved = 0;
 		return emit_non_cum_binary(compiler, SBB_r_rm, SBB_rm_r, SBB, SBB_EAX_i32,
 			dst, dstw, src1, src1w, src2, src2w);
@@ -2519,7 +2519,7 @@ struct sljit_label* sljit_emit_label(struct sljit_compiler *compiler)
 
 	/* We should restore the flags before the label,
 	   since other taken jumps has their own flags as well. */
-	if (SLJIT_UNLIKELY(compiler->flags_saved))
+	if (compiler->flags_saved)
 		PTR_FAIL_IF(emit_restore_flags(compiler, 0));
 
 	if (compiler->last_label && compiler->last_label->size == compiler->size)
@@ -2546,7 +2546,7 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 	CHECK_ERROR_PTR();
 	CHECK_PTR(check_sljit_emit_jump(compiler, type));
 
-	if (SLJIT_UNLIKELY(compiler->flags_saved)) {
+	if (compiler->flags_saved) {
 		if ((type & 0xff) <= SLJIT_JUMP)
 			PTR_FAIL_IF(emit_restore_flags(compiler, 0));
 		compiler->flags_saved = 0;
@@ -2586,7 +2586,7 @@ sljit_si sljit_emit_ijump(struct sljit_compiler *compiler, sljit_si type, sljit_
 
 	CHECK_EXTRA_REGS(src, srcw, (void)0);
 
-	if (SLJIT_UNLIKELY(compiler->flags_saved)) {
+	if (compiler->flags_saved) {
 		if (type <= SLJIT_JUMP)
 			FAIL_IF(emit_restore_flags(compiler, 0));
 		compiler->flags_saved = 0;
@@ -2667,7 +2667,7 @@ sljit_si sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_si op,
 
 	ADJUST_LOCAL_OFFSET(dst, dstw);
 	CHECK_EXTRA_REGS(dst, dstw, (void)0);
-	if (SLJIT_UNLIKELY(compiler->flags_saved))
+	if (compiler->flags_saved)
 		FAIL_IF(emit_restore_flags(compiler, op & SLJIT_KEEP_FLAGS));
 
 	type &= 0xff;

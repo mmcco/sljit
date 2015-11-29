@@ -257,7 +257,7 @@ void sljit_free_exec(void* ptr)
 	/* If header->prev_size == 0, free_block will equal to header.
 	   In this case, free_block->header.size will be > 0. */
 	free_block = AS_FREE_BLOCK(header, -(sljit_sw)header->prev_size);
-	if (SLJIT_UNLIKELY(!free_block->header.size)) {
+	if (!free_block->header.size) {
 		free_block->size += header->size;
 		header = AS_BLOCK_HEADER(free_block, free_block->size);
 		header->prev_size = free_block->size;
@@ -268,7 +268,7 @@ void sljit_free_exec(void* ptr)
 	}
 
 	header = AS_BLOCK_HEADER(free_block, free_block->size);
-	if (SLJIT_UNLIKELY(!header->size)) {
+	if (!header->size) {
 		free_block->size += ((struct free_block*)header)->size;
 		sljit_remove_free_block((struct free_block*)header);
 		header = AS_BLOCK_HEADER(free_block, free_block->size);
@@ -276,7 +276,7 @@ void sljit_free_exec(void* ptr)
 	}
 
 	/* The whole chunk is free. */
-	if (SLJIT_UNLIKELY(!free_block->header.prev_size && header->size == 1)) {
+	if (!free_block->header.prev_size && header->size == 1) {
 		/* If this block is freed, we still have (allocated_size / 2) free space. */
 		if (total_size - free_block->size > (allocated_size * 3 / 2)) {
 			total_size -= free_block->size;

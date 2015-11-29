@@ -59,7 +59,7 @@ static void sparc_cache_flush(sljit_ins *from, sljit_ins *to)
 		".leave:"
 	);
 #else
-	if (SLJIT_UNLIKELY(from == to))
+	if (from == to)
 		return;
 
 	do {
@@ -514,7 +514,7 @@ static sljit_si getput_arg_fast(struct sljit_compiler *compiler, sljit_si flags,
 		if ((!(arg & OFFS_REG_MASK) && argw <= SIMM_MAX && argw >= SIMM_MIN)
 				|| ((arg & OFFS_REG_MASK) && (argw & 0x3) == 0)) {
 			/* Works for both absoulte and relative addresses (immediate case). */
-			if (SLJIT_UNLIKELY(flags & ARG_TEST))
+			if (flags & ARG_TEST)
 				return 1;
 			FAIL_IF(push_inst(compiler, data_transfer_insts[flags & MEM_MASK]
 				| ((flags & MEM_MASK) <= GPR_REG ? D(reg) : DA(reg))
@@ -561,7 +561,7 @@ static sljit_si getput_arg(struct sljit_compiler *compiler, sljit_si flags, slji
 	}
 
 	base = arg & REG_MASK;
-	if (SLJIT_UNLIKELY(arg & OFFS_REG_MASK)) {
+	if (arg & OFFS_REG_MASK) {
 		argw &= 0x3;
 		SLJIT_ASSERT(argw != 0);
 
@@ -648,7 +648,7 @@ static sljit_si emit_op(struct sljit_compiler *compiler, sljit_si op, sljit_si f
 		compiler->cache_argw = 0;
 	}
 
-	if (SLJIT_UNLIKELY(dst == SLJIT_UNUSED)) {
+	if (dst == SLJIT_UNUSED) {
 		if (op >= SLJIT_MOV && op <= SLJIT_MOVU_SI && !(src2 & SLJIT_MEM))
 			return SLJIT_SUCCESS;
 	}

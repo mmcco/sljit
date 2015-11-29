@@ -283,7 +283,7 @@ static SLJIT_INLINE void set_jump_instruction(struct sljit_jump *jump)
 	sljit_uh *jump_inst;
 	sljit_si s, j1, j2;
 
-	if (SLJIT_UNLIKELY(type == 0)) {
+	if (type == 0) {
 		modify_imm32_const((sljit_uh*)jump->addr, (jump->flags & JUMP_LABEL) ? jump->u.label->addr : jump->u.target);
 		return;
 	}
@@ -516,7 +516,7 @@ static sljit_si emit_op_imm(struct sljit_compiler *compiler, sljit_si flags, slj
 	sljit_si reg;
 	sljit_uw imm, nimm;
 
-	if (SLJIT_UNLIKELY((flags & (ARG1_IMM | ARG2_IMM)) == (ARG1_IMM | ARG2_IMM))) {
+	if ((flags & (ARG1_IMM | ARG2_IMM)) == (ARG1_IMM | ARG2_IMM)) {
 		/* Both are immediates. */
 		flags &= ~ARG1_IMM;
 		FAIL_IF(load_immediate(compiler, TMP_REG1, arg1));
@@ -894,9 +894,9 @@ static sljit_si getput_arg_fast(struct sljit_compiler *compiler, sljit_si flags,
 
 	SLJIT_ASSERT(arg & SLJIT_MEM);
 
-	if (SLJIT_UNLIKELY(flags & UPDATE)) {
+	if (flags & UPDATE) {
 		if ((arg & REG_MASK) && !(arg & OFFS_REG_MASK) && argw <= 0xff && argw >= -0xff) {
-			if (SLJIT_UNLIKELY(flags & ARG_TEST))
+			if (flags & ARG_TEST)
 				return 1;
 
 			flags &= ~UPDATE;
@@ -914,8 +914,8 @@ static sljit_si getput_arg_fast(struct sljit_compiler *compiler, sljit_si flags,
 		return 0;
 	}
 
-	if (SLJIT_UNLIKELY(arg & OFFS_REG_MASK)) {
-		if (SLJIT_UNLIKELY(flags & ARG_TEST))
+	if (arg & OFFS_REG_MASK) {
+		if (flags & ARG_TEST)
 			return 1;
 
 		argw &= 0x3;
@@ -932,7 +932,7 @@ static sljit_si getput_arg_fast(struct sljit_compiler *compiler, sljit_si flags,
 	if (!(arg & REG_MASK) || argw > 0xfff || argw < -0xff)
 		return 0;
 
-	if (SLJIT_UNLIKELY(flags & ARG_TEST))
+	if (flags & ARG_TEST)
 		return 1;
 
 	arg &= 0xf;
@@ -960,7 +960,7 @@ static sljit_si getput_arg_fast(struct sljit_compiler *compiler, sljit_si flags,
 	}
 
 	/* SP based immediate. */
-	if (SLJIT_UNLIKELY(arg == SLJIT_SP) && OFFSET_CHECK(0xff, 2) && IS_WORD_SIZE(flags) && reg_map[reg] <= 7) {
+	if (arg == SLJIT_SP && OFFSET_CHECK(0xff, 2) && IS_WORD_SIZE(flags) && reg_map[reg] <= 7) {
 		FAIL_IF(push_inst16(compiler, STR_SP | ((flags & STORE) ? 0 : 0x800) | RDN3(reg) | (argw >> 2)));
 		return -1;
 	}
@@ -1013,7 +1013,7 @@ static sljit_si getput_arg(struct sljit_compiler *compiler, sljit_si flags, slji
 
 	tmp_r = (flags & STORE) ? TMP_REG3 : reg;
 
-	if (SLJIT_UNLIKELY((flags & UPDATE) && (arg & REG_MASK))) {
+	if ((flags & UPDATE) && (arg & REG_MASK)) {
 		/* Update only applies if a base register exists. */
 		/* There is no caching here. */
 		other_r = OFFS_REG(arg);
@@ -1539,7 +1539,7 @@ static sljit_si emit_fop_mem(struct sljit_compiler *compiler, sljit_si flags, sl
 	SLJIT_ASSERT(arg & SLJIT_MEM);
 
 	/* Fast loads and stores. */
-	if (SLJIT_UNLIKELY(arg & OFFS_REG_MASK)) {
+	if (arg & OFFS_REG_MASK) {
 		FAIL_IF(push_inst32(compiler, ADD_W | RD4(TMP_REG2) | RN4(arg & REG_MASK) | RM4(OFFS_REG(arg)) | ((argw & 0x3) << 6)));
 		arg = SLJIT_MEM | TMP_REG2;
 		argw = 0;

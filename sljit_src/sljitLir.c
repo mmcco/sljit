@@ -30,31 +30,31 @@
 
 #define CHECK_ERROR() \
 	do { \
-		if (SLJIT_UNLIKELY(compiler->error)) \
+		if (compiler->error) \
 			return compiler->error; \
 	} while (0)
 
 #define CHECK_ERROR_PTR() \
 	do { \
-		if (SLJIT_UNLIKELY(compiler->error)) \
+		if (compiler->error) \
 			return NULL; \
 	} while (0)
 
 #define FAIL_IF(expr) \
 	do { \
-		if (SLJIT_UNLIKELY(expr)) \
+		if (expr) \
 			return compiler->error; \
 	} while (0)
 
 #define PTR_FAIL_IF(expr) \
 	do { \
-		if (SLJIT_UNLIKELY(expr)) \
+		if (expr) \
 			return NULL; \
 	} while (0)
 
 #define FAIL_IF_NULL(ptr) \
 	do { \
-		if (SLJIT_UNLIKELY(!(ptr))) { \
+		if (!(ptr)) { \
 			compiler->error = SLJIT_ERR_ALLOC_FAILED; \
 			return SLJIT_ERR_ALLOC_FAILED; \
 		} \
@@ -62,7 +62,7 @@
 
 #define PTR_FAIL_IF_NULL(ptr) \
 	do { \
-		if (SLJIT_UNLIKELY(!(ptr))) { \
+		if (!(ptr)) { \
 			compiler->error = SLJIT_ERR_ALLOC_FAILED; \
 			return NULL; \
 		} \
@@ -70,7 +70,7 @@
 
 #define PTR_FAIL_WITH_EXEC_IF(ptr) \
 	do { \
-		if (SLJIT_UNLIKELY(!(ptr))) { \
+		if (!(ptr)) { \
 			compiler->error = SLJIT_ERR_EX_ALLOC_FAILED; \
 			return NULL; \
 		} \
@@ -255,7 +255,7 @@
 
 #define CHECK_ARGUMENT(x) \
 	do { \
-		if (SLJIT_UNLIKELY(!(x))) \
+		if (!(x)) \
 			return 1; \
 	} while (0)
 
@@ -264,7 +264,7 @@
 
 #define CHECK(x) \
 	do { \
-		if (SLJIT_UNLIKELY(x)) { \
+		if (x) { \
 			compiler->error = SLJIT_ERR_BAD_ARGUMENT; \
 			return SLJIT_ERR_BAD_ARGUMENT; \
 		} \
@@ -272,7 +272,7 @@
 
 #define CHECK_PTR(x) \
 	do { \
-		if (SLJIT_UNLIKELY(x)) { \
+		if (x) { \
 			compiler->error = SLJIT_ERR_BAD_ARGUMENT; \
 			return NULL; \
 		} \
@@ -280,7 +280,7 @@
 
 #define CHECK_REG_INDEX(x) \
 	do { \
-		if (SLJIT_UNLIKELY(x)) { \
+		if (x) { \
 			return -2; \
 		} \
 	} while (0)
@@ -455,7 +455,7 @@ void sljit_free_code(void* code)
 
 void sljit_set_label(struct sljit_jump *jump, struct sljit_label* label)
 {
-	if (SLJIT_LIKELY(!!jump) && SLJIT_LIKELY(!!label)) {
+	if (!!jump && !!label) {
 		jump->flags &= ~JUMP_ADDR;
 		jump->flags |= JUMP_LABEL;
 		jump->u.label = label;
@@ -464,7 +464,7 @@ void sljit_set_label(struct sljit_jump *jump, struct sljit_label* label)
 
 void sljit_set_target(struct sljit_jump *jump, sljit_uw target)
 {
-	if (SLJIT_LIKELY(!!jump)) {
+	if (!!jump) {
 		jump->flags &= ~JUMP_LABEL;
 		jump->flags |= JUMP_ADDR;
 		jump->u.target = target;
@@ -931,7 +931,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_enter(struct sljit_compil
 	CHECK_ARGUMENT(local_size >= 0 && local_size <= SLJIT_MAX_LOCAL_SIZE);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose))
+	if (!!compiler->verbose)
 		fprintf(compiler->verbose, "  enter options:none args:%d scratches:%d saveds:%d fscratches:%d fsaveds:%d local_size:%d\n",
 			args, scratches, saveds, fscratches, fsaveds, local_size);
 #endif
@@ -942,7 +942,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_set_context(struct sljit_compi
 	sljit_si options, sljit_si args, sljit_si scratches, sljit_si saveds,
 	sljit_si fscratches, sljit_si fsaveds, sljit_si local_size)
 {
-	if (SLJIT_UNLIKELY(compiler->skip_checks)) {
+	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
 		CHECK_RETURN_OK;
 	}
@@ -960,7 +960,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_set_context(struct sljit_compi
 	CHECK_ARGUMENT(local_size >= 0 && local_size <= SLJIT_MAX_LOCAL_SIZE);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose))
+	if (!!compiler->verbose)
 		fprintf(compiler->verbose, "  set_context options:none args:%d scratches:%d saveds:%d fscratches:%d fsaveds:%d local_size:%d\n",
 			args, scratches, saveds, fscratches, fsaveds, local_size);
 #endif
@@ -979,7 +979,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_return(struct sljit_compi
 		CHECK_ARGUMENT(src == 0 && srcw == 0);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		if (op == SLJIT_UNUSED)
 			fprintf(compiler->verbose, "  return\n");
 		else {
@@ -998,7 +998,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fast_enter(struct sljit_c
 	FUNCTION_CHECK_DST(dst, dstw);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  fast_enter ");
 		sljit_verbose_param(compiler, dst, dstw);
 		fprintf(compiler->verbose, "\n");
@@ -1013,7 +1013,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fast_return(struct sljit_
 	FUNCTION_CHECK_SRC(src, srcw);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  fast_return ");
 		sljit_verbose_param(compiler, src, srcw);
 		fprintf(compiler->verbose, "\n");
@@ -1030,7 +1030,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op0(struct sljit_compiler
 	CHECK_ARGUMENT(op < SLJIT_LUMUL || compiler->scratches >= 2);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose))
+	if (!!compiler->verbose)
 		fprintf(compiler->verbose, "  %s%s\n", !(op & SLJIT_INT_OP) ? "" : "i", op0_names[GET_OPCODE(op) - SLJIT_OP0_BASE]);
 #endif
 	CHECK_RETURN_OK;
@@ -1040,7 +1040,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op1(struct sljit_compiler
 	sljit_si dst, sljit_sw dstw,
 	sljit_si src, sljit_sw srcw)
 {
-	if (SLJIT_UNLIKELY(compiler->skip_checks)) {
+	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
 		CHECK_RETURN_OK;
 	}
@@ -1053,7 +1053,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op1(struct sljit_compiler
 	FUNCTION_CHECK_OP1();
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  %s%s%s%s%s%s%s%s ", !(op & SLJIT_INT_OP) ? "" : "i", op1_names[GET_OPCODE(op) - SLJIT_OP1_BASE],
 			!(op & SLJIT_SET_E) ? "" : ".e", !(op & SLJIT_SET_U) ? "" : ".u", !(op & SLJIT_SET_S) ? "" : ".s",
 			!(op & SLJIT_SET_O) ? "" : ".o", !(op & SLJIT_SET_C) ? "" : ".c", !(op & SLJIT_KEEP_FLAGS) ? "" : ".k");
@@ -1071,7 +1071,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op2(struct sljit_compiler
 	sljit_si src1, sljit_sw src1w,
 	sljit_si src2, sljit_sw src2w)
 {
-	if (SLJIT_UNLIKELY(compiler->skip_checks)) {
+	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
 		CHECK_RETURN_OK;
 	}
@@ -1084,7 +1084,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op2(struct sljit_compiler
 	FUNCTION_CHECK_DST(dst, dstw);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  %s%s%s%s%s%s%s%s ", !(op & SLJIT_INT_OP) ? "" : "i", op2_names[GET_OPCODE(op) - SLJIT_OP2_BASE],
 			!(op & SLJIT_SET_E) ? "" : ".e", !(op & SLJIT_SET_U) ? "" : ".u", !(op & SLJIT_SET_S) ? "" : ".s",
 			!(op & SLJIT_SET_O) ? "" : ".o", !(op & SLJIT_SET_C) ? "" : ".c", !(op & SLJIT_KEEP_FLAGS) ? "" : ".k");
@@ -1139,7 +1139,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op_custom(struct sljit_co
 
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  op_custom");
 		for (i = 0; i < size; i++)
 			fprintf(compiler->verbose, " 0x%x", ((sljit_ub*)instruction)[i]);
@@ -1153,7 +1153,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1(struct sljit_compile
 	sljit_si dst, sljit_sw dstw,
 	sljit_si src, sljit_sw srcw)
 {
-	if (SLJIT_UNLIKELY(compiler->skip_checks)) {
+	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
 		CHECK_RETURN_OK;
 	}
@@ -1166,7 +1166,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1(struct sljit_compile
 	FUNCTION_FCHECK(dst, dstw);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		if (GET_OPCODE(op) == SLJIT_CONVD_FROMS)
 			fprintf(compiler->verbose, "  %s%s ", fop1_names[SLJIT_CONVD_FROMS - SLJIT_FOP1_BASE],
 				(op & SLJIT_SINGLE_OP) ? "s.fromd" : "d.froms");
@@ -1187,7 +1187,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_cmp(struct sljit_com
 	sljit_si src1, sljit_sw src1w,
 	sljit_si src2, sljit_sw src2w)
 {
-	if (SLJIT_UNLIKELY(compiler->skip_checks)) {
+	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
 		CHECK_RETURN_OK;
 	}
@@ -1200,7 +1200,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_cmp(struct sljit_com
 	FUNCTION_FCHECK(src2, src2w);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  %s%s%s%s ", (op & SLJIT_SINGLE_OP) ? "s" : "d", fop1_names[SLJIT_DCMP - SLJIT_FOP1_BASE],
 			(op & SLJIT_SET_E) ? ".e" : "", (op & SLJIT_SET_S) ? ".s" : "");
 		sljit_verbose_fparam(compiler, src1, src1w);
@@ -1216,7 +1216,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_convw_fromd(struct s
 	sljit_si dst, sljit_sw dstw,
 	sljit_si src, sljit_sw srcw)
 {
-	if (SLJIT_UNLIKELY(compiler->skip_checks)) {
+	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
 		CHECK_RETURN_OK;
 	}
@@ -1229,7 +1229,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_convw_fromd(struct s
 	FUNCTION_CHECK_DST(dst, dstw);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  %s%s.from%s ", fop1_names[GET_OPCODE(op) - SLJIT_FOP1_BASE],
 			(GET_OPCODE(op) == SLJIT_CONVI_FROMD) ? "i" : "w",
 			(op & SLJIT_SINGLE_OP) ? "s" : "d");
@@ -1246,7 +1246,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_convd_fromw(struct s
 	sljit_si dst, sljit_sw dstw,
 	sljit_si src, sljit_sw srcw)
 {
-	if (SLJIT_UNLIKELY(compiler->skip_checks)) {
+	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
 		CHECK_RETURN_OK;
 	}
@@ -1259,7 +1259,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_convd_fromw(struct s
 	FUNCTION_FCHECK(dst, dstw);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  %s%s.from%s ", fop1_names[GET_OPCODE(op) - SLJIT_FOP1_BASE],
 			(op & SLJIT_SINGLE_OP) ? "s" : "d",
 			(GET_OPCODE(op) == SLJIT_CONVD_FROMI) ? "i" : "w");
@@ -1286,7 +1286,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop2(struct sljit_compile
 	FUNCTION_FCHECK(dst, dstw);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  %s%s ", (op & SLJIT_SINGLE_OP) ? "s" : "d", fop2_names[GET_OPCODE(op) - SLJIT_FOP2_BASE]);
 		sljit_verbose_fparam(compiler, dst, dstw);
 		fprintf(compiler->verbose, ", ");
@@ -1304,7 +1304,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_label(struct sljit_compil
 	SLJIT_UNUSED_ARG(compiler);
 
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose))
+	if (!!compiler->verbose)
 		fprintf(compiler->verbose, "label:\n");
 #endif
 	CHECK_RETURN_OK;
@@ -1312,7 +1312,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_label(struct sljit_compil
 
 static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_jump(struct sljit_compiler *compiler, sljit_si type)
 {
-	if (SLJIT_UNLIKELY(compiler->skip_checks)) {
+	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
 		CHECK_RETURN_OK;
 	}
@@ -1323,7 +1323,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_jump(struct sljit_compile
 	CHECK_ARGUMENT((type & 0xff) < SLJIT_JUMP || !(type & SLJIT_INT_OP));
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose))
+	if (!!compiler->verbose)
 		fprintf(compiler->verbose, "  jump%s.%s%s\n", !(type & SLJIT_REWRITABLE_JUMP) ? "" : ".r",
 			JUMP_PREFIX(type), jump_names[type & 0xff]);
 #endif
@@ -1341,7 +1341,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_cmp(struct sljit_compiler
 	FUNCTION_CHECK_SRC(src2, src2w);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  cmp%s.%s%s ", !(type & SLJIT_REWRITABLE_JUMP) ? "" : ".r",
 			(type & SLJIT_INT_OP) ? "i_" : "", jump_names[type & 0xff]);
 		sljit_verbose_param(compiler, src1, src1w);
@@ -1365,7 +1365,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fcmp(struct sljit_compile
 	FUNCTION_FCHECK(src2, src2w);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  fcmp%s.%s%s ", !(type & SLJIT_REWRITABLE_JUMP) ? "" : ".r",
 			(type & SLJIT_SINGLE_OP) ? "s_" : "d_", jump_names[type & 0xff]);
 		sljit_verbose_fparam(compiler, src1, src1w);
@@ -1379,7 +1379,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fcmp(struct sljit_compile
 
 static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_ijump(struct sljit_compiler *compiler, sljit_si type, sljit_si src, sljit_sw srcw)
 {
-	if (SLJIT_UNLIKELY(compiler->skip_checks)) {
+	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
 		CHECK_RETURN_OK;
 	}
@@ -1389,7 +1389,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_ijump(struct sljit_compil
 	FUNCTION_CHECK_SRC(src, srcw);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  ijump.%s ", jump_names[type]);
 		sljit_verbose_param(compiler, src, srcw);
 		fprintf(compiler->verbose, "\n");
@@ -1418,7 +1418,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op_flags(struct sljit_com
 	FUNCTION_CHECK_DST(dst, dstw);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  flags.%s%s%s%s ", !(op & SLJIT_INT_OP) ? "" : "i",
 			GET_OPCODE(op) >= SLJIT_OP2_BASE ? op2_names[GET_OPCODE(op) - SLJIT_OP2_BASE] : op1_names[GET_OPCODE(op) - SLJIT_OP1_BASE],
 			!(op & SLJIT_SET_E) ? "" : ".e", !(op & SLJIT_KEEP_FLAGS) ? "" : ".k");
@@ -1439,7 +1439,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_get_local_base(struct sljit_co
 	FUNCTION_CHECK_DST(dst, dstw);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  local_base ");
 		sljit_verbose_param(compiler, dst, dstw);
 		fprintf(compiler->verbose, ", #%" SLJIT_PRINT_D "d\n", offset);
@@ -1454,7 +1454,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_const(struct sljit_compil
 	FUNCTION_CHECK_DST(dst, dstw);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	if (SLJIT_UNLIKELY(!!compiler->verbose)) {
+	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  const ");
 		sljit_verbose_param(compiler, dst, dstw);
 		fprintf(compiler->verbose, ", #%" SLJIT_PRINT_D "d\n", init_value);
@@ -1585,7 +1585,7 @@ struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, sljit_si type
 	}
 #endif
 
-	if (SLJIT_UNLIKELY((src1 & SLJIT_IMM) && !(src2 & SLJIT_IMM))) {
+	if ((src1 & SLJIT_IMM) && !(src2 & SLJIT_IMM)) {
 		/* Immediate is prefered as second argument by most architectures. */
 		switch (condition) {
 		case SLJIT_LESS:

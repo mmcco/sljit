@@ -1327,7 +1327,7 @@ static sljit_si getput_arg_fast(struct sljit_compiler *compiler, sljit_si flags,
 	if ((!(flags & WRITE_BACK) || !(arg & REG_MASK))
 			&& !(arg & OFFS_REG_MASK) && argw <= SIMM_16BIT_MAX && argw >= SIMM_16BIT_MIN) {
 		/* Works for both absoulte and relative addresses. */
-		if (SLJIT_UNLIKELY(flags & ARG_TEST))
+		if (flags & ARG_TEST)
 			return 1;
 
 		FAIL_IF(ADDLI(ADDR_TMP_mapped, reg_map[arg & REG_MASK], argw));
@@ -1389,7 +1389,7 @@ static sljit_si getput_arg(struct sljit_compiler *compiler, sljit_si flags, slji
 
 	base = arg & REG_MASK;
 
-	if (SLJIT_UNLIKELY(arg & OFFS_REG_MASK)) {
+	if (arg & OFFS_REG_MASK) {
 		argw &= 0x3;
 
 		if ((flags & WRITE_BACK) && reg_ar == reg_map[base]) {
@@ -1436,7 +1436,7 @@ static sljit_si getput_arg(struct sljit_compiler *compiler, sljit_si flags, slji
 			}
 		}
 
-		if (SLJIT_UNLIKELY(argw)) {
+		if (argw) {
 			compiler->cache_arg = SLJIT_MEM | (arg & OFFS_REG_MASK);
 			compiler->cache_argw = argw;
 			FAIL_IF(SHLI(TMP_REG3_mapped, reg_map[OFFS_REG(arg)], argw));
@@ -1465,7 +1465,7 @@ static sljit_si getput_arg(struct sljit_compiler *compiler, sljit_si flags, slji
 			return PB2(data_transfer_insts[flags & MEM_MASK], reg_map[base], reg_ar);
 	}
 
-	if (SLJIT_UNLIKELY(flags & WRITE_BACK) && base) {
+	if (flags & WRITE_BACK && base) {
 		/* Update only applies if a base register exists. */
 		if (reg_ar == reg_map[base]) {
 			SLJIT_ASSERT(!(flags & LOAD_DATA) && TMP_REG1_mapped != reg_ar);
@@ -1991,7 +1991,7 @@ static sljit_si emit_op(struct sljit_compiler *compiler, sljit_si op, sljit_si f
 		compiler->cache_argw = 0;
 	}
 
-	if (SLJIT_UNLIKELY(dst == SLJIT_UNUSED)) {
+	if (dst == SLJIT_UNUSED) {
 		if (op >= SLJIT_MOV && op <= SLJIT_MOVU_SI && !(src2 & SLJIT_MEM))
 			return SLJIT_SUCCESS;
 		if (GET_FLAGS(op))
