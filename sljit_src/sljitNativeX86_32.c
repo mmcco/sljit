@@ -26,7 +26,7 @@
 
 /* x86 32-bit arch dependent functions. */
 
-static sljit_si emit_do_imm(struct sljit_compiler *compiler, sljit_ub opcode, sljit_sw imm)
+static int emit_do_imm(struct sljit_compiler *compiler, sljit_ub opcode, sljit_sw imm)
 {
 	sljit_ub *inst;
 
@@ -38,7 +38,7 @@ static sljit_si emit_do_imm(struct sljit_compiler *compiler, sljit_ub opcode, sl
 	return SLJIT_SUCCESS;
 }
 
-static sljit_ub* generate_far_jump_code(struct sljit_jump *jump, sljit_ub *code_ptr, sljit_si type)
+static sljit_ub* generate_far_jump_code(struct sljit_jump *jump, sljit_ub *code_ptr, int type)
 {
 	if (type == SLJIT_JUMP) {
 		*code_ptr++ = JMP_i32;
@@ -63,11 +63,11 @@ static sljit_ub* generate_far_jump_code(struct sljit_jump *jump, sljit_ub *code_
 	return code_ptr;
 }
 
-sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
-	sljit_si options, sljit_si args, sljit_si scratches, sljit_si saveds,
-	sljit_si fscratches, sljit_si fsaveds, sljit_si local_size)
+int sljit_emit_enter(struct sljit_compiler *compiler,
+	int options, int args, int scratches, int saveds,
+	int fscratches, int fsaveds, int local_size)
 {
-	sljit_si size;
+	int size;
 	sljit_ub *inst;
 
 	CHECK_ERROR();
@@ -183,9 +183,9 @@ sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
 		SLJIT_SP, 0, SLJIT_SP, 0, SLJIT_IMM, local_size);
 }
 
-sljit_si sljit_set_context(struct sljit_compiler *compiler,
-	sljit_si options, sljit_si args, sljit_si scratches, sljit_si saveds,
-	sljit_si fscratches, sljit_si fsaveds, sljit_si local_size)
+int sljit_set_context(struct sljit_compiler *compiler,
+	int options, int args, int scratches, int saveds,
+	int fscratches, int fsaveds, int local_size)
 {
 	CHECK_ERROR();
 	CHECK(check_sljit_set_context(compiler, options, args, scratches, saveds, fscratches, fsaveds, local_size));
@@ -205,9 +205,9 @@ sljit_si sljit_set_context(struct sljit_compiler *compiler,
 	return SLJIT_SUCCESS;
 }
 
-sljit_si sljit_emit_return(struct sljit_compiler *compiler, sljit_si op, sljit_si src, sljit_sw srcw)
+int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, sljit_sw srcw)
 {
-	sljit_si size;
+	int size;
 	sljit_ub *inst;
 
 	CHECK_ERROR();
@@ -271,16 +271,16 @@ sljit_si sljit_emit_return(struct sljit_compiler *compiler, sljit_si op, sljit_s
 /* --------------------------------------------------------------------- */
 
 /* Size contains the flags as well. */
-static sljit_ub* emit_x86_instruction(struct sljit_compiler *compiler, sljit_si size,
+static sljit_ub* emit_x86_instruction(struct sljit_compiler *compiler, int size,
 	/* The register or immediate operand. */
-	sljit_si a, sljit_sw imma,
+	int a, sljit_sw imma,
 	/* The general operand (not immediate). */
-	sljit_si b, sljit_sw immb)
+	int b, sljit_sw immb)
 {
 	sljit_ub *inst;
 	sljit_ub *buf_ptr;
-	sljit_si flags = size & ~0xf;
-	sljit_si inst_size;
+	int flags = size & ~0xf;
+	int inst_size;
 
 	/* Both cannot be switched on. */
 	SLJIT_ASSERT((flags & (EX86_BIN_INS | EX86_SHIFT_INS)) != (EX86_BIN_INS | EX86_SHIFT_INS));
@@ -439,7 +439,7 @@ static sljit_ub* emit_x86_instruction(struct sljit_compiler *compiler, sljit_si 
 /*  Call / return instructions                                           */
 /* --------------------------------------------------------------------- */
 
-static SLJIT_INLINE sljit_si call_with_args(struct sljit_compiler *compiler, sljit_si type)
+static SLJIT_INLINE int call_with_args(struct sljit_compiler *compiler, int type)
 {
 	sljit_ub *inst;
 
@@ -477,7 +477,7 @@ static SLJIT_INLINE sljit_si call_with_args(struct sljit_compiler *compiler, slj
 	return SLJIT_SUCCESS;
 }
 
-sljit_si sljit_emit_fast_enter(struct sljit_compiler *compiler, sljit_si dst, sljit_sw dstw)
+int sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, sljit_sw dstw)
 {
 	sljit_ub *inst;
 
@@ -508,7 +508,7 @@ sljit_si sljit_emit_fast_enter(struct sljit_compiler *compiler, sljit_si dst, sl
 	return SLJIT_SUCCESS;
 }
 
-sljit_si sljit_emit_fast_return(struct sljit_compiler *compiler, sljit_si src, sljit_sw srcw)
+int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, sljit_sw srcw)
 {
 	sljit_ub *inst;
 

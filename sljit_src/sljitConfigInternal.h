@@ -270,9 +270,6 @@ typedef signed char sljit_sb;
 typedef unsigned short int sljit_uh;
 typedef signed short int sljit_sh;
 
-/* 32 bit integer type. */
-typedef signed int sljit_si;
-
 /* Machine word type. Enough for storing a pointer.
      32 bit for 32 bit machines.
      64 bit for 64 bit machines. */

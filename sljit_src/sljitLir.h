@@ -297,8 +297,8 @@ struct sljit_const {
 };
 
 struct sljit_compiler {
-	sljit_si error;
-	sljit_si options;
+	int error;
+	int options;
 
 	struct sljit_label *labels;
 	struct sljit_jump *jumps;
@@ -311,30 +311,30 @@ struct sljit_compiler {
 	struct sljit_memory_fragment *abuf;
 
 	/* Used scratch registers. */
-	sljit_si scratches;
+	int scratches;
 	/* Used saved registers. */
-	sljit_si saveds;
+	int saveds;
 	/* Used float scratch registers. */
-	sljit_si fscratches;
+	int fscratches;
 	/* Used float saved registers. */
-	sljit_si fsaveds;
+	int fsaveds;
 	/* Local stack size. */
-	sljit_si local_size;
+	int local_size;
 	/* Code size. */
 	sljit_uw size;
 	/* For statistical purposes. */
 	sljit_uw executable_size;
 
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
-	sljit_si args;
+	int args;
 #endif
 
 #if (defined SLJIT_CONFIG_X86_64 && SLJIT_CONFIG_X86_64)
-	sljit_si mode32;
+	int mode32;
 #endif
 
 #if (defined SLJIT_CONFIG_X86 && SLJIT_CONFIG_X86)
-	sljit_si flags_saved;
+	int flags_saved;
 #endif
 
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5)
@@ -351,40 +351,40 @@ struct sljit_compiler {
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5) || (defined SLJIT_CONFIG_ARM_V7 && SLJIT_CONFIG_ARM_V7)
 	/* Temporary fields. */
 	sljit_uw shift_imm;
-	sljit_si cache_arg;
+	int cache_arg;
 	sljit_sw cache_argw;
 #endif
 
 #if (defined SLJIT_CONFIG_ARM_THUMB2 && SLJIT_CONFIG_ARM_THUMB2)
-	sljit_si cache_arg;
+	int cache_arg;
 	sljit_sw cache_argw;
 #endif
 
 #if (defined SLJIT_CONFIG_ARM_64 && SLJIT_CONFIG_ARM_64)
-	sljit_si cache_arg;
+	int cache_arg;
 	sljit_sw cache_argw;
 #endif
 
 #if (defined SLJIT_CONFIG_PPC && SLJIT_CONFIG_PPC)
 	sljit_sw imm;
-	sljit_si cache_arg;
+	int cache_arg;
 	sljit_sw cache_argw;
 #endif
 
 #if (defined SLJIT_CONFIG_MIPS && SLJIT_CONFIG_MIPS)
-	sljit_si delay_slot;
-	sljit_si cache_arg;
+	int delay_slot;
+	int cache_arg;
 	sljit_sw cache_argw;
 #endif
 
 #if (defined SLJIT_CONFIG_SPARC_32 && SLJIT_CONFIG_SPARC_32)
-	sljit_si delay_slot;
-	sljit_si cache_arg;
+	int delay_slot;
+	int cache_arg;
 	sljit_sw cache_argw;
 #endif
 
 #if (defined SLJIT_CONFIG_TILEGX && SLJIT_CONFIG_TILEGX)
-	sljit_si cache_arg;
+	int cache_arg;
 	sljit_sw cache_argw;
 #endif
 
@@ -395,13 +395,13 @@ struct sljit_compiler {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS) \
 		|| (defined SLJIT_DEBUG && SLJIT_DEBUG)
 	/* Local size passed to the functions. */
-	sljit_si logical_local_size;
+	int logical_local_size;
 #endif
 
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS) \
 		|| (defined SLJIT_DEBUG && SLJIT_DEBUG) \
 		|| (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
-	sljit_si skip_checks;
+	int skip_checks;
 #endif
 };
 
@@ -421,7 +421,7 @@ void sljit_free_compiler(struct sljit_compiler *compiler);
    error code. Thus there is no need for checking the error after every
    call, it is enough to do it before the code is compiled. Removing
    these checks increases the performance of the compiling process. */
-static SLJIT_INLINE sljit_si sljit_get_compiler_error(struct sljit_compiler *compiler) { return compiler->error; }
+static SLJIT_INLINE int sljit_get_compiler_error(struct sljit_compiler *compiler) { return compiler->error; }
 
 /*
    Allocate a small amount of memory. The size must be <= 64 bytes on 32 bit,
@@ -434,7 +434,7 @@ static SLJIT_INLINE sljit_si sljit_get_compiler_error(struct sljit_compiler *com
    indicate that there is no more memory (does not set the current error code
    of the compiler to out-of-memory status).
 */
-void* sljit_alloc_memory(struct sljit_compiler *compiler, sljit_si size);
+void* sljit_alloc_memory(struct sljit_compiler *compiler, int size);
 
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 /* Passing NULL disables verbose. */
@@ -504,9 +504,9 @@ offset 0 is aligned to sljit_d. Otherwise it is aligned to sljit_uw. */
 /* The local_size must be >= 0 and <= SLJIT_MAX_LOCAL_SIZE. */
 #define SLJIT_MAX_LOCAL_SIZE	65536
 
-sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
-	sljit_si options, sljit_si args, sljit_si scratches, sljit_si saveds,
-	sljit_si fscratches, sljit_si fsaveds, sljit_si local_size);
+int sljit_emit_enter(struct sljit_compiler *compiler,
+	int options, int args, int scratches, int saveds,
+	int fscratches, int fsaveds, int local_size);
 
 /* The machine code has a context (which contains the local stack space size,
    number of used registers, etc.) which initialized by sljit_emit_enter. Several
@@ -518,9 +518,9 @@ sljit_si sljit_emit_enter(struct sljit_compiler *compiler,
    Note: every call of sljit_emit_enter and sljit_set_context overwrites
          the previous context. */
 
-sljit_si sljit_set_context(struct sljit_compiler *compiler,
-	sljit_si options, sljit_si args, sljit_si scratches, sljit_si saveds,
-	sljit_si fscratches, sljit_si fsaveds, sljit_si local_size);
+int sljit_set_context(struct sljit_compiler *compiler,
+	int options, int args, int scratches, int saveds,
+	int fscratches, int fsaveds, int local_size);
 
 /* Return from machine code.  The op argument can be SLJIT_UNUSED which means the
    function does not return with anything or any opcode between SLJIT_MOV and
@@ -528,8 +528,8 @@ sljit_si sljit_set_context(struct sljit_compiler *compiler,
    is SLJIT_UNUSED, otherwise see below the description about source and
    destination arguments. */
 
-sljit_si sljit_emit_return(struct sljit_compiler *compiler, sljit_si op,
-	sljit_si src, sljit_sw srcw);
+int sljit_emit_return(struct sljit_compiler *compiler, int op,
+	int src, sljit_sw srcw);
 
 /* Fast calling mechanism for utility functions (see SLJIT_FAST_CALL). All registers and
    even the stack frame is passed to the callee. The return address is preserved in
@@ -546,8 +546,8 @@ sljit_si sljit_emit_return(struct sljit_compiler *compiler, sljit_si op,
 /* Note: although sljit_emit_fast_return could be replaced by an ijump, it is not suggested,
    since many architectures do clever branch prediction on call / return instruction pairs. */
 
-sljit_si sljit_emit_fast_enter(struct sljit_compiler *compiler, sljit_si dst, sljit_sw dstw);
-sljit_si sljit_emit_fast_return(struct sljit_compiler *compiler, sljit_si src, sljit_sw srcw);
+int sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, sljit_sw dstw);
+int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, sljit_sw srcw);
 
 /*
    Source and destination values for arithmetical instructions
@@ -701,7 +701,7 @@ sljit_si sljit_emit_fast_return(struct sljit_compiler *compiler, sljit_si src, s
 #define SLJIT_LSDIV			(SLJIT_OP0_BASE + 5)
 #define SLJIT_ILSDIV			(SLJIT_LSDIV | SLJIT_INT_OP)
 
-sljit_si sljit_emit_op0(struct sljit_compiler *compiler, sljit_si op);
+int sljit_emit_op0(struct sljit_compiler *compiler, int op);
 
 /* Starting index of opcodes for sljit_emit_op1. */
 #define SLJIT_OP1_BASE			32
@@ -778,9 +778,9 @@ sljit_si sljit_emit_op0(struct sljit_compiler *compiler, sljit_si op);
 #define SLJIT_CLZ			(SLJIT_OP1_BASE + 18)
 #define SLJIT_ICLZ			(SLJIT_CLZ | SLJIT_INT_OP)
 
-sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
-	sljit_si dst, sljit_sw dstw,
-	sljit_si src, sljit_sw srcw);
+int sljit_emit_op1(struct sljit_compiler *compiler, int op,
+	int dst, sljit_sw dstw,
+	int src, sljit_sw srcw);
 
 /* Starting index of opcodes for sljit_emit_op2. */
 #define SLJIT_OP2_BASE			96
@@ -832,10 +832,10 @@ sljit_si sljit_emit_op1(struct sljit_compiler *compiler, sljit_si op,
 #define SLJIT_ASHR			(SLJIT_OP2_BASE + 10)
 #define SLJIT_IASHR			(SLJIT_ASHR | SLJIT_INT_OP)
 
-sljit_si sljit_emit_op2(struct sljit_compiler *compiler, sljit_si op,
-	sljit_si dst, sljit_sw dstw,
-	sljit_si src1, sljit_sw src1w,
-	sljit_si src2, sljit_sw src2w);
+int sljit_emit_op2(struct sljit_compiler *compiler, int op,
+	int dst, sljit_sw dstw,
+	int src1, sljit_sw src1w,
+	int src2, sljit_sw src2w);
 
 /* The following function is a helper function for sljit_emit_op_custom.
    It returns with the real machine register index ( >=0 ) of any SLJIT_R,
@@ -843,14 +843,14 @@ sljit_si sljit_emit_op2(struct sljit_compiler *compiler, sljit_si op,
 
    Note: it returns with -1 for virtual registers (only on x86-32). */
 
-sljit_si sljit_get_register_index(sljit_si reg);
+int sljit_get_register_index(int reg);
 
 /* The following function is a helper function for sljit_emit_op_custom.
    It returns with the real machine register index of any SLJIT_FLOAT register.
 
    Note: the index is always an even number on ARM (except ARM-64), MIPS, and SPARC. */
 
-sljit_si sljit_get_float_register_index(sljit_si reg);
+int sljit_get_float_register_index(int reg);
 
 /* Any instruction can be inserted into the instruction stream by
    sljit_emit_op_custom. It has a similar purpose as inline assembly.
@@ -862,12 +862,12 @@ sljit_si sljit_get_float_register_index(sljit_si reg);
               if size == 4, the instruction argument must be 4 byte aligned.
    Otherwise: size must be 4 and instruction argument must be 4 byte aligned. */
 
-sljit_si sljit_emit_op_custom(struct sljit_compiler *compiler,
-	void *instruction, sljit_si size);
+int sljit_emit_op_custom(struct sljit_compiler *compiler,
+	void *instruction, int size);
 
 /* Returns with non-zero if fpu is available. */
 
-sljit_si sljit_is_fpu_available(void);
+int sljit_is_fpu_available(void);
 
 /* Starting index of opcodes for sljit_emit_fop1. */
 #define SLJIT_FOP1_BASE			128
@@ -906,9 +906,9 @@ sljit_si sljit_is_fpu_available(void);
 #define SLJIT_DABS			(SLJIT_FOP1_BASE + 8)
 #define SLJIT_SABS			(SLJIT_DABS | SLJIT_SINGLE_OP)
 
-sljit_si sljit_emit_fop1(struct sljit_compiler *compiler, sljit_si op,
-	sljit_si dst, sljit_sw dstw,
-	sljit_si src, sljit_sw srcw);
+int sljit_emit_fop1(struct sljit_compiler *compiler, int op,
+	int dst, sljit_sw dstw,
+	int src, sljit_sw srcw);
 
 /* Starting index of opcodes for sljit_emit_fop2. */
 #define SLJIT_FOP2_BASE			160
@@ -926,10 +926,10 @@ sljit_si sljit_emit_fop1(struct sljit_compiler *compiler, sljit_si op,
 #define SLJIT_DDIV			(SLJIT_FOP2_BASE + 3)
 #define SLJIT_SDIV			(SLJIT_DDIV | SLJIT_SINGLE_OP)
 
-sljit_si sljit_emit_fop2(struct sljit_compiler *compiler, sljit_si op,
-	sljit_si dst, sljit_sw dstw,
-	sljit_si src1, sljit_sw src1w,
-	sljit_si src2, sljit_sw src2w);
+int sljit_emit_fop2(struct sljit_compiler *compiler, int op,
+	int dst, sljit_sw dstw,
+	int src1, sljit_sw src1w,
+	int src2, sljit_sw src2w);
 
 /* Label and jump instructions. */
 
@@ -1010,7 +1010,7 @@ struct sljit_label* sljit_emit_label(struct sljit_compiler *compiler);
     type can be combined (or'ed) with SLJIT_REWRITABLE_JUMP
    Flags: - (never set any flags) for both conditional and unconditional jumps.
    Flags: destroy all flags for calls. */
-struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si type);
+struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, int type);
 
 /* Basic arithmetic comparison. In most architectures it is implemented as
    an SLJIT_SUB operation (with SLJIT_UNUSED destination and setting
@@ -1020,9 +1020,9 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
     type must be between SLJIT_EQUAL and SLJIT_I_SIG_LESS_EQUAL
     type can be combined (or'ed) with SLJIT_REWRITABLE_JUMP
    Flags: destroy flags. */
-struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, sljit_si type,
-	sljit_si src1, sljit_sw src1w,
-	sljit_si src2, sljit_sw src2w);
+struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, int type,
+	int src1, sljit_sw src1w,
+	int src2, sljit_sw src2w);
 
 /* Basic floating point comparison. In most architectures it is implemented as
    an SLJIT_FCMP operation (setting appropriate flags) followed by a
@@ -1034,9 +1034,9 @@ struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, sljit_si type
    Flags: destroy flags.
    Note: if either operand is NaN, the behaviour is undefined for
          types up to SLJIT_S_LESS_EQUAL. */
-struct sljit_jump* sljit_emit_fcmp(struct sljit_compiler *compiler, sljit_si type,
-	sljit_si src1, sljit_sw src1w,
-	sljit_si src2, sljit_sw src2w);
+struct sljit_jump* sljit_emit_fcmp(struct sljit_compiler *compiler, int type,
+	int src1, sljit_sw src1w,
+	int src2, sljit_sw src2w);
 
 /* Set the destination of the jump to this label. */
 void sljit_set_label(struct sljit_jump *jump, struct sljit_label* label);
@@ -1049,7 +1049,7 @@ void sljit_set_target(struct sljit_jump *jump, sljit_uw target);
     Indirect form: any other valid addressing mode
    Flags: - (never set any flags) for unconditional jumps.
    Flags: destroy all flags for calls. */
-sljit_si sljit_emit_ijump(struct sljit_compiler *compiler, sljit_si type, sljit_si src, sljit_sw srcw);
+int sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, sljit_sw srcw);
 
 /* Perform the operation using the conditional flags as the second argument.
    Type must always be between SLJIT_EQUAL and SLJIT_S_ORDERED. The value
@@ -1066,18 +1066,18 @@ sljit_si sljit_emit_ijump(struct sljit_compiler *compiler, sljit_si type, sljit_
      Important note: only dst=src and dstw=srcw is supported at the moment!
      Flags: I | E | K
    Note: sljit_emit_op_flags does nothing, if dst is SLJIT_UNUSED (regardless of op). */
-sljit_si sljit_emit_op_flags(struct sljit_compiler *compiler, sljit_si op,
-	sljit_si dst, sljit_sw dstw,
-	sljit_si src, sljit_sw srcw,
-	sljit_si type);
+int sljit_emit_op_flags(struct sljit_compiler *compiler, int op,
+	int dst, sljit_sw dstw,
+	int src, sljit_sw srcw,
+	int type);
 
 /* Copies the base address of SLJIT_SP + offset to dst.
    Flags: - (never set any flags) */
-sljit_si sljit_get_local_base(struct sljit_compiler *compiler, sljit_si dst, sljit_sw dstw, sljit_sw offset);
+int sljit_get_local_base(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw offset);
 
 /* The constant can be changed runtime (see: sljit_set_const)
    Flags: - (never set any flags) */
-struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, sljit_si dst, sljit_sw dstw, sljit_sw init_value);
+struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw init_value);
 
 /* After the code generation the address for label, jump and const instructions
    are computed. Since these structures are freed by sljit_free_compiler, the

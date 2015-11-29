@@ -26,7 +26,7 @@
 
 /* mips 32-bit arch dependent functions. */
 
-static sljit_si load_immediate(struct sljit_compiler *compiler, sljit_si dst_ar, sljit_sw imm)
+static int load_immediate(struct sljit_compiler *compiler, int dst_ar, sljit_sw imm)
 {
 	if (!(imm & ~0xffff))
 		return push_inst(compiler, ORI | SA(0) | TA(dst_ar) | IMM(imm), dst_ar);
@@ -66,8 +66,8 @@ static sljit_si load_immediate(struct sljit_compiler *compiler, sljit_si dst_ar,
 			FAIL_IF(push_inst(compiler, op_v | S(src2) | T(src1) | D(dst), DR(dst))); \
 	}
 
-static SLJIT_INLINE sljit_si emit_single_op(struct sljit_compiler *compiler, sljit_si op, sljit_si flags,
-	sljit_si dst, sljit_si src1, sljit_sw src2)
+static SLJIT_INLINE int emit_single_op(struct sljit_compiler *compiler, int op, int flags,
+	int dst, int src1, sljit_sw src2)
 {
 	switch (GET_OPCODE(op)) {
 	case SLJIT_MOV:
@@ -341,7 +341,7 @@ static SLJIT_INLINE sljit_si emit_single_op(struct sljit_compiler *compiler, slj
 	return SLJIT_SUCCESS;
 }
 
-static SLJIT_INLINE sljit_si emit_const(struct sljit_compiler *compiler, sljit_si dst, sljit_sw init_value)
+static SLJIT_INLINE int emit_const(struct sljit_compiler *compiler, int dst, sljit_sw init_value)
 {
 	FAIL_IF(push_inst(compiler, LUI | T(dst) | IMM(init_value >> 16), DR(dst)));
 	return push_inst(compiler, ORI | S(dst) | T(dst) | IMM(init_value), DR(dst));
