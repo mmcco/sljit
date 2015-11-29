@@ -1581,7 +1581,7 @@ struct sljit_label* sljit_emit_label(struct sljit_compiler *compiler)
 	if (compiler->last_label && compiler->last_label->size == compiler->size)
 		return compiler->last_label;
 
-	label = (struct sljit_label*)ensure_abuf(compiler, sizeof(struct sljit_label));
+	label = ensure_abuf(compiler, sizeof(struct sljit_label));
 	PTR_FAIL_IF(!label);
 	set_label(label, compiler);
 	compiler->delay_slot = UNMOVABLE_INS;
@@ -1624,7 +1624,7 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, sljit_si typ
 	CHECK_ERROR_PTR();
 	CHECK_PTR(check_sljit_emit_jump(compiler, type));
 
-	jump = (struct sljit_jump*)ensure_abuf(compiler, sizeof(struct sljit_jump));
+	jump = ensure_abuf(compiler, sizeof(struct sljit_jump));
 	PTR_FAIL_IF(!jump);
 	set_jump(jump, compiler, type & SLJIT_REWRITABLE_JUMP);
 	type &= 0xff;
@@ -1755,7 +1755,7 @@ struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, sljit_si type
 		src2 = TMP_REG2;
 	}
 
-	jump = (struct sljit_jump*)ensure_abuf(compiler, sizeof(struct sljit_jump));
+	jump = ensure_abuf(compiler, sizeof(struct sljit_jump));
 	PTR_FAIL_IF(!jump);
 	set_jump(jump, compiler, type & SLJIT_REWRITABLE_JUMP);
 	type &= 0xff;
@@ -1879,7 +1879,7 @@ struct sljit_jump* sljit_emit_fcmp(struct sljit_compiler *compiler, sljit_si typ
 	else
 		src2 <<= 1;
 
-	jump = (struct sljit_jump*)ensure_abuf(compiler, sizeof(struct sljit_jump));
+	jump = ensure_abuf(compiler, sizeof(struct sljit_jump));
 	PTR_FAIL_IF(!jump);
 	set_jump(jump, compiler, type & SLJIT_REWRITABLE_JUMP);
 	jump->flags |= IS_BIT16_COND;
@@ -1978,7 +1978,7 @@ sljit_si sljit_emit_ijump(struct sljit_compiler *compiler, sljit_si type, sljit_
 	}
 
 	if (src & SLJIT_IMM) {
-		jump = (struct sljit_jump*)ensure_abuf(compiler, sizeof(struct sljit_jump));
+		jump = ensure_abuf(compiler, sizeof(struct sljit_jump));
 		FAIL_IF(!jump);
 		set_jump(jump, compiler, JUMP_ADDR | ((type >= SLJIT_FAST_CALL) ? IS_JAL : 0));
 		jump->u.target = srcw;
@@ -2121,7 +2121,7 @@ struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, sljit_si d
 	CHECK_PTR(check_sljit_emit_const(compiler, dst, dstw, init_value));
 	ADJUST_LOCAL_OFFSET(dst, dstw);
 
-	const_ = (struct sljit_const*)ensure_abuf(compiler, sizeof(struct sljit_const));
+	const_ = ensure_abuf(compiler, sizeof(struct sljit_const));
 	PTR_FAIL_IF(!const_);
 	set_const(const_, compiler);
 
