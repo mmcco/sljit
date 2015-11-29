@@ -329,7 +329,7 @@ struct sljit_compiler* sljit_create_compiler(void)
 	memset(compiler, 0, sizeof(struct sljit_compiler));
 
 	SLJIT_COMPILE_ASSERT(
-		sizeof(sljit_sb) == 1 && sizeof(sljit_ub) == 1
+		sizeof(sljit_sb) == 1 && sizeof(u_char) == 1
 		&& sizeof(sljit_sh) == 2 && sizeof(sljit_uh) == 2
 		&& sizeof(int) == 4 && sizeof(unsigned int) == 4
 		&& (sizeof(sljit_p) == 4 || sizeof(sljit_p) == 8)
@@ -373,14 +373,14 @@ struct sljit_compiler* sljit_create_compiler(void)
 #endif
 
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5)
-	compiler->cpool = malloc(CPOOL_SIZE * sizeof(sljit_uw) + CPOOL_SIZE * sizeof(sljit_ub));
+	compiler->cpool = malloc(CPOOL_SIZE * sizeof(sljit_uw) + CPOOL_SIZE * sizeof(u_char));
 	if (!compiler->cpool) {
 		free(compiler->buf);
 		free(compiler->abuf);
 		free(compiler);
 		return NULL;
 	}
-	compiler->cpool_unique = (sljit_ub*)(compiler->cpool + CPOOL_SIZE);
+	compiler->cpool_unique = (u_char*)(compiler->cpool + CPOOL_SIZE);
 	compiler->cpool_diff = 0xffffffff;
 #endif
 
@@ -471,7 +471,7 @@ void sljit_set_target(struct sljit_jump *jump, sljit_uw target)
 
 static void* ensure_buf(struct sljit_compiler *compiler, sljit_uw size)
 {
-	sljit_ub *ret;
+	u_char *ret;
 	struct sljit_memory_fragment *new_frag;
 
 	SLJIT_ASSERT(size <= 256);
@@ -490,7 +490,7 @@ static void* ensure_buf(struct sljit_compiler *compiler, sljit_uw size)
 
 static void* ensure_abuf(struct sljit_compiler *compiler, sljit_uw size)
 {
-	sljit_ub *ret;
+	u_char *ret;
 	struct sljit_memory_fragment *new_frag;
 
 	SLJIT_ASSERT(size <= 256);
@@ -1136,7 +1136,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op_custom(struct sljit_co
 	if (!!compiler->verbose) {
 		fprintf(compiler->verbose, "  op_custom");
 		for (i = 0; i < size; i++)
-			fprintf(compiler->verbose, " 0x%x", ((sljit_ub*)instruction)[i]);
+			fprintf(compiler->verbose, " 0x%x", ((u_char*)instruction)[i]);
 		fprintf(compiler->verbose, "\n");
 	}
 #endif

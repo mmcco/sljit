@@ -26,9 +26,9 @@
 
 /* x86 32-bit arch dependent functions. */
 
-static int emit_do_imm(struct sljit_compiler *compiler, sljit_ub opcode, sljit_sw imm)
+static int emit_do_imm(struct sljit_compiler *compiler, u_char opcode, sljit_sw imm)
 {
-	sljit_ub *inst;
+	u_char *inst;
 
 	inst = ensure_buf(compiler, 1 + 1 + sizeof(sljit_sw));
 	FAIL_IF(!inst);
@@ -38,7 +38,7 @@ static int emit_do_imm(struct sljit_compiler *compiler, sljit_ub opcode, sljit_s
 	return SLJIT_SUCCESS;
 }
 
-static sljit_ub* generate_far_jump_code(struct sljit_jump *jump, sljit_ub *code_ptr, int type)
+static u_char* generate_far_jump_code(struct sljit_jump *jump, u_char *code_ptr, int type)
 {
 	if (type == SLJIT_JUMP) {
 		*code_ptr++ = JMP_i32;
@@ -68,7 +68,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 	int fscratches, int fsaveds, int local_size)
 {
 	int size;
-	sljit_ub *inst;
+	u_char *inst;
 
 	CHECK_ERROR();
 	CHECK(check_sljit_emit_enter(compiler, options, args, scratches, saveds, fscratches, fsaveds, local_size));
@@ -208,7 +208,7 @@ int sljit_set_context(struct sljit_compiler *compiler,
 int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, sljit_sw srcw)
 {
 	int size;
-	sljit_ub *inst;
+	u_char *inst;
 
 	CHECK_ERROR();
 	CHECK(check_sljit_emit_return(compiler, op, src, srcw));
@@ -271,14 +271,14 @@ int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, sljit_sw
 /* --------------------------------------------------------------------- */
 
 /* Size contains the flags as well. */
-static sljit_ub* emit_x86_instruction(struct sljit_compiler *compiler, int size,
+static u_char* emit_x86_instruction(struct sljit_compiler *compiler, int size,
 	/* The register or immediate operand. */
 	int a, sljit_sw imma,
 	/* The general operand (not immediate). */
 	int b, sljit_sw immb)
 {
-	sljit_ub *inst;
-	sljit_ub *buf_ptr;
+	u_char *inst;
+	u_char *buf_ptr;
 	int flags = size & ~0xf;
 	int inst_size;
 
@@ -441,7 +441,7 @@ static sljit_ub* emit_x86_instruction(struct sljit_compiler *compiler, int size,
 
 static SLJIT_INLINE int call_with_args(struct sljit_compiler *compiler, int type)
 {
-	sljit_ub *inst;
+	u_char *inst;
 
 #if (defined SLJIT_X86_32_FASTCALL && SLJIT_X86_32_FASTCALL)
 	inst = ensure_buf(compiler, type >= SLJIT_CALL3 ? 1 + 2 + 1 : 1 + 2);
@@ -479,7 +479,7 @@ static SLJIT_INLINE int call_with_args(struct sljit_compiler *compiler, int type
 
 int sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, sljit_sw dstw)
 {
-	sljit_ub *inst;
+	u_char *inst;
 
 	CHECK_ERROR();
 	CHECK(check_sljit_emit_fast_enter(compiler, dst, dstw));
@@ -510,7 +510,7 @@ int sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, sljit_sw dst
 
 int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, sljit_sw srcw)
 {
-	sljit_ub *inst;
+	u_char *inst;
 
 	CHECK_ERROR();
 	CHECK(check_sljit_emit_fast_return(compiler, src, srcw));

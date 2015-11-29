@@ -55,7 +55,7 @@ SLJIT_CONST char* sljit_get_platform_name(void)
 	(((max_diff) / (int)sizeof(sljit_uw)) - (CONST_POOL_ALIGNMENT - 1))
 
 /* See sljit_emit_enter and sljit_emit_op0 if you want to change them. */
-static SLJIT_CONST sljit_ub reg_map[SLJIT_NUMBER_OF_REGISTERS + 6] = {
+static SLJIT_CONST u_char reg_map[SLJIT_NUMBER_OF_REGISTERS + 6] = {
 	0, 0, 1, 2, 11, 10, 9, 8, 7, 6, 5, 4, 13, 3, 12, 14, 15
 };
 
@@ -184,7 +184,7 @@ static int push_inst_with_literal(struct sljit_compiler *compiler, sljit_uw inst
 	sljit_uw cpool_index = CPOOL_SIZE;
 	sljit_uw* cpool_ptr;
 	sljit_uw* cpool_end;
-	sljit_ub* cpool_unique_ptr;
+	u_char* cpool_unique_ptr;
 
 	if (compiler->cpool_diff != CONST_POOL_EMPTY && compiler->size - compiler->cpool_diff >= MAX_DIFFERENCE(4092))
 		FAIL_IF(push_cpool(compiler));
@@ -1866,7 +1866,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 		return emit_op(compiler, SLJIT_MOV, ALLOW_ANY_IMM, dst, dstw, TMP_REG1, 0, src, srcw);
 
 	case SLJIT_MOV_UB:
-		return emit_op(compiler, SLJIT_MOV_UB, ALLOW_ANY_IMM | BYTE_DATA, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (sljit_ub)srcw : srcw);
+		return emit_op(compiler, SLJIT_MOV_UB, ALLOW_ANY_IMM | BYTE_DATA, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (u_char)srcw : srcw);
 
 	case SLJIT_MOV_SB:
 		return emit_op(compiler, SLJIT_MOV_SB, ALLOW_ANY_IMM | SIGNED_DATA | BYTE_DATA, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (sljit_sb)srcw : srcw);
@@ -1884,7 +1884,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 		return emit_op(compiler, SLJIT_MOV, ALLOW_ANY_IMM | WRITE_BACK, dst, dstw, TMP_REG1, 0, src, srcw);
 
 	case SLJIT_MOVU_UB:
-		return emit_op(compiler, SLJIT_MOV_UB, ALLOW_ANY_IMM | BYTE_DATA | WRITE_BACK, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (sljit_ub)srcw : srcw);
+		return emit_op(compiler, SLJIT_MOV_UB, ALLOW_ANY_IMM | BYTE_DATA | WRITE_BACK, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (u_char)srcw : srcw);
 
 	case SLJIT_MOVU_SB:
 		return emit_op(compiler, SLJIT_MOV_SB, ALLOW_ANY_IMM | SIGNED_DATA | BYTE_DATA | WRITE_BACK, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (sljit_sb)srcw : srcw);

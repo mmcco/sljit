@@ -1745,7 +1745,7 @@ static void test23(void)
 	int ibuf[5];
 	union {
 		int asint;
-		sljit_ub asbytes[4];
+		u_char asbytes[4];
 	} u;
 #if (defined SLJIT_64BIT_ARCHITECTURE && SLJIT_64BIT_ARCHITECTURE)
 	sljit_sw garbage = SLJIT_W(0x1234567812345678);
@@ -3553,9 +3553,9 @@ static void test41(void)
 	int i;
 	sljit_d buf[3];
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
-	sljit_ub inst[16];
+	u_char inst[16];
 #elif (defined SLJIT_CONFIG_X86_64 && SLJIT_CONFIG_X86_64)
-	sljit_ub inst[16];
+	u_char inst[16];
 	int reg;
 #else
 	unsigned int inst;

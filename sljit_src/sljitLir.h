@@ -271,7 +271,7 @@ struct sljit_memory_fragment {
 	struct sljit_memory_fragment *next;
 	sljit_uw used_size;
 	/* Must be aligned to sljit_sw. */
-	sljit_ub memory[1];
+	u_char memory[1];
 };
 
 struct sljit_label {
@@ -340,7 +340,7 @@ struct sljit_compiler {
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5)
 	/* Constant pool handling. */
 	sljit_uw *cpool;
-	sljit_ub *cpool_unique;
+	u_char *cpool_unique;
 	sljit_uw cpool_diff;
 	sljit_uw cpool_fill;
 	/* Other members. */

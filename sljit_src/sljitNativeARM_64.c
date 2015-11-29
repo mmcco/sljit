@@ -43,7 +43,7 @@ typedef unsigned int sljit_ins;
 #define TMP_FREG1	(0)
 #define TMP_FREG2	(SLJIT_NUMBER_OF_FLOAT_REGISTERS + 1)
 
-static SLJIT_CONST sljit_ub reg_map[SLJIT_NUMBER_OF_REGISTERS + 8] = {
+static SLJIT_CONST u_char reg_map[SLJIT_NUMBER_OF_REGISTERS + 8] = {
   31, 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15, 16, 17, 8, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 29, 9, 10, 11, 30, 31
 };
 
@@ -1271,7 +1271,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 		case SLJIT_MOV_UB:
 			flags = BYTE_SIZE;
 			if (src & SLJIT_IMM)
-				srcw = (sljit_ub)srcw;
+				srcw = (u_char)srcw;
 			break;
 		case SLJIT_MOV_SB:
 			flags = BYTE_SIZE | SIGNED;
@@ -1305,7 +1305,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 		case SLJIT_MOVU_UB:
 			flags = BYTE_SIZE | UPDATE;
 			if (src & SLJIT_IMM)
-				srcw = (sljit_ub)srcw;
+				srcw = (u_char)srcw;
 			break;
 		case SLJIT_MOVU_SB:
 			flags = BYTE_SIZE | SIGNED | UPDATE;

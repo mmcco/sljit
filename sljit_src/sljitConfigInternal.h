@@ -258,12 +258,16 @@
 
 #endif /* !SLJIT_CACHE_FLUSH */
 
+/*
+ * Used to maintain sanity/brevity. Admittedly a BSDism.
+ */
+typedef unsigned char	u_char;
+
 /******************************************************/
 /* Byte/half/int/word/single/double type definitions. */
 /******************************************************/
 
 /* 8 bit byte type. */
-typedef unsigned char sljit_ub;
 typedef signed char sljit_sb;
 
 /* 16 bit half-word type. */

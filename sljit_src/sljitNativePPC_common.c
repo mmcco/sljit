@@ -101,7 +101,7 @@ static void ppc_cache_flush(sljit_ins *from, sljit_ins *to)
 #define TMP_FREG1	(0)
 #define TMP_FREG2	(SLJIT_NUMBER_OF_FLOAT_REGISTERS + 1)
 
-static SLJIT_CONST sljit_ub reg_map[SLJIT_NUMBER_OF_REGISTERS + 7] = {
+static SLJIT_CONST u_char reg_map[SLJIT_NUMBER_OF_REGISTERS + 7] = {
 	0, 3, 4, 5, 6, 7, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 1, 8, 9, 10, 31, 12
 };
 
@@ -1356,7 +1356,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 #endif
 
 	case SLJIT_MOV_UB:
-		return EMIT_MOV(SLJIT_MOV_UB, BYTE_DATA, (sljit_ub));
+		return EMIT_MOV(SLJIT_MOV_UB, BYTE_DATA, (u_char));
 
 	case SLJIT_MOV_SB:
 		return EMIT_MOV(SLJIT_MOV_SB, BYTE_DATA | SIGNED_DATA, (sljit_sb));
@@ -1384,7 +1384,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 #endif
 
 	case SLJIT_MOVU_UB:
-		return EMIT_MOV(SLJIT_MOV_UB, BYTE_DATA | WRITE_BACK, (sljit_ub));
+		return EMIT_MOV(SLJIT_MOV_UB, BYTE_DATA | WRITE_BACK, (u_char));
 
 	case SLJIT_MOVU_SB:
 		return EMIT_MOV(SLJIT_MOV_SB, BYTE_DATA | SIGNED_DATA | WRITE_BACK, (sljit_sb));
