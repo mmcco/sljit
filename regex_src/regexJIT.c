@@ -216,7 +216,7 @@ static void stack_destroy(struct stack *stack)
 	while (curr) {
 		prev = curr;
 		curr = curr->data.next;
-		SLJIT_FREE(prev);
+		free(prev);
 	}
 }
 
@@ -1875,7 +1875,7 @@ struct regex_machine* regex_compile(const regex_char_t *regex_string, int length
 	stack_destroy(&compiler_common.depth);
 	if (error_code) {
 		if (compiler_common.dfa_transitions)
-			SLJIT_FREE(compiler_common.dfa_transitions);
+			free(compiler_common.dfa_transitions);
 		if (error)
 			*error = error_code;
 		return NULL;
@@ -1884,7 +1884,7 @@ struct regex_machine* regex_compile(const regex_char_t *regex_string, int length
 	/* Step 3: Generate necessary data for depth-first search (Left->Right). */
 	error_code = generate_search_states(&compiler_common);
 	if (error_code) {
-		SLJIT_FREE(compiler_common.dfa_transitions);
+		free(compiler_common.dfa_transitions);
 		if (error)
 			*error = error_code;
 		return NULL;
@@ -2281,17 +2281,17 @@ struct regex_machine* regex_compile(const regex_char_t *regex_string, int length
 
 	stack_destroy(&compiler_common.stack);
 	stack_destroy(&compiler_common.depth);
-	SLJIT_FREE(compiler_common.dfa_transitions);
-	SLJIT_FREE(compiler_common.search_states);
+	free(compiler_common.dfa_transitions);
+	free(compiler_common.search_states);
 	if (compiler_common.range_jump_list)
-		SLJIT_FREE(compiler_common.range_jump_list);
+		free(compiler_common.range_jump_list);
 	if (compiler_common.compiler)
 		sljit_free_compiler(compiler_common.compiler);
 	if (done)
 		return compiler_common.machine;
 
 	if (compiler_common.machine) {
-		SLJIT_FREE(compiler_common.machine);
+		free(compiler_common.machine);
 	}
 	if (error)
 		*error = REGEX_MEMORY_ERROR;
@@ -2311,7 +2311,7 @@ struct regex_machine* regex_compile(const regex_char_t *regex_string, int length
 void regex_free_machine(struct regex_machine *machine)
 {
 	sljit_free_code(machine->continue_match);
-	SLJIT_FREE(machine);
+	free(machine);
 }
 
 const char* regex_get_platform_name(void)
@@ -2417,7 +2417,7 @@ void regex_reset_match(struct regex_match *match)
 
 void regex_free_match(struct regex_match *match)
 {
-	SLJIT_FREE(match);
+	free(match);
 }
 
 void regex_continue_match(struct regex_match *match, const regex_char_t *input_string, int length)

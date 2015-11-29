@@ -337,7 +337,7 @@ static SLJIT_INLINE sljit_si resolve_const_pool_index(struct future_patch **firs
 					prev_patch->next = curr_patch->next;
 				else
 					*first_patch = curr_patch->next;
-				SLJIT_FREE(curr_patch);
+				free(curr_patch);
 				break;
 			}
 			prev_patch = curr_patch;
@@ -352,7 +352,7 @@ static SLJIT_INLINE sljit_si resolve_const_pool_index(struct future_patch **firs
 				while (*first_patch) {
 					curr_patch = *first_patch;
 					*first_patch = (*first_patch)->next;
-					SLJIT_FREE(curr_patch);
+					free(curr_patch);
 				}
 				return SLJIT_ERR_ALLOC_FAILED;
 			}

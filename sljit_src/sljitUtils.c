@@ -239,7 +239,7 @@ struct sljit_stack* SLJIT_CALL sljit_allocate_stack(sljit_uw limit, sljit_uw max
 #ifdef _WIN32
 	base.ptr = VirtualAlloc(NULL, max_limit, MEM_RESERVE, PAGE_READWRITE);
 	if (!base.ptr) {
-		SLJIT_FREE(stack);
+		free(stack);
 		return NULL;
 	}
 	stack->base = base.uw;
@@ -255,14 +255,14 @@ struct sljit_stack* SLJIT_CALL sljit_allocate_stack(sljit_uw limit, sljit_uw max
 #else
 	if (dev_zero < 0) {
 		if (open_dev_zero()) {
-			SLJIT_FREE(stack);
+			free(stack);
 			return NULL;
 		}
 	}
 	base.ptr = mmap(NULL, max_limit, PROT_READ | PROT_WRITE, MAP_PRIVATE, dev_zero, 0);
 #endif
 	if (base.ptr == MAP_FAILED) {
-		SLJIT_FREE(stack);
+		free(stack);
 		return NULL;
 	}
 	stack->base = base.uw;
@@ -282,7 +282,7 @@ void SLJIT_CALL sljit_free_stack(struct sljit_stack* stack)
 #else
 	munmap((void*)stack->base, stack->max_limit - stack->base);
 #endif
-	SLJIT_FREE(stack);
+	free(stack);
 }
 
 sljit_sw SLJIT_CALL sljit_stack_resize(struct sljit_stack* stack, sljit_uw new_limit)

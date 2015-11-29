@@ -354,10 +354,10 @@ struct sljit_compiler* sljit_create_compiler(void)
 
 	if (!compiler->buf || !compiler->abuf) {
 		if (compiler->buf)
-			SLJIT_FREE(compiler->buf);
+			free(compiler->buf);
 		if (compiler->abuf)
-			SLJIT_FREE(compiler->abuf);
-		SLJIT_FREE(compiler);
+			free(compiler->abuf);
+		free(compiler);
 		return NULL;
 	}
 
@@ -379,9 +379,9 @@ struct sljit_compiler* sljit_create_compiler(void)
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5)
 	compiler->cpool = (sljit_uw*)SLJIT_MALLOC(CPOOL_SIZE * sizeof(sljit_uw) + CPOOL_SIZE * sizeof(sljit_ub));
 	if (!compiler->cpool) {
-		SLJIT_FREE(compiler->buf);
-		SLJIT_FREE(compiler->abuf);
-		SLJIT_FREE(compiler);
+		free(compiler->buf);
+		free(compiler->abuf);
+		free(compiler);
 		return NULL;
 	}
 	compiler->cpool_unique = (sljit_ub*)(compiler->cpool + CPOOL_SIZE);
@@ -415,20 +415,20 @@ void sljit_free_compiler(struct sljit_compiler *compiler)
 	while (buf) {
 		curr = buf;
 		buf = buf->next;
-		SLJIT_FREE(curr);
+		free(curr);
 	}
 
 	buf = compiler->abuf;
 	while (buf) {
 		curr = buf;
 		buf = buf->next;
-		SLJIT_FREE(curr);
+		free(curr);
 	}
 
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5)
-	SLJIT_FREE(compiler->cpool);
+	free(compiler->cpool);
 #endif
-	SLJIT_FREE(compiler);
+	free(compiler);
 }
 
 #if (defined SLJIT_CONFIG_ARM_THUMB2 && SLJIT_CONFIG_ARM_THUMB2)
