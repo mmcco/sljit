@@ -35,7 +35,7 @@ const char* sljit_get_platform_name(void)
 #endif
 }
 
-/* Last register + 1. */
+/* Last reg + 1. */
 #define TMP_REG1	(SLJIT_NUM_REGS + 2)
 #define TMP_REG2	(SLJIT_NUM_REGS + 3)
 #define TMP_REG3	(SLJIT_NUM_REGS + 4)
@@ -834,7 +834,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 	CHECK(check_sljit_emit_enter(compiler, options, args, scratches, saveds, fscratches, fsaveds, local_size));
 	set_emit_enter(compiler, options, args, scratches, saveds, fscratches, fsaveds, local_size);
 
-	/* Push saved registers, temporary registers
+	/* Push saved regs, temporary regs
 	   stmdb sp!, {..., lr} */
 	push = PUSH | (1 << 14);
 
@@ -892,7 +892,7 @@ int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, long src
 	if (compiler->local_size > 0)
 		FAIL_IF(emit_op(compiler, SLJIT_ADD, ALLOW_IMM, SLJIT_SP, 0, SLJIT_SP, 0, SLJIT_IMM, compiler->local_size));
 
-	/* Push saved registers, temporary registers
+	/* Push saved regs, temporary regs
 	   ldmia sp!, {..., pc} */
 	pop = POP | (1 << 15);
 
@@ -949,7 +949,7 @@ static long data_transfer_insts[16] = {
 #define ARGS_SWAPPED	0x01
   /* Inverted immediate. */
 #define INV_IMM		0x02
-  /* Source and destination is register. */
+  /* Source and destination is reg. */
 #define REG_DEST	0x04
 #define REG_SOURCE	0x08
   /* One instruction is enough. */
@@ -1088,7 +1088,7 @@ static __inline int emit_single_op(struct sljit_compiler *compiler, int op, int 
 		else if (dst != src1)
 			FAIL_IF(push_inst(compiler, mul_inst | (reg_map[src2] << 8) | reg_map[src1]));
 		else {
-			/* Rm and Rd must not be the same register. */
+			/* Rm and Rd must not be the same reg. */
 			SLJIT_ASSERT(dst != TMP_REG1);
 			FAIL_IF(push_inst(compiler, EMIT_DATA_PROCESS_INS(MOV_DP, 0, TMP_REG1, SLJIT_UNUSED, reg_map[src2])));
 			FAIL_IF(push_inst(compiler, mul_inst | (reg_map[src2] << 8) | reg_map[TMP_REG1]));
@@ -1607,7 +1607,7 @@ static int emit_op(struct sljit_compiler *compiler, int op, int inp_flags,
 	   TMP_REG3 can be used for caching
 	   result goes to TMP_REG2, so put result can use TMP_REG1 and TMP_REG3. */
 
-	/* We prefers register and simple consts. */
+	/* We prefers reg and simple consts. */
 	int dst_r;
 	int src1_r;
 	int src2_r = 0;
@@ -1735,7 +1735,7 @@ static int emit_op(struct sljit_compiler *compiler, int op, int inp_flags,
 	}
 
 	/* src1_r, src2_r and dst_r can be zero (=unprocessed) or non-zero.
-	   If they are zero, they must not be registers. */
+	   If they are zero, they must not be regs. */
 	if (src1_r == 0 && src2_r == 0 && dst_r == 0) {
 		if (!can_cache(src1, src1w, src2, src2w) && can_cache(src1, src1w, dst, dstw)) {
 			SLJIT_ASSERT(!(flags & ARGS_SWAPPED));
@@ -1954,15 +1954,15 @@ int sljit_emit_op2(struct sljit_compiler *compiler, int op,
 	return SLJIT_SUCCESS;
 }
 
-int sljit_get_register_index(int reg)
+int sljit_get_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_reg_index(reg));
 	return reg_map[reg];
 }
 
-int sljit_get_float_register_index(int reg)
+int sljit_get_float_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_float_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_float_reg_index(reg));
 	return reg << 1;
 }
 
@@ -2104,7 +2104,7 @@ static __inline int sljit_emit_fop1_convw_fromd(struct sljit_compiler *compiler,
 	if (FAST_IS_REG(dst))
 		return push_inst(compiler, VMOV | (1 << 20) | RD(dst) | (TMP_FREG1 << 16));
 
-	/* Store the integer value from a VFP register. */
+	/* Store the integer value from a VFP reg. */
 	return emit_fop_mem(compiler, 0, TMP_FREG1, dst, dstw);
 }
 
@@ -2117,7 +2117,7 @@ static __inline int sljit_emit_fop1_convd_fromw(struct sljit_compiler *compiler,
 	if (FAST_IS_REG(src))
 		FAIL_IF(push_inst(compiler, VMOV | RD(src) | (TMP_FREG1 << 16)));
 	else if (src & SLJIT_MEM) {
-		/* Load the integer value into a VFP register. */
+		/* Load the integer value into a VFP reg. */
 		FAIL_IF(emit_fop_mem(compiler, FPU_LOAD, TMP_FREG1, src, srcw));
 	}
 	else {

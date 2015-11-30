@@ -91,7 +91,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 	int options, int args, int scratches, int saveds,
 	int fscratches, int fsaveds, int local_size)
 {
-	int i, tmp, size, saved_register_size;
+	int i, tmp, size, saved_reg_size;
 	u_char *inst;
 
 	CHECK_ERROR();
@@ -101,7 +101,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 	compiler->flags_saved = 0;
 
 	/* Including the return address saved by the call instruction. */
-	saved_register_size = GET_SAVED_REGS_SIZE(scratches, saveds, 1);
+	saved_reg_size = GET_SAVED_REGS_SIZE(scratches, saveds, 1);
 
 	tmp = saveds < SLJIT_NUM_SAVED_REGS ? (SLJIT_S0 + 1 - saveds) : SLJIT_FIRST_SAVED_REG;
 	for (i = SLJIT_S0; i >= tmp; i--) {
@@ -166,7 +166,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 #endif
 	}
 
-	local_size = ((local_size + SLJIT_LOCALS_OFFSET + saved_register_size + 15) & ~15) - saved_register_size;
+	local_size = ((local_size + SLJIT_LOCALS_OFFSET + saved_reg_size + 15) & ~15) - saved_reg_size;
 	compiler->local_size = local_size;
 
 #ifdef _WIN64
@@ -178,10 +178,10 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 		*inst++ = REX_W;
 		*inst++ = GROUP_BINARY_83;
 		*inst++ = MOD_REG | SUB | 4;
-		/* Allocated size for registers must be divisible by 8. */
-		SLJIT_ASSERT(!(saved_register_size & 0x7));
+		/* Allocated size for regs must be divisible by 8. */
+		SLJIT_ASSERT(!(saved_reg_size & 0x7));
 		/* Aligned to 16 byte. */
-		if (saved_register_size & 0x8) {
+		if (saved_reg_size & 0x8) {
 			*inst++ = 5 * sizeof(long);
 			local_size -= 5 * sizeof(long);
 		} else {
@@ -224,7 +224,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 	}
 
 #ifdef _WIN64
-	/* Save xmm6 register: movaps [rsp + 0x20], xmm6 */
+	/* Save xmm6 reg: movaps [rsp + 0x20], xmm6 */
 	if (fscratches >= 6 || fsaveds >= 1) {
 		inst = ensure_buf(compiler, 1 + 5);
 		FAIL_IF(!inst);
@@ -241,15 +241,15 @@ int sljit_set_context(struct sljit_compiler *compiler,
 	int options, int args, int scratches, int saveds,
 	int fscratches, int fsaveds, int local_size)
 {
-	int saved_register_size;
+	int saved_reg_size;
 
 	CHECK_ERROR();
 	CHECK(check_sljit_set_context(compiler, options, args, scratches, saveds, fscratches, fsaveds, local_size));
 	set_set_context(compiler, options, args, scratches, saveds, fscratches, fsaveds, local_size);
 
 	/* Including the return address saved by the call instruction. */
-	saved_register_size = GET_SAVED_REGS_SIZE(scratches, saveds, 1);
-	compiler->local_size = ((local_size + SLJIT_LOCALS_OFFSET + saved_register_size + 15) & ~15) - saved_register_size;
+	saved_reg_size = GET_SAVED_REGS_SIZE(scratches, saveds, 1);
+	compiler->local_size = ((local_size + SLJIT_LOCALS_OFFSET + saved_reg_size + 15) & ~15) - saved_reg_size;
 	return SLJIT_SUCCESS;
 }
 
@@ -265,7 +265,7 @@ int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, long src
 	FAIL_IF(emit_mov_before_return(compiler, op, src, srcw));
 
 #ifdef _WIN64
-	/* Restore xmm6 register: movaps xmm6, [rsp + 0x20] */
+	/* Restore xmm6 reg: movaps xmm6, [rsp + 0x20] */
 	if (compiler->fscratches >= 6 || compiler->fsaveds >= 1) {
 		inst = ensure_buf(compiler, 1 + 5);
 		FAIL_IF(!inst);
@@ -344,7 +344,7 @@ static int emit_do_imm32(struct sljit_compiler *compiler, u_char rex, u_char opc
 }
 
 static u_char* emit_x86_instruction(struct sljit_compiler *compiler, int size,
-	/* The register or immediate operand. */
+	/* The reg or immediate operand. */
 	int a, long imma,
 	/* The general operand (not immediate). */
 	int b, long immb)
@@ -559,7 +559,7 @@ static __inline int call_with_args(struct sljit_compiler *compiler, int type)
 	u_char *inst;
 
 #ifndef _WIN64
-	SLJIT_COMPILE_ASSERT(reg_map[SLJIT_R1] == 6 && reg_map[SLJIT_R0] < 8 && reg_map[SLJIT_R2] < 8, args_registers);
+	SLJIT_COMPILE_ASSERT(reg_map[SLJIT_R1] == 6 && reg_map[SLJIT_R0] < 8 && reg_map[SLJIT_R2] < 8, args_regs);
 
 	inst = ensure_buf(compiler, 1 + ((type < SLJIT_CALL3) ? 3 : 6));
 	FAIL_IF(!inst);
@@ -573,7 +573,7 @@ static __inline int call_with_args(struct sljit_compiler *compiler, int type)
 	*inst++ = MOV_r_rm;
 	*inst++ = MOD_REG | (0x7 /* rdi */ << 3) | reg_lmap[SLJIT_R0];
 #else
-	SLJIT_COMPILE_ASSERT(reg_map[SLJIT_R1] == 2 && reg_map[SLJIT_R0] < 8 && reg_map[SLJIT_R2] < 8, args_registers);
+	SLJIT_COMPILE_ASSERT(reg_map[SLJIT_R1] == 2 && reg_map[SLJIT_R0] < 8 && reg_map[SLJIT_R2] < 8, args_regs);
 
 	inst = ensure_buf(compiler, 1 + ((type < SLJIT_CALL3) ? 3 : 6));
 	FAIL_IF(!inst);

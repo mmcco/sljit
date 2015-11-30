@@ -122,7 +122,7 @@ static const u_char reg_map[SLJIT_NUM_REGS + 8] = {
 #define UDIV 0x9ac00800
 #define UMULH 0x9bc03c00
 
-/* dest_reg is the absolute name of the register
+/* dest_reg is the absolute name of the reg
    Useful for reordering instructions in the delay slot. */
 static int push_inst(struct sljit_compiler *compiler, sljit_ins ins)
 {
@@ -514,9 +514,9 @@ static int load_immediate(struct sljit_compiler *compiler, int dst, long simm)
 
 static int emit_op_imm(struct sljit_compiler *compiler, int flags, int dst, long arg1, long arg2)
 {
-	/* dst must be register, TMP_REG1
-	   arg1 must be register, TMP_REG1, imm
-	   arg2 must be register, TMP_REG2, imm */
+	/* dst must be reg, TMP_REG1
+	   arg1 must be reg, TMP_REG1, imm
+	   arg2 must be reg, TMP_REG2, imm */
 	sljit_ins inv_bits = (flags & INT_OP) ? (1 << 31) : 0;
 	sljit_ins inst_bits;
 	int op = (flags & 0xffff);
@@ -545,7 +545,7 @@ static int emit_op_imm(struct sljit_compiler *compiler, int flags, int dst, long
 		case SLJIT_ADDC:
 		case SLJIT_SUBC:
 			/* No form with immediate operand (except imm 0, which
-			is represented by a ZERO register). */
+			is represented by a ZERO reg). */
 			break;
 		case SLJIT_MOV:
 			SLJIT_ASSERT(!(flags & SET_FLAGS) && (flags & ARG2_IMM) && arg1 == TMP_REG1);
@@ -657,7 +657,7 @@ static int emit_op_imm(struct sljit_compiler *compiler, int flags, int dst, long
 		}
 	}
 
-	/* Both arguments are registers. */
+	/* Both arguments are regs. */
 	switch (op) {
 	case SLJIT_MOV:
 	case SLJIT_MOV_P:
@@ -922,7 +922,7 @@ static int getput_arg(struct sljit_compiler *compiler, int flags, int reg,
 	tmp_r = (flags & STORE) ? TMP_REG3 : reg;
 
 	if ((flags & UPDATE) && (arg & REG_MASK)) {
-		/* Update only applies if a base register exists. */
+		/* Update only applies if a base reg exists. */
 		other_r = OFFS_REG(arg);
 		if (!other_r) {
 			other_r = arg & REG_MASK;
@@ -1115,7 +1115,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 		FAIL_IF(push_inst(compiler, STRI | RT(prev) | RN(TMP_SP) | (offs >> 5)));
 
 	if (compiler->local_size > (63 * sizeof(long))) {
-		/* The local_size is already adjusted by the saved registers. */
+		/* The local_size is already adjusted by the saved regs. */
 		if (local_size > 0xfff) {
 			FAIL_IF(push_inst(compiler, SUBI | RD(TMP_SP) | RN(TMP_SP) | ((local_size >> 12) << 10) | (1 << 22)));
 			local_size &= 0xfff;
@@ -1481,15 +1481,15 @@ int sljit_emit_op2(struct sljit_compiler *compiler, int op,
 	return SLJIT_SUCCESS;
 }
 
-int sljit_get_register_index(int reg)
+int sljit_get_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_reg_index(reg));
 	return reg_map[reg];
 }
 
-int sljit_get_float_register_index(int reg)
+int sljit_get_float_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_float_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_float_reg_index(reg));
 	return reg;
 }
 

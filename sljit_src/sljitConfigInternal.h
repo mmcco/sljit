@@ -39,12 +39,12 @@
      SLJIT_INDIRECT_CALL : see SLJIT_FUNC_OFFSET() for more information
 
    Constants:
-     SLJIT_NUM_REGS : number of available registers
-     SLJIT_NUM_SCRATCH_REGS : number of available scratch registers
-     SLJIT_NUM_SAVED_REGS : number of available saved registers
-     SLJIT_NUM_FLOAT_REGS : number of available floating point registers
-     SLJIT_NUM_SCRATCH_FLOAT_REGS : number of available floating point scratch registers
-     SLJIT_NUM_SAVED_FLOAT_REGS : number of available floating point saved registers
+     SLJIT_NUM_REGS : number of available regs
+     SLJIT_NUM_SCRATCH_REGS : number of available scratch regs
+     SLJIT_NUM_SAVED_REGS : number of available saved regs
+     SLJIT_NUM_FLOAT_REGS : number of available floating point regs
+     SLJIT_NUM_SCRATCH_FLOAT_REGS : number of available floating point scratch regs
+     SLJIT_NUM_SAVED_FLOAT_REGS : number of available floating point saved regs
      SLJIT_WORD_SHIFT : the shift required to apply when accessing a long/unsigned long array by index
      SLJIT_DOUBLE_SHIFT : the shift required to apply when accessing
                           a double precision floating point array by index

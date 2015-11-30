@@ -120,7 +120,7 @@ struct regex_match
 #define R_REGEX_MATCH	SLJIT_R0
 /* Current character. */
 #define R_CURR_CHAR	SLJIT_R1
-/* Temporary register. */
+/* Temporary reg. */
 #define R_TEMP		SLJIT_R2
 /* Caches the regex_match->best_begin. */
 #define R_BEST_BEGIN	SLJIT_R3
@@ -1550,7 +1550,7 @@ static int compile_end_check(struct compiler_common *compiler_common, struct slj
 	       otherwise we know that new_end > old_end, since R_CURR_INDEX ever increasing
 	       therefore we must overwrite all best_* variables (new_id also contains the highest id for this turn). */
 
-	/* Both R_CURR_CHAR and R_BEST_BEGIN used as temporary registers. */
+	/* Both R_CURR_CHAR and R_BEST_BEGIN used as temporary regs. */
 
 	if (!(compiler_common->flags & REGEX_MATCH_BEGIN)) {
 		EMIT_OP1(SLJIT_MOV, R_CURR_CHAR, 0, SLJIT_MEM1(R_CURR_STATE), TERM_REL_OFFSET_OF(0, 2));
@@ -1969,7 +1969,7 @@ struct regex_machine* regex_compile(const regex_char_t *regex_string, int length
 	EMIT_OP1(SLJIT_MOV, R_STRING, 0, SLJIT_S1, 0);
 	EMIT_OP2(SLJIT_ADD, R_LENGTH, 0, SLJIT_S2, 0, SLJIT_IMM, 1);
 
-	/* Init global registers. */
+	/* Init global regs. */
 	EMIT_OP1(SLJIT_MOV, R_CURR_STATE, 0, SLJIT_MEM1(R_REGEX_MATCH), SLJIT_OFFSETOF(struct regex_match, current));
 	EMIT_OP1(SLJIT_MOV, R_NEXT_STATE, 0, SLJIT_MEM1(R_REGEX_MATCH), SLJIT_OFFSETOF(struct regex_match, next));
 	EMIT_OP1(SLJIT_MOV, R_NEXT_HEAD, 0, SLJIT_MEM1(R_REGEX_MATCH), SLJIT_OFFSETOF(struct regex_match, head));
@@ -2100,7 +2100,7 @@ struct regex_machine* regex_compile(const regex_char_t *regex_string, int length
 		EMIT_LABEL(label);
 		sljit_set_label(fast_forward_jump, label);
 
-		/* Moving everything to registers. */
+		/* Moving everything to regs. */
 		EMIT_OP1(SLJIT_MOV, SLJIT_MEM1(R_REGEX_MATCH), SLJIT_OFFSETOF(struct regex_match, next), R_NEXT_STATE, 0);
 		EMIT_OP1(SLJIT_MOV, SLJIT_MEM1(R_REGEX_MATCH), SLJIT_OFFSETOF(struct regex_match, current), R_CURR_STATE, 0);
 		EMIT_OP1(SLJIT_MOV, SLJIT_MEM1(R_REGEX_MATCH), SLJIT_OFFSETOF(struct regex_match, head), R_NEXT_HEAD, 0);

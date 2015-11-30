@@ -30,7 +30,7 @@ const char* sljit_get_platform_name(void)
 }
 
 /*
-   32b register indexes:
+   32b reg indexes:
      0 - EAX
      1 - ECX
      2 - EDX
@@ -42,7 +42,7 @@ const char* sljit_get_platform_name(void)
 */
 
 /*
-   64b register indexes:
+   64b reg indexes:
      0 - RAX
      1 - RCX
      2 - RDX
@@ -63,7 +63,7 @@ const char* sljit_get_platform_name(void)
 
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 
-/* Last register + 1. */
+/* Last reg + 1. */
 #define TMP_REG1	(SLJIT_NUM_REGS + 2)
 
 static const u_char reg_map[SLJIT_NUM_REGS + 3] = {
@@ -79,7 +79,7 @@ static const u_char reg_map[SLJIT_NUM_REGS + 3] = {
 
 #else /* SLJIT_CONFIG_X86_32 */
 
-/* Last register + 1. */
+/* Last reg + 1. */
 #define TMP_REG1	(SLJIT_NUM_REGS + 2)
 #define TMP_REG2	(SLJIT_NUM_REGS + 3)
 #define TMP_REG3	(SLJIT_NUM_REGS + 4)
@@ -751,13 +751,13 @@ int sljit_emit_op0(struct sljit_compiler *compiler, int op)
 			reg_map[SLJIT_R0] == 0
 			&& reg_map[SLJIT_R1] == 2
 			&& reg_map[TMP_REG1] > 7,
-			invalid_register_assignment_for_div_mul);
+			invalid_reg_assignment_for_div_mul);
 #else
 		SLJIT_COMPILE_ASSERT(
 			reg_map[SLJIT_R0] == 0
 			&& reg_map[SLJIT_R1] < 7
 			&& reg_map[TMP_REG1] == 2,
-			invalid_register_assignment_for_div_mul);
+			invalid_reg_assignment_for_div_mul);
 #endif
 		compiler->mode32 = op & SLJIT_INT_OP;
 #endif
@@ -909,7 +909,7 @@ static int emit_mov_byte(struct sljit_compiler *compiler, int sign,
 	}
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 	else if (FAST_IS_REG(src) && reg_map[src] >= 4) {
-		/* src, dst are registers. */
+		/* src, dst are regs. */
 		SLJIT_ASSERT(SLOW_IS_REG(dst));
 		if (reg_map[dst] < 4) {
 			if (dst != src)
@@ -952,7 +952,7 @@ static int emit_mov_byte(struct sljit_compiler *compiler, int sign,
 	if (dst & SLJIT_MEM) {
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 		if (dst_r == TMP_REG1) {
-			/* Find a non-used register, whose reg_map[src] < 4. */
+			/* Find a non-used reg, whose reg_map[src] < 4. */
 			if ((dst & REG_MASK) == SLJIT_R0) {
 				if ((dst & OFFS_REG_MASK) == TO_OFFS_REG(SLJIT_R1))
 					work_r = SLJIT_R2;
@@ -1175,7 +1175,7 @@ static int emit_clz(struct sljit_compiler *compiler, int op_flags,
 	if (FAST_IS_REG(dst))
 		dst_r = dst;
 	else {
-		/* Find an unused temporary register. */
+		/* Find an unused temporary reg. */
 		if ((dst & REG_MASK) != SLJIT_R0 && (dst & OFFS_REG_MASK) != TO_OFFS_REG(SLJIT_R0))
 			dst_r = SLJIT_R0;
 		else if ((dst & REG_MASK) != SLJIT_R1 && (dst & OFFS_REG_MASK) != TO_OFFS_REG(SLJIT_R1))
@@ -2208,9 +2208,9 @@ int sljit_emit_op2(struct sljit_compiler *compiler, int op,
 	return SLJIT_SUCCESS;
 }
 
-int sljit_get_register_index(int reg)
+int sljit_get_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_reg_index(reg));
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 	if (reg >= SLJIT_R3 && reg <= SLJIT_R6)
 		return -1;
@@ -2218,9 +2218,9 @@ int sljit_get_register_index(int reg)
 	return reg_map[reg];
 }
 
-int sljit_get_float_register_index(int reg)
+int sljit_get_float_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_float_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_float_reg_index(reg));
 	return reg;
 }
 
@@ -2687,7 +2687,7 @@ int sljit_emit_op_flags(struct sljit_compiler *compiler, int op,
 		inst = ensure_buf(compiler, 1 + 4 + 3);
 		FAIL_IF(!inst);
 		INC_SIZE(4 + 3);
-		/* Set low register to conditional flag. */
+		/* Set low reg to conditional flag. */
 		*inst++ = (reg_map[TMP_REG1] <= 7) ? REX : REX_B;
 		*inst++ = GROUP_0F;
 		*inst++ = cond_set;
@@ -2703,7 +2703,7 @@ int sljit_emit_op_flags(struct sljit_compiler *compiler, int op,
 	inst = ensure_buf(compiler, 1 + 4 + 4);
 	FAIL_IF(!inst);
 	INC_SIZE(4 + 4);
-	/* Set low register to conditional flag. */
+	/* Set low reg to conditional flag. */
 	*inst++ = (reg_map[reg] <= 7) ? REX : REX_B;
 	*inst++ = GROUP_0F;
 	*inst++ = cond_set;
@@ -2785,7 +2785,7 @@ int sljit_emit_op_flags(struct sljit_compiler *compiler, int op,
 			inst = ensure_buf(compiler, 1 + 1 + 3 + 2 + 1);
 			FAIL_IF(!inst);
 			INC_SIZE(1 + 3 + 2 + 1);
-			/* Set low register to conditional flag. */
+			/* Set low reg to conditional flag. */
 			*inst++ = XCHG_EAX_r + reg_map[TMP_REG1];
 			*inst++ = GROUP_0F;
 			*inst++ = cond_set;
@@ -2798,7 +2798,7 @@ int sljit_emit_op_flags(struct sljit_compiler *compiler, int op,
 			inst = ensure_buf(compiler, 1 + 2 + 3 + 2 + 2);
 			FAIL_IF(!inst);
 			INC_SIZE(2 + 3 + 2 + 2);
-			/* Set low register to conditional flag. */
+			/* Set low reg to conditional flag. */
 			*inst++ = XCHG_r_rm;
 			*inst++ = MOD_REG | (1 /* ecx */ << 3) | reg_map[TMP_REG1];
 			*inst++ = GROUP_0F;

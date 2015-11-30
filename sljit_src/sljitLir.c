@@ -184,10 +184,10 @@
 
 	/* instruction types */
 #	define MOVABLE_INS	0
-	/* 1 - 31 last destination register */
+	/* 1 - 31 last destination reg */
 	/* no destination (i.e: store) */
 #	define UNMOVABLE_INS	32
-	/* FPU status register */
+	/* FPU status reg */
 #	define FCSR_FCC		33
 #endif
 
@@ -209,7 +209,7 @@
 
 	/* instruction types */
 #	define MOVABLE_INS	0
-	/* 1 - 31 last destination register */
+	/* 1 - 31 last destination reg */
 	/* no destination (i.e: store) */
 #	define UNMOVABLE_INS	32
 
@@ -1094,7 +1094,7 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_op2(struct sljit_compiler *co
 	CHECK_RETURN_OK;
 }
 
-static __inline CHECK_RETURN_TYPE check_sljit_get_register_index(int reg)
+static __inline CHECK_RETURN_TYPE check_sljit_get_reg_index(int reg)
 {
 	(void)reg;
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
@@ -1103,7 +1103,7 @@ static __inline CHECK_RETURN_TYPE check_sljit_get_register_index(int reg)
 	CHECK_RETURN_OK;
 }
 
-static __inline CHECK_RETURN_TYPE check_sljit_get_float_register_index(int reg)
+static __inline CHECK_RETURN_TYPE check_sljit_get_float_reg_index(int reg)
 {
 	(void)reg;
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
@@ -1836,7 +1836,7 @@ int sljit_emit_op2(struct sljit_compiler *compiler, int op,
 	return SLJIT_ERR_UNSUPPORTED;
 }
 
-int sljit_get_register_index(int reg)
+int sljit_get_reg_index(int reg)
 {
 	SLJIT_ASSERT_STOP();
 	return reg;

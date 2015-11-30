@@ -32,7 +32,7 @@ const char* sljit_get_platform_name(void)
 /* Length of an instruction word. */
 typedef unsigned int sljit_ins;
 
-/* Last register + 1. */
+/* Last reg + 1. */
 #define TMP_REG1	(SLJIT_NUM_REGS + 2)
 #define TMP_REG2	(SLJIT_NUM_REGS + 3)
 #define TMP_REG3	(SLJIT_NUM_REGS + 4)
@@ -510,9 +510,9 @@ static int load_immediate(struct sljit_compiler *compiler, int dst, unsigned lon
 
 static int emit_op_imm(struct sljit_compiler *compiler, int flags, int dst, unsigned long arg1, unsigned long arg2)
 {
-	/* dst must be register, TMP_REG1
-	   arg1 must be register, TMP_REG1, imm
-	   arg2 must be register, TMP_REG2, imm */
+	/* dst must be reg, TMP_REG1
+	   arg1 must be reg, TMP_REG1, imm
+	   arg2 must be reg, TMP_REG2, imm */
 	int reg;
 	unsigned long imm, nimm;
 
@@ -538,7 +538,7 @@ static int emit_op_imm(struct sljit_compiler *compiler, int flags, int dst, unsi
 		case SLJIT_NOT:
 			if (!(flags & SET_FLAGS))
 				return load_immediate(compiler, dst, ~imm);
-			/* Since the flags should be set, we just fallback to the register mode.
+			/* Since the flags should be set, we just fallback to the reg mode.
 			   Although some clever things could be done here, "NOT IMM" does not worth the efforts. */
 			break;
 		case SLJIT_ADD:
@@ -674,7 +674,7 @@ static int emit_op_imm(struct sljit_compiler *compiler, int flags, int dst, unsi
 		}
 	}
 
-	/* Both arguments are registers. */
+	/* Both arguments are regs. */
 	switch (flags & 0xffff) {
 	case SLJIT_MOV:
 	case SLJIT_MOV_UI:
@@ -1014,7 +1014,7 @@ static int getput_arg(struct sljit_compiler *compiler, int flags, int reg,
 	tmp_r = (flags & STORE) ? TMP_REG3 : reg;
 
 	if ((flags & UPDATE) && (arg & REG_MASK)) {
-		/* Update only applies if a base register exists. */
+		/* Update only applies if a base reg exists. */
 		/* There is no caching here. */
 		other_r = OFFS_REG(arg);
 		arg &= 0xf;
@@ -1491,15 +1491,15 @@ int sljit_emit_op2(struct sljit_compiler *compiler, int op,
 	return SLJIT_SUCCESS;
 }
 
-int sljit_get_register_index(int reg)
+int sljit_get_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_reg_index(reg));
 	return reg_map[reg];
 }
 
-int sljit_get_float_register_index(int reg)
+int sljit_get_float_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_float_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_float_reg_index(reg));
 	return reg << 1;
 }
 
@@ -1611,7 +1611,7 @@ static __inline int sljit_emit_fop1_convw_fromd(struct sljit_compiler *compiler,
 	if (FAST_IS_REG(dst))
 		return push_inst32(compiler, VMOV | (1 << 20) | RT4(dst) | DN4(TMP_FREG1));
 
-	/* Store the integer value from a VFP register. */
+	/* Store the integer value from a VFP reg. */
 	return emit_fop_mem(compiler, 0, TMP_FREG1, dst, dstw);
 }
 
@@ -1624,7 +1624,7 @@ static __inline int sljit_emit_fop1_convd_fromw(struct sljit_compiler *compiler,
 	if (FAST_IS_REG(src))
 		FAIL_IF(push_inst32(compiler, VMOV | RT4(src) | DN4(TMP_FREG1)));
 	else if (src & SLJIT_MEM) {
-		/* Load the integer value into a VFP register. */
+		/* Load the integer value into a VFP reg. */
 		FAIL_IF(emit_fop_mem(compiler, FPU_LOAD, TMP_FREG1, src, srcw));
 	}
 	else {

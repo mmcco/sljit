@@ -64,7 +64,7 @@ static const u_char reg_map[SLJIT_NO_REGS + 5] = {
 #define SLJIT_SAVED_EREG1_mapped 33
 #define SLJIT_SAVED_EREG2_mapped 34
 
-/* Flags are keept in volatile registers. */
+/* Flags are keept in volatile regs. */
 #define EQUAL_FLAG 8
 /* And carry flag as well. */
 #define ULESS_FLAG 9
@@ -86,7 +86,7 @@ static const u_char reg_map[SLJIT_NO_REGS + 5] = {
 #define SIGNED_DATA 0x08
 #define DOUBLE_DATA 0x10
 
-/* Separates integer and floating point registers */
+/* Separates integer and floating point regs */
 #define GPR_REG 0xf
 
 #define MEM_MASK 0x1f
@@ -122,8 +122,8 @@ typedef unsigned long sljit_ins;
 struct jit_instr {
 	const struct tilegx_opcode* opcode; 
 	tilegx_pipeline pipe;
-	unsigned long input_registers;
-	unsigned long output_registers;
+	unsigned long input_regs;
+	unsigned long output_regs;
 	int operand_value[4];
 	int line;
 };
@@ -532,8 +532,8 @@ void insert_nop(tilegx_mnemonic opc, int line)
 	opcode = &tilegx_opcodes[opc];
 	inst_buf[0].opcode = opcode;
 	inst_buf[0].pipe = get_any_valid_pipe(opcode);
-	inst_buf[0].input_registers = 0;
-	inst_buf[0].output_registers = 0;
+	inst_buf[0].input_regs = 0;
+	inst_buf[0].output_regs = 0;
 	inst_buf[0].line = line;
 	++inst_buf_index;
 }
@@ -561,7 +561,7 @@ const struct Format* compute_format()
 
 int assign_pipes()
 {
-	unsigned long output_registers = 0;
+	unsigned long output_regs = 0;
 	unsigned int i = 0;
 
 	if (inst_buf_index == 1) {
@@ -577,16 +577,16 @@ int assign_pipes()
 
 	for (i = 0; i < inst_buf_index; i++) {
 
-		if ((i > 0) && ((inst_buf[i].input_registers & output_registers) != 0))
+		if ((i > 0) && ((inst_buf[i].input_regs & output_regs) != 0))
 			return -1;
 
-		if ((i > 0) && ((inst_buf[i].output_registers & output_registers) != 0))
+		if ((i > 0) && ((inst_buf[i].output_regs & output_regs) != 0))
 			return -1;
 
 		/* Don't include Rzero in the match set, to avoid triggering
 		   needlessly on 'prefetch' instrs. */
 
-		output_registers |= inst_buf[i].output_registers & 0xFFFFFFFFFFFFFFL;
+		output_regs |= inst_buf[i].output_regs & 0xFFFFFFFFFFFFFFL;
 
 		inst_buf[i].pipe = match->pipe[i];
 	}
@@ -754,8 +754,8 @@ static int push_4_buffer(struct sljit_compiler *compiler, tilegx_mnemonic opc, i
 	inst_buf[inst_buf_index].operand_value[1] = op1;
 	inst_buf[inst_buf_index].operand_value[2] = op2;
 	inst_buf[inst_buf_index].operand_value[3] = op3;
-	inst_buf[inst_buf_index].input_registers = 1L << op1;
-	inst_buf[inst_buf_index].output_registers = 1L << op0;
+	inst_buf[inst_buf_index].input_regs = 1L << op1;
+	inst_buf[inst_buf_index].output_regs = 1L << op0;
 	inst_buf[inst_buf_index].line = line;
 	inst_buf_index++;
 
@@ -777,12 +777,12 @@ static int push_3_buffer(struct sljit_compiler *compiler, tilegx_mnemonic opc, i
 
 	switch (opc) {
 	case TILEGX_OPC_ST_ADD:
-		inst_buf[inst_buf_index].input_registers = (1L << op0) | (1L << op1);
-		inst_buf[inst_buf_index].output_registers = 1L << op0;
+		inst_buf[inst_buf_index].input_regs = (1L << op0) | (1L << op1);
+		inst_buf[inst_buf_index].output_regs = 1L << op0;
 		break;
 	case TILEGX_OPC_LD_ADD:
-		inst_buf[inst_buf_index].input_registers = 1L << op1;
-		inst_buf[inst_buf_index].output_registers = (1L << op0) | (1L << op1);
+		inst_buf[inst_buf_index].input_regs = 1L << op1;
+		inst_buf[inst_buf_index].output_regs = (1L << op0) | (1L << op1);
 		break;
 	case TILEGX_OPC_ADD:
 	case TILEGX_OPC_AND:
@@ -797,8 +797,8 @@ static int push_3_buffer(struct sljit_compiler *compiler, tilegx_mnemonic opc, i
 	case TILEGX_OPC_CMPLTS:
 	case TILEGX_OPC_CMOVEQZ:
 	case TILEGX_OPC_CMOVNEZ:
-		inst_buf[inst_buf_index].input_registers = (1L << op1) | (1L << op2);
-		inst_buf[inst_buf_index].output_registers = 1L << op0;
+		inst_buf[inst_buf_index].input_regs = (1L << op1) | (1L << op2);
+		inst_buf[inst_buf_index].output_regs = 1L << op0;
 		break;
 	case TILEGX_OPC_ADDLI:
 	case TILEGX_OPC_XORI:
@@ -809,8 +809,8 @@ static int push_3_buffer(struct sljit_compiler *compiler, tilegx_mnemonic opc, i
 	case TILEGX_OPC_SHL16INSLI:
 	case TILEGX_OPC_CMPLTUI:
 	case TILEGX_OPC_CMPLTSI:
-		inst_buf[inst_buf_index].input_registers = 1L << op1;
-		inst_buf[inst_buf_index].output_registers = 1L << op0;
+		inst_buf[inst_buf_index].input_regs = 1L << op1;
+		inst_buf[inst_buf_index].output_regs = 1L << op0;
 		break;
 	default:
 		printf("unrecoginzed opc: %s\n", opcode->name);
@@ -837,14 +837,14 @@ static int push_2_buffer(struct sljit_compiler *compiler, tilegx_mnemonic opc, i
 	switch (opc) {
 	case TILEGX_OPC_BEQZ:
 	case TILEGX_OPC_BNEZ:
-		inst_buf[inst_buf_index].input_registers = 1L << op0;
+		inst_buf[inst_buf_index].input_regs = 1L << op0;
 		break;
 	case TILEGX_OPC_ST:
 	case TILEGX_OPC_ST1:
 	case TILEGX_OPC_ST2:
 	case TILEGX_OPC_ST4:
-		inst_buf[inst_buf_index].input_registers = (1L << op0) | (1L << op1);
-		inst_buf[inst_buf_index].output_registers = 0;
+		inst_buf[inst_buf_index].input_regs = (1L << op0) | (1L << op1);
+		inst_buf[inst_buf_index].output_regs = 0;
 		break;
 	case TILEGX_OPC_CLZ:
 	case TILEGX_OPC_LD:
@@ -854,8 +854,8 @@ static int push_2_buffer(struct sljit_compiler *compiler, tilegx_mnemonic opc, i
 	case TILEGX_OPC_LD2S:
 	case TILEGX_OPC_LD4U:
 	case TILEGX_OPC_LD4S:
-		inst_buf[inst_buf_index].input_registers = 1L << op1;
-		inst_buf[inst_buf_index].output_registers = 1L << op0;
+		inst_buf[inst_buf_index].input_regs = 1L << op1;
+		inst_buf[inst_buf_index].output_regs = 1L << op0;
 		break;
 	default:
 		printf("unrecoginzed opc: %s\n", opcode->name);
@@ -875,8 +875,8 @@ static int push_0_buffer(struct sljit_compiler *compiler, tilegx_mnemonic opc, i
 	const struct tilegx_opcode* opcode = &tilegx_opcodes[opc];
 	inst_buf[inst_buf_index].opcode = opcode;
 	inst_buf[inst_buf_index].pipe = get_any_valid_pipe(opcode);
-	inst_buf[inst_buf_index].input_registers = 0;
-	inst_buf[inst_buf_index].output_registers = 0;
+	inst_buf[inst_buf_index].input_regs = 0;
+	inst_buf[inst_buf_index].output_regs = 0;
 	inst_buf[inst_buf_index].line = line;
 	inst_buf_index++;
 
@@ -892,8 +892,8 @@ static int push_jr_buffer(struct sljit_compiler *compiler, tilegx_mnemonic opc, 
 	inst_buf[inst_buf_index].opcode = opcode;
 	inst_buf[inst_buf_index].pipe = get_any_valid_pipe(opcode);
 	inst_buf[inst_buf_index].operand_value[0] = op0;
-	inst_buf[inst_buf_index].input_registers = 1L << op0;
-	inst_buf[inst_buf_index].output_registers = 0;
+	inst_buf[inst_buf_index].input_regs = 1L << op0;
+	inst_buf[inst_buf_index].output_regs = 0;
 	inst_buf[inst_buf_index].line = line;
 	inst_buf_index++;
  
@@ -1317,7 +1317,7 @@ int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, long src
 	return JR(RA);
 }
 
-/* reg_ar is an absoulute register! */
+/* reg_ar is an absoulute reg! */
 
 /* Can perform an operation using at most 1 instruction. */
 static int getput_arg_fast(struct sljit_compiler *compiler, int flags, int reg_ar, int arg, long argw)
@@ -1466,7 +1466,7 @@ static int getput_arg(struct sljit_compiler *compiler, int flags, int reg_ar, in
 	}
 
 	if (flags & WRITE_BACK && base) {
-		/* Update only applies if a base register exists. */
+		/* Update only applies if a base reg exists. */
 		if (reg_ar == reg_map[base]) {
 			SLJIT_ASSERT(!(flags & LOAD_DATA) && TMP_REG1_mapped != reg_ar);
 			if (argw <= SIMM_16BIT_MAX && argw >= SIMM_16BIT_MIN) {

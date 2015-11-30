@@ -136,7 +136,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 
 	SLJIT_COMPILE_ASSERT(SLJIT_LOCALS_OFFSET >= (2 + 4) * sizeof(unsigned long), require_at_least_two_words);
 #if defined(__APPLE__)
-	/* Ignore pushed registers and SLJIT_LOCALS_OFFSET when computing the aligned local size. */
+	/* Ignore pushed regs and SLJIT_LOCALS_OFFSET when computing the aligned local size. */
 	saveds = (2 + (scratches > 7 ? (scratches - 7) : 0) + (saveds <= 3 ? saveds : 3)) * sizeof(unsigned long);
 	local_size = ((SLJIT_LOCALS_OFFSET + saveds + local_size + 15) & ~15) - saveds;
 #else
@@ -272,7 +272,7 @@ int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, long src
 
 /* Size contains the flags as well. */
 static u_char* emit_x86_instruction(struct sljit_compiler *compiler, int size,
-	/* The register or immediate operand. */
+	/* The reg or immediate operand. */
 	int a, long imma,
 	/* The general operand (not immediate). */
 	int b, long immb)

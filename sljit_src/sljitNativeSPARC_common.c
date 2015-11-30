@@ -179,7 +179,7 @@ static const u_char reg_map[SLJIT_NUM_REGS + 6] = {
 #define SIMM_MAX	(0x0fff)
 #define SIMM_MIN	(-0x1000)
 
-/* dest_reg is the absolute name of the register
+/* dest_reg is the absolute name of the reg
    Useful for reordering instructions in the delay slot. */
 static int push_inst(struct sljit_compiler *compiler, sljit_ins ins, int delay_slot)
 {
@@ -390,7 +390,7 @@ void* sljit_generate_code(struct sljit_compiler *compiler)
 #define HALF_DATA	0x04
 #define INT_DATA	0x06
 #define SIGNED_DATA	0x08
-/* Separates integer and floating point registers */
+/* Separates integer and floating point regs */
 #define GPR_REG		0x0f
 #define DOUBLE_DATA	0x10
 #define SINGLE_DATA	0x12
@@ -437,7 +437,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 		FAIL_IF(push_inst(compiler, SAVE | D(SLJIT_SP) | S1(SLJIT_SP) | S2(TMP_REG1), UNMOVABLE_INS));
 	}
 
-	/* Arguments are in their appropriate registers. */
+	/* Arguments are in their appropriate regs. */
 
 	return SLJIT_SUCCESS;
 }
@@ -909,15 +909,15 @@ int sljit_emit_op2(struct sljit_compiler *compiler, int op,
 	return SLJIT_SUCCESS;
 }
 
-int sljit_get_register_index(int reg)
+int sljit_get_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_reg_index(reg));
 	return reg_map[reg];
 }
 
-int sljit_get_float_register_index(int reg)
+int sljit_get_float_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_float_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_float_reg_index(reg));
 	return reg << 1;
 }
 
@@ -969,7 +969,7 @@ static __inline int sljit_emit_fop1_convw_fromd(struct sljit_compiler *compiler,
 		return emit_op_mem2(compiler, WORD_DATA | LOAD_DATA, dst, SLJIT_MEM1(SLJIT_SP), FLOAT_TMP_MEM_OFFSET, SLJIT_MEM1(SLJIT_SP), FLOAT_TMP_MEM_OFFSET);
 	}
 
-	/* Store the integer value from a VFP register. */
+	/* Store the integer value from a VFP reg. */
 	return emit_op_mem2(compiler, SINGLE_DATA, TMP_FREG1, dst, dstw, 0, 0);
 }
 

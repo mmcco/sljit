@@ -33,13 +33,13 @@
 #include <string.h>
 #define BFD_RELOC(x) R_##x
 
-/* Special registers. */
+/* Special regs. */
 #define TREG_LR 55
 #define TREG_SN 56
 #define TREG_ZERO 63
 
-/* Canonical name of each register. */
-const char *const tilegx_register_names[] =
+/* Canonical name of each reg. */
+const char *const tilegx_reg_names[] =
 {
   "r0",   "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
   "r8",   "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
@@ -215,7 +215,7 @@ enum
   TILEGX_BUNDLE_ALIGNMENT_IN_BYTES =
     (1 << TILEGX_LOG2_BUNDLE_ALIGNMENT_IN_BYTES),
 
-  /* Number of registers (some are magic, such as network I/O). */
+  /* Number of regs (some are magic, such as network I/O). */
   TILEGX_NUM_REGS = 64,
 };
 
@@ -241,7 +241,7 @@ typedef enum
 
 struct tilegx_operand
 {
-  /* Is this operand a register, immediate or address? */
+  /* Is this operand a reg, immediate or address? */
   tilegx_operand_type type;
 
   /* The default relocation type for this operand.  */
@@ -253,10 +253,10 @@ struct tilegx_operand
   /* Is the value signed? (used for range checking) */
   unsigned int is_signed : 1;
 
-  /* Is this operand a source register? */
+  /* Is this operand a source reg? */
   unsigned int is_src_reg : 1;
 
-  /* Is this operand written? (i.e. is it a destination register) */
+  /* Is this operand written? (i.e. is it a destination reg) */
   unsigned int is_dest_reg : 1;
 
   /* Is this operand PC-relative? */
@@ -637,8 +637,8 @@ struct tilegx_opcode
   /* How many operands are there? */
   unsigned char num_operands;
 
-  /* Which register does this write implicitly, or TREG_ZERO if none? */
-  unsigned char implicitly_written_register;
+  /* Which reg does this write implicitly, or TREG_ZERO if none? */
+  unsigned char implicitly_written_reg;
 
   /* Can this be bundled with other instructions (almost always true). */
   unsigned char can_bundle;
@@ -10133,7 +10133,7 @@ print_insn_tilegx (unsigned char * memaddr)
       switch (op->type)
       {
       case TILEGX_OP_TYPE_REG:
-        printf ("%s", tilegx_register_names[(int)num]);
+        printf ("%s", tilegx_reg_names[(int)num]);
         break;
       case TILEGX_OP_TYPE_SPR:
         spr_name = get_tilegx_spr_name(num);

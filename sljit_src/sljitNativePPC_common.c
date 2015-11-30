@@ -521,7 +521,7 @@ void* sljit_generate_code(struct sljit_compiler *compiler)
 #define HALF_DATA	0x10
 #define INT_DATA	0x18
 #define SIGNED_DATA	0x20
-/* Separates integer and floating point registers */
+/* Separates integer and floating point regs */
 #define GPR_REG		0x3f
 #define DOUBLE_DATA	0x40
 
@@ -542,7 +542,7 @@ void* sljit_generate_code(struct sljit_compiler *compiler)
 #define ALT_FORM5	0x100000
 #define ALT_FORM6	0x200000
 
-/* Source and destination is register. */
+/* Source and destination is reg. */
 #define REG_DEST	0x000001
 #define REG1_SOURCE	0x000002
 #define REG2_SOURCE	0x000004
@@ -1655,15 +1655,15 @@ int sljit_emit_op2(struct sljit_compiler *compiler, int op,
 	return SLJIT_SUCCESS;
 }
 
-int sljit_get_register_index(int reg)
+int sljit_get_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_reg_index(reg));
 	return reg_map[reg];
 }
 
-int sljit_get_float_register_index(int reg)
+int sljit_get_float_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_float_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_float_reg_index(reg));
 	return reg;
 }
 

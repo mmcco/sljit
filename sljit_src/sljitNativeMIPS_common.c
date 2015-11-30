@@ -51,12 +51,12 @@ typedef unsigned int sljit_ins;
 /* For position independent code, t9 must contain the function address. */
 #define PIC_ADDR_REG	TMP_REG2
 
-/* Floating point status register. */
+/* Floating point status reg. */
 #define FCSR_REG	31
-/* Return address register. */
+/* Return address reg. */
 #define RETURN_ADDR_REG	31
 
-/* Flags are kept in volatile registers. */
+/* Flags are kept in volatile regs. */
 #define EQUAL_FLAG	12
 /* And carry flag as well. */
 #define ULESS_FLAG	13
@@ -79,7 +79,7 @@ static const u_char reg_map[SLJIT_NUM_REGS + 5] = {
 #define S(s)		(reg_map[s] << 21)
 #define T(t)		(reg_map[t] << 16)
 #define D(d)		(reg_map[d] << 11)
-/* Absolute registers. */
+/* Absolute regs. */
 #define SA(s)		((s) << 21)
 #define TA(t)		((t) << 16)
 #define DA(d)		((d) << 11)
@@ -199,7 +199,7 @@ static const u_char reg_map[SLJIT_NUM_REGS + 5] = {
 #define SIMM_MIN	(-0x8000)
 #define UIMM_MAX	(0xffff)
 
-/* dest_reg is the absolute name of the register
+/* dest_reg is the absolute name of the reg
    Useful for reordering instructions in the delay slot. */
 static int push_inst(struct sljit_compiler *compiler, sljit_ins ins, int delay_slot)
 {
@@ -497,7 +497,7 @@ void* sljit_generate_code(struct sljit_compiler *compiler)
 #define HALF_DATA	0x04
 #define INT_DATA	0x06
 #define SIGNED_DATA	0x08
-/* Separates integer and floating point registers */
+/* Separates integer and floating point regs */
 #define GPR_REG		0x0f
 #define DOUBLE_DATA	0x10
 #define SINGLE_DATA	0x12
@@ -695,7 +695,7 @@ static const sljit_ins data_transfer_insts[16 + 4] = {
 
 #undef ARCH_32_64
 
-/* reg_ar is an absoulute register! */
+/* reg_ar is an absoulute reg! */
 
 /* Can perform an operation using at most 1 instruction. */
 static int getput_arg_fast(struct sljit_compiler *compiler, int flags, int reg_ar, int arg, long argw)
@@ -812,7 +812,7 @@ static int getput_arg(struct sljit_compiler *compiler, int flags, int reg_ar, in
 	}
 
 	if (flags & WRITE_BACK && base) {
-		/* Update only applies if a base register exists. */
+		/* Update only applies if a base reg exists. */
 		if (reg_ar == DR(base)) {
 			SLJIT_ASSERT(!(flags & LOAD_DATA) && DR(TMP_REG1) != reg_ar);
 			if (argw <= SIMM_MAX && argw >= SIMM_MIN) {
@@ -1245,15 +1245,15 @@ int sljit_emit_op2(struct sljit_compiler *compiler, int op,
 #endif
 }
 
-int sljit_get_register_index(int reg)
+int sljit_get_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_reg_index(reg));
 	return reg_map[reg];
 }
 
-int sljit_get_float_register_index(int reg)
+int sljit_get_float_reg_index(int reg)
 {
-	CHECK_REG_INDEX(check_sljit_get_float_register_index(reg));
+	CHECK_REG_INDEX(check_sljit_get_float_reg_index(reg));
 	return reg << 1;
 }
 
@@ -1311,7 +1311,7 @@ static __inline int sljit_emit_fop1_convw_fromd(struct sljit_compiler *compiler,
 	if (FAST_IS_REG(dst))
 		return push_inst(compiler, MFC1 | flags | T(dst) | FS(TMP_FREG1), MOVABLE_INS);
 
-	/* Store the integer value from a VFP register. */
+	/* Store the integer value from a VFP reg. */
 	return emit_op_mem2(compiler, flags ? DOUBLE_DATA : SINGLE_DATA, TMP_FREG1, dst, dstw, 0, 0);
 
 #if (defined SLJIT_CONFIG_MIPS_32 && SLJIT_CONFIG_MIPS_32)
@@ -1334,7 +1334,7 @@ static __inline int sljit_emit_fop1_convd_fromw(struct sljit_compiler *compiler,
 	if (FAST_IS_REG(src))
 		FAIL_IF(push_inst(compiler, MTC1 | flags | T(src) | FS(TMP_FREG1), MOVABLE_INS));
 	else if (src & SLJIT_MEM) {
-		/* Load the integer value into a VFP register. */
+		/* Load the integer value into a VFP reg. */
 		FAIL_IF(emit_op_mem2(compiler, ((flags) ? DOUBLE_DATA : SINGLE_DATA) | LOAD_DATA, TMP_FREG1, src, srcw, dst, dstw));
 	}
 	else {

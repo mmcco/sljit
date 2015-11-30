@@ -54,11 +54,11 @@
         threaded applications), and you can use your own system functions
         (including memory allocators). See sljitConfig.h
     Disadvantages:
-      - No automatic register allocation, and temporary results are
+      - No automatic reg allocation, and temporary results are
         not stored on the stack. (hence the name comes)
     In practice:
       - This approach is very effective for interpreters
-        - One of the saved registers typically points to a stack interface
+        - One of the saved regs typically points to a stack interface
         - It can jump to any exception handler anytime (even if it belongs
           to another function)
         - Hot paths can be modified during runtime reflecting the changes
@@ -105,71 +105,71 @@ of sljitConfigInternal.h */
 /* --------------------------------------------------------------------- */
 
 /*
-  Scratch (R) registers: registers whose may not preserve their values
+  Scratch (R) regs: regs whose may not preserve their values
   across function calls.
 
-  Saved (S) registers: registers whose preserve their values across
+  Saved (S) regs: regs whose preserve their values across
   function calls.
 
-  The scratch and saved register sets are overlap. The last scratch register
-  is the first saved register, the one before the last is the second saved
-  register, and so on.
+  The scratch and saved reg sets are overlap. The last scratch reg
+  is the first saved reg, the one before the last is the second saved
+  reg, and so on.
 
-  If an architecture provides two scratch and three saved registers,
-  its scratch and saved register sets are the following:
+  If an architecture provides two scratch and three saved regs,
+  its scratch and saved reg sets are the following:
 
-     R0   |  [S4]  |   R0 and S4 represent the same physical register
-     R1   |  [S3]  |   R1 and S3 represent the same physical register
-    [R2]  |   S2   |   R2 and S2 represent the same physical register
-    [R3]  |   S1   |   R3 and S1 represent the same physical register
-    [R4]  |   S0   |   R4 and S0 represent the same physical register
+     R0   |  [S4]  |   R0 and S4 represent the same physical reg
+     R1   |  [S3]  |   R1 and S3 represent the same physical reg
+    [R2]  |   S2   |   R2 and S2 represent the same physical reg
+    [R3]  |   S1   |   R3 and S1 represent the same physical reg
+    [R4]  |   S0   |   R4 and S0 represent the same physical reg
 
   Note: SLJIT_NUM_SCRATCH_REGS would be 2 and
         SLJIT_NUM_SAVED_REGS would be 3 for this architecture.
 
   Note: On all supported architectures SLJIT_NUM_REGS >= 10
-        and SLJIT_NUM_SAVED_REGS >= 5. However, 4 registers
+        and SLJIT_NUM_SAVED_REGS >= 5. However, 4 regs
         are virtual on x86-32. See below.
 
-  The purpose of this definition is convenience. Although a register
-  is either scratch register or saved register, SLJIT allows accessing
-  them from the other set. For example, four registers can be used as
-  scratch registers and the fifth one as saved register on the architecture
-  above. Of course the last two scratch registers (R2 and R3) from this
+  The purpose of this definition is convenience. Although a reg
+  is either scratch reg or saved reg, SLJIT allows accessing
+  them from the other set. For example, four regs can be used as
+  scratch regs and the fifth one as saved reg on the architecture
+  above. Of course the last two scratch regs (R2 and R3) from this
   four will be saved on the stack, because they are defined as saved
-  registers in the application binary interface. Still R2 and R3 can be
-  used for referencing to these registers instead of S2 and S1, which
-  makes easier to write platform independent code. Scratch registers
-  can be saved registers in a similar way, but these extra saved
-  registers will not be preserved across function calls! Hence the
+  regs in the application binary interface. Still R2 and R3 can be
+  used for referencing to these regs instead of S2 and S1, which
+  makes easier to write platform independent code. Scratch regs
+  can be saved regs in a similar way, but these extra saved
+  regs will not be preserved across function calls! Hence the
   application must save them on those platforms, where the number of
-  saved registers is too low. This can be done by copy them onto
+  saved regs is too low. This can be done by copy them onto
   the stack and restore them after a function call.
 
-  Note: To emphasize that registers assigned to R2-R4 are saved
-        registers, they are enclosed by square brackets. S3-S4
+  Note: To emphasize that regs assigned to R2-R4 are saved
+        regs, they are enclosed by square brackets. S3-S4
         are marked in a similar way.
 
-  Note: sljit_emit_enter and sljit_set_context defines whether a register
-        is S or R register. E.g: when 3 scratches and 1 saved is mapped
-        by sljit_emit_enter, the allowed register set will be: R0-R2 and
+  Note: sljit_emit_enter and sljit_set_context defines whether a reg
+        is S or R reg. E.g: when 3 scratches and 1 saved is mapped
+        by sljit_emit_enter, the allowed reg set will be: R0-R2 and
         S0. Although S2 is mapped to the same position as R2, it does not
         available in the current configuration. Furthermore the R3 (S1)
-        register does not available as well.
+        reg does not available as well.
 */
 
 /* When SLJIT_UNUSED is specified as destination, the result is discarded. */
 #define SLJIT_UNUSED		0
 
-/* Scratch registers. */
+/* Scratch regs. */
 #define SLJIT_R0	1
 #define SLJIT_R1	2
 #define SLJIT_R2	3
 /* Note: on x86-32, R3 - R6 (same as S3 - S6) are emulated (they
-   are allocated on the stack). These registers are called virtual
+   are allocated on the stack). These regs are called virtual
    and cannot be used for memory addressing (cannot be part of
    any SLJIT_MEM1, SLJIT_MEM2 construct). There is no such
-   limitation on other CPUs. See sljit_get_register_index(). */
+   limitation on other CPUs. See sljit_get_reg_index(). */
 #define SLJIT_R3	4
 #define SLJIT_R4	5
 #define SLJIT_R5	6
@@ -177,19 +177,19 @@ of sljitConfigInternal.h */
 #define SLJIT_R7	8
 #define SLJIT_R8	9
 #define SLJIT_R9	10
-/* All R registers provided by the architecture can be accessed by SLJIT_R(i)
+/* All R regs provided by the architecture can be accessed by SLJIT_R(i)
    The i parameter must be >= 0 and < SLJIT_NUM_REGS. */
 #define SLJIT_R(i)	(1 + (i))
 
-/* Saved registers. */
+/* Saved regs. */
 #define SLJIT_S0	(SLJIT_NUM_REGS)
 #define SLJIT_S1	(SLJIT_NUM_REGS - 1)
 #define SLJIT_S2	(SLJIT_NUM_REGS - 2)
 /* Note: on x86-32, S3 - S6 (same as R3 - R6) are emulated (they
-   are allocated on the stack). These registers are called virtual
+   are allocated on the stack). These regs are called virtual
    and cannot be used for memory addressing (cannot be part of
    any SLJIT_MEM1, SLJIT_MEM2 construct). There is no such
-   limitation on other CPUs. See sljit_get_register_index(). */
+   limitation on other CPUs. See sljit_get_reg_index(). */
 #define SLJIT_S3	(SLJIT_NUM_REGS - 3)
 #define SLJIT_S4	(SLJIT_NUM_REGS - 4)
 #define SLJIT_S5	(SLJIT_NUM_REGS - 5)
@@ -197,11 +197,11 @@ of sljitConfigInternal.h */
 #define SLJIT_S7	(SLJIT_NUM_REGS - 7)
 #define SLJIT_S8	(SLJIT_NUM_REGS - 8)
 #define SLJIT_S9	(SLJIT_NUM_REGS - 9)
-/* All S registers provided by the architecture can be accessed by SLJIT_S(i)
+/* All S regs provided by the architecture can be accessed by SLJIT_S(i)
    The i parameter must be >= 0 and < SLJIT_NUM_SAVED_REGS. */
 #define SLJIT_S(i)	(SLJIT_NUM_REGS - (i))
 
-/* Registers >= SLJIT_FIRST_SAVED_REG are saved registers. */
+/* Registers >= SLJIT_FIRST_SAVED_REG are saved regs. */
 #define SLJIT_FIRST_SAVED_REG (SLJIT_S0 - SLJIT_NUM_SAVED_REGS + 1)
 
 /* The SLJIT_SP provides direct access to the linear stack space allocated by
@@ -214,48 +214,48 @@ of sljitConfigInternal.h */
 
 #define SLJIT_RETURN_REG	SLJIT_R0
 
-/* x86 prefers specific registers for special purposes. In case of shift
-   by register it supports only SLJIT_R2 for shift argument
-   (which is the src2 argument of sljit_emit_op2). If another register is
-   used, sljit must exchange data between registers which cause a minor
+/* x86 prefers specific regs for special purposes. In case of shift
+   by reg it supports only SLJIT_R2 for shift argument
+   (which is the src2 argument of sljit_emit_op2). If another reg is
+   used, sljit must exchange data between regs which cause a minor
    slowdown. Other architectures has no such limitation. */
 
 #define SLJIT_PREF_SHIFT_REG	SLJIT_R2
 
 /* --------------------------------------------------------------------- */
-/*  Floating point registers                                             */
+/*  Floating point regs                                             */
 /* --------------------------------------------------------------------- */
 
-/* Each floating point register can store a double or single precision
-   value. The FR and FS register sets are overlap in the same way as R
-   and S register sets. See above. */
+/* Each floating point reg can store a double or single precision
+   value. The FR and FS reg sets are overlap in the same way as R
+   and S reg sets. See above. */
 
 /* Note: SLJIT_UNUSED as destination is not valid for floating point
    operations, since they cannot be used for setting flags. */
 
-/* Floating point scratch registers. */
+/* Floating point scratch regs. */
 #define SLJIT_FR0	1
 #define SLJIT_FR1	2
 #define SLJIT_FR2	3
 #define SLJIT_FR3	4
 #define SLJIT_FR4	5
 #define SLJIT_FR5	6
-/* All FR registers provided by the architecture can be accessed by SLJIT_FR(i)
+/* All FR regs provided by the architecture can be accessed by SLJIT_FR(i)
    The i parameter must be >= 0 and < SLJIT_NUM_FLOAT_REGS. */
 #define SLJIT_FR(i)	(1 + (i))
 
-/* Floating point saved registers. */
+/* Floating point saved regs. */
 #define SLJIT_FS0	(SLJIT_NUM_FLOAT_REGS)
 #define SLJIT_FS1	(SLJIT_NUM_FLOAT_REGS - 1)
 #define SLJIT_FS2	(SLJIT_NUM_FLOAT_REGS - 2)
 #define SLJIT_FS3	(SLJIT_NUM_FLOAT_REGS - 3)
 #define SLJIT_FS4	(SLJIT_NUM_FLOAT_REGS - 4)
 #define SLJIT_FS5	(SLJIT_NUM_FLOAT_REGS - 5)
-/* All S registers provided by the architecture can be accessed by SLJIT_FS(i)
+/* All S regs provided by the architecture can be accessed by SLJIT_FS(i)
    The i parameter must be >= 0 and < SLJIT_NUM_SAVED_FLOAT_REGS. */
 #define SLJIT_FS(i)	(SLJIT_NUM_FLOAT_REGS - (i))
 
-/* Float registers >= SLJIT_FIRST_SAVED_FLOAT_REG are saved registers. */
+/* Float regs >= SLJIT_FIRST_SAVED_FLOAT_REG are saved regs. */
 #define SLJIT_FIRST_SAVED_FLOAT_REG (SLJIT_FS0 - SLJIT_NUM_SAVED_FLOAT_REGS + 1)
 
 /* --------------------------------------------------------------------- */
@@ -310,13 +310,13 @@ struct sljit_compiler {
 	struct sljit_memory_fragment *buf;
 	struct sljit_memory_fragment *abuf;
 
-	/* Used scratch registers. */
+	/* Used scratch regs. */
 	int scratches;
-	/* Used saved registers. */
+	/* Used saved regs. */
 	int saveds;
-	/* Used float scratch registers. */
+	/* Used float scratch regs. */
 	int fscratches;
-	/* Used float saved registers. */
+	/* Used float saved regs. */
 	int fsaveds;
 	/* Local stack size. */
 	int local_size;
@@ -461,23 +461,23 @@ static __inline unsigned long sljit_get_generated_code_size(struct sljit_compile
    The executable code is a function call from the viewpoint of the C
    language. The function calls must obey to the ABI (Application
    Binary Interface) of the platform, which specify the purpose of
-   all machine registers and stack handling among other things. The
+   all machine regs and stack handling among other things. The
    sljit_emit_enter function emits the necessary instructions for
    setting up a new context for the executable code and moves function
-   arguments to the saved registers. Furthermore the options argument
+   arguments to the saved regs. Furthermore the options argument
    can be used to pass configuration options to the compiler. The
    available options are listed before sljit_emit_enter.
 
    The number of long arguments passed to the generated function
    are specified in the "args" parameter. The number of arguments must
    be less than or equal to 3. The first argument goes to SLJIT_S0,
-   the second goes to SLJIT_S1 and so on. The register set used by
+   the second goes to SLJIT_S1 and so on. The reg set used by
    the function must be declared as well. The number of scratch and
-   saved registers used by the function must be passed to sljit_emit_enter.
-   Only R registers between R0 and "scratches" argument can be used
-   later. E.g. if "scratches" is set to 2, the register set will be
-   limited to R0 and R1. The S registers and the floating point
-   registers ("fscratches" and "fsaveds") are specified in a similar
+   saved regs used by the function must be passed to sljit_emit_enter.
+   Only R regs between R0 and "scratches" argument can be used
+   later. E.g. if "scratches" is set to 2, the reg set will be
+   limited to R0 and R1. The S regs and the floating point
+   regs ("fscratches" and "fsaveds") are specified in a similar
    way. The sljit_emit_enter is also capable of allocating a stack
    space for local variables. The "local_size" argument contains the
    size in bytes of this local area and its staring address is stored
@@ -509,7 +509,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 	int fscratches, int fsaveds, int local_size);
 
 /* The machine code has a context (which contains the local stack space size,
-   number of used registers, etc.) which initialized by sljit_emit_enter. Several
+   number of used regs, etc.) which initialized by sljit_emit_enter. Several
    functions (like sljit_emit_return) requres this context to be able to generate
    the appropriate code. However, some code fragments (like inline cache) may have
    no normal entry point so their context is unknown for the compiler. Their context
@@ -531,13 +531,13 @@ int sljit_set_context(struct sljit_compiler *compiler,
 int sljit_emit_return(struct sljit_compiler *compiler, int op,
 	int src, long srcw);
 
-/* Fast calling mechanism for utility functions (see SLJIT_FAST_CALL). All registers and
+/* Fast calling mechanism for utility functions (see SLJIT_FAST_CALL). All regs and
    even the stack frame is passed to the callee. The return address is preserved in
    dst/dstw by sljit_emit_fast_enter (the type of the value stored by this function
    is uintptr_t), and sljit_emit_fast_return can use this as a return value later. */
 
 /* Note: only for sljit specific, non ABI compilant calls. Fast, since only a few machine
-   instructions are needed. Excellent for small uility functions, where saving registers
+   instructions are needed. Excellent for small uility functions, where saving regs
    and setting up a new stack frame would cost too much performance. However, it is still
    possible to return to the address of the caller (or anywhere else). */
 
@@ -552,7 +552,7 @@ int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, long srcw);
 /*
    Source and destination values for arithmetical instructions
     imm              - a simple immediate value (cannot be used as a destination)
-    reg              - any of the registers (immediate argument must be 0)
+    reg              - any of the regs (immediate argument must be 0)
     [imm]            - absolute immediate memory address
     [reg+imm]        - indirect memory address
     [reg+(reg<<imm)] - indirect indexed memory address (shift must be between 0 and 3)
@@ -602,7 +602,7 @@ int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, long srcw);
            [reg+reg] is supported
 */
 
-/* Register output: simply the name of the register.
+/* Register output: simply the name of the reg.
    For destination, you can use SLJIT_UNUSED as well. */
 #define SLJIT_MEM		0x80
 #define SLJIT_MEM0()		(SLJIT_MEM)
@@ -612,26 +612,26 @@ int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, long srcw);
 
 /* Set 32 bit operation mode (I) on 64 bit CPUs. The flag is totally ignored on
    32 bit CPUs. If this flag is set for an arithmetic operation, it uses only the
-   lower 32 bit of the input register(s), and set the CPU status flags according
+   lower 32 bit of the input reg(s), and set the CPU status flags according
    to the 32 bit result. The higher 32 bits are undefined for both the input and
    output. However, the CPU might not ignore those higher 32 bits, like MIPS, which
    expects it to be the sign extension of the lower 32 bit. All 32 bit operations
    are undefined, if this condition is not fulfilled. Therefore, when SLJIT_INT_OP
-   is specified, all register arguments must be the result of other operations with
-   the same SLJIT_INT_OP flag. In other words, although a register can hold either
+   is specified, all reg arguments must be the result of other operations with
+   the same SLJIT_INT_OP flag. In other words, although a reg can hold either
    a 64 or 32 bit value, these values cannot be mixed. The only exceptions are
    SLJIT_IMOV and SLJIT_IMOVU (SLJIT_MOV_SI/SLJIT_MOVU_SI with SLJIT_INT_OP flag)
    which can convert any source argument to SLJIT_INT_OP compatible result. This
    conversion might be unnecessary on some CPUs like x86-64, since the upper 32
    bit is always ignored. In this case SLJIT is clever enough to not generate any
-   instructions if the source and destination operands are the same registers.
+   instructions if the source and destination operands are the same regs.
    Affects sljit_emit_op0, sljit_emit_op1 and sljit_emit_op2. */
 #define SLJIT_INT_OP		0x100
 
 /* Single precision mode (SP). This flag is similar to SLJIT_INT_OP, just
-   it applies to floating point registers (it is even the same bit). When
+   it applies to floating point regs (it is even the same bit). When
    this flag is passed, the CPU performs single precision floating point
-   operations. Similar to SLJIT_INT_OP, all register arguments must be the
+   operations. Similar to SLJIT_INT_OP, all reg arguments must be the
    result of other floating point operations with this flag. Affects
    sljit_emit_fop1, sljit_emit_fop2 and sljit_emit_fcmp. */
 #define SLJIT_SINGLE_OP		0x100
@@ -838,19 +838,19 @@ int sljit_emit_op2(struct sljit_compiler *compiler, int op,
 	int src2, long src2w);
 
 /* The following function is a helper function for sljit_emit_op_custom.
-   It returns with the real machine register index ( >=0 ) of any SLJIT_R,
-   SLJIT_S and SLJIT_SP registers.
+   It returns with the real machine reg index ( >=0 ) of any SLJIT_R,
+   SLJIT_S and SLJIT_SP regs.
 
-   Note: it returns with -1 for virtual registers (only on x86-32). */
+   Note: it returns with -1 for virtual regs (only on x86-32). */
 
-int sljit_get_register_index(int reg);
+int sljit_get_reg_index(int reg);
 
 /* The following function is a helper function for sljit_emit_op_custom.
-   It returns with the real machine register index of any SLJIT_FLOAT register.
+   It returns with the real machine reg index of any SLJIT_FLOAT reg.
 
    Note: the index is always an even number on ARM (except ARM-64), MIPS, and SPARC. */
 
-int sljit_get_float_register_index(int reg);
+int sljit_get_float_reg_index(int reg);
 
 /* Any instruction can be inserted into the instruction stream by
    sljit_emit_op_custom. It has a similar purpose as inline assembly.
