@@ -35,7 +35,7 @@ static int load_immediate(struct sljit_compiler *compiler, int dst, sljit_sw imm
 
 #define ARG2(flags, src2) ((flags & SRC2_IMM) ? IMM(src2) : S2(src2))
 
-static SLJIT_INLINE int emit_single_op(struct sljit_compiler *compiler, int op, int flags,
+static __inline int emit_single_op(struct sljit_compiler *compiler, int op, int flags,
 	int dst, int src1, sljit_sw src2)
 {
 	SLJIT_COMPILE_ASSERT(ICC_IS_SET == SET_FLAGS, icc_is_set_and_set_flags_must_be_the_same);
@@ -139,7 +139,7 @@ static SLJIT_INLINE int emit_single_op(struct sljit_compiler *compiler, int op, 
 	return SLJIT_SUCCESS;
 }
 
-static SLJIT_INLINE int emit_const(struct sljit_compiler *compiler, int dst, sljit_sw init_value)
+static __inline int emit_const(struct sljit_compiler *compiler, int dst, sljit_sw init_value)
 {
 	FAIL_IF(push_inst(compiler, SETHI | D(dst) | ((init_value >> 10) & 0x3fffff), DR(dst)));
 	return push_inst(compiler, OR | D(dst) | S1(dst) | IMM_ARG | (init_value & 0x3ff), DR(dst));

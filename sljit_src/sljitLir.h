@@ -421,7 +421,7 @@ void sljit_free_compiler(struct sljit_compiler *compiler);
    error code. Thus there is no need for checking the error after every
    call, it is enough to do it before the code is compiled. Removing
    these checks increases the performance of the compiling process. */
-static SLJIT_INLINE int sljit_get_compiler_error(struct sljit_compiler *compiler) { return compiler->error; }
+static __inline int sljit_get_compiler_error(struct sljit_compiler *compiler) { return compiler->error; }
 
 /*
    Allocate a small amount of memory. The size must be <= 64 bytes on 32 bit,
@@ -452,7 +452,7 @@ void sljit_free_code(void* code);
 
    Before a successful code generation, this function returns with 0.
 */
-static SLJIT_INLINE sljit_uw sljit_get_generated_code_size(struct sljit_compiler *compiler) { return compiler->executable_size; }
+static __inline sljit_uw sljit_get_generated_code_size(struct sljit_compiler *compiler) { return compiler->executable_size; }
 
 /* Instruction generation. Returns with any error code. If there is no
    error, they return with SLJIT_SUCCESS. */
@@ -1082,9 +1082,9 @@ struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, int dst, s
 /* After the code generation the address for label, jump and const instructions
    are computed. Since these structures are freed by sljit_free_compiler, the
    addresses must be preserved by the user program elsewere. */
-static SLJIT_INLINE sljit_uw sljit_get_label_addr(struct sljit_label *label) { return label->addr; }
-static SLJIT_INLINE sljit_uw sljit_get_jump_addr(struct sljit_jump *jump) { return jump->addr; }
-static SLJIT_INLINE sljit_uw sljit_get_const_addr(struct sljit_const *const_) { return const_->addr; }
+static __inline sljit_uw sljit_get_label_addr(struct sljit_label *label) { return label->addr; }
+static __inline sljit_uw sljit_get_jump_addr(struct sljit_jump *jump) { return jump->addr; }
+static __inline sljit_uw sljit_get_const_addr(struct sljit_const *const_) { return const_->addr; }
 
 /* Only the address is required to rewrite the code. */
 void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr);

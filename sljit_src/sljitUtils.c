@@ -34,12 +34,12 @@
 
 #if (defined SLJIT_EXECUTABLE_ALLOCATOR && SLJIT_EXECUTABLE_ALLOCATOR)
 
-static SLJIT_INLINE void allocator_grab_lock(void)
+static __inline void allocator_grab_lock(void)
 {
 	/* Always successful. */
 }
 
-static SLJIT_INLINE void allocator_release_lock(void)
+static __inline void allocator_release_lock(void)
 {
 	/* Always successful. */
 }
@@ -68,7 +68,7 @@ void SLJIT_CALL sljit_release_lock(void)
 
 static HANDLE allocator_mutex = 0;
 
-static SLJIT_INLINE void allocator_grab_lock(void)
+static __inline void allocator_grab_lock(void)
 {
 	/* No idea what to do if an error occures. Static mutexes should never fail... */
 	if (!allocator_mutex)
@@ -77,7 +77,7 @@ static SLJIT_INLINE void allocator_grab_lock(void)
 		WaitForSingleObject(allocator_mutex, INFINITE);
 }
 
-static SLJIT_INLINE void allocator_release_lock(void)
+static __inline void allocator_release_lock(void)
 {
 	ReleaseMutex(allocator_mutex);
 }
@@ -112,12 +112,12 @@ void SLJIT_CALL sljit_release_lock(void)
 
 static pthread_mutex_t allocator_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static SLJIT_INLINE void allocator_grab_lock(void)
+static __inline void allocator_grab_lock(void)
 {
 	pthread_mutex_lock(&allocator_mutex);
 }
 
-static SLJIT_INLINE void allocator_release_lock(void)
+static __inline void allocator_release_lock(void)
 {
 	pthread_mutex_unlock(&allocator_mutex);
 }
@@ -167,7 +167,7 @@ static int dev_zero = -1;
 
 #if (defined SLJIT_SINGLE_THREADED && SLJIT_SINGLE_THREADED)
 
-static SLJIT_INLINE int open_dev_zero(void)
+static __inline int open_dev_zero(void)
 {
 	dev_zero = open("/dev/zero", O_RDWR);
 	return dev_zero < 0;
@@ -179,7 +179,7 @@ static SLJIT_INLINE int open_dev_zero(void)
 
 static pthread_mutex_t dev_zero_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static SLJIT_INLINE int open_dev_zero(void)
+static __inline int open_dev_zero(void)
 {
 	pthread_mutex_lock(&dev_zero_mutex);
 	dev_zero = open("/dev/zero", O_RDWR);

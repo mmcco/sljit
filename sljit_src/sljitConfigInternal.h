@@ -185,15 +185,6 @@
 /* Compiler helper macros. */
 /***************************/
 
-#ifndef SLJIT_INLINE
-/* Inline functions. Some old compilers do not support them. */
-#if defined(__SUNPRO_C) && __SUNPRO_C <= 0x510
-#define SLJIT_INLINE
-#else
-#define SLJIT_INLINE __inline
-#endif
-#endif /* !SLJIT_INLINE */
-
 #ifndef SLJIT_CONST
 /* Const variables. */
 #define SLJIT_CONST const

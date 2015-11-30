@@ -213,12 +213,12 @@ static int push_inst(struct sljit_compiler *compiler, sljit_ins ins, int delay_s
 	return SLJIT_SUCCESS;
 }
 
-static SLJIT_INLINE sljit_ins invert_branch(int flags)
+static __inline sljit_ins invert_branch(int flags)
 {
 	return (flags & IS_BIT26_COND) ? (1 << 26) : (1 << 16);
 }
 
-static SLJIT_INLINE sljit_ins* detect_jump_type(struct sljit_jump *jump, sljit_ins *code_ptr, sljit_ins *code)
+static __inline sljit_ins* detect_jump_type(struct sljit_jump *jump, sljit_ins *code_ptr, sljit_ins *code)
 {
 	sljit_sw diff;
 	sljit_uw target_addr;
@@ -878,7 +878,7 @@ static int getput_arg(struct sljit_compiler *compiler, int flags, int reg_ar, in
 	return push_inst(compiler, data_transfer_insts[flags & MEM_MASK] | SA(tmp_ar) | TA(reg_ar), delay_slot);
 }
 
-static SLJIT_INLINE int emit_op_mem(struct sljit_compiler *compiler, int flags, int reg_ar, int arg, sljit_sw argw)
+static __inline int emit_op_mem(struct sljit_compiler *compiler, int flags, int reg_ar, int arg, sljit_sw argw)
 {
 	if (getput_arg_fast(compiler, flags, reg_ar, arg, argw))
 		return compiler->error;
@@ -887,7 +887,7 @@ static SLJIT_INLINE int emit_op_mem(struct sljit_compiler *compiler, int flags, 
 	return getput_arg(compiler, flags, reg_ar, arg, argw, 0, 0);
 }
 
-static SLJIT_INLINE int emit_op_mem2(struct sljit_compiler *compiler, int flags, int reg, int arg1, sljit_sw arg1w, int arg2, sljit_sw arg2w)
+static __inline int emit_op_mem2(struct sljit_compiler *compiler, int flags, int reg, int arg1, sljit_sw arg1w, int arg2, sljit_sw arg2w)
 {
 	if (getput_arg_fast(compiler, flags, reg, arg1, arg1w))
 		return compiler->error;
@@ -1286,7 +1286,7 @@ int sljit_is_fpu_available(void)
 #define FLOAT_DATA(op) (DOUBLE_DATA | ((op & SLJIT_SINGLE_OP) >> 7))
 #define FMT(op) (((op & SLJIT_SINGLE_OP) ^ SLJIT_SINGLE_OP) << (21 - 8))
 
-static SLJIT_INLINE int sljit_emit_fop1_convw_fromd(struct sljit_compiler *compiler, int op,
+static __inline int sljit_emit_fop1_convw_fromd(struct sljit_compiler *compiler, int op,
 	int dst, sljit_sw dstw,
 	int src, sljit_sw srcw)
 {
@@ -1319,7 +1319,7 @@ static SLJIT_INLINE int sljit_emit_fop1_convw_fromd(struct sljit_compiler *compi
 #endif
 }
 
-static SLJIT_INLINE int sljit_emit_fop1_convd_fromw(struct sljit_compiler *compiler, int op,
+static __inline int sljit_emit_fop1_convd_fromw(struct sljit_compiler *compiler, int op,
 	int dst, sljit_sw dstw,
 	int src, sljit_sw srcw)
 {
@@ -1357,7 +1357,7 @@ static SLJIT_INLINE int sljit_emit_fop1_convd_fromw(struct sljit_compiler *compi
 #endif
 }
 
-static SLJIT_INLINE int sljit_emit_fop1_cmp(struct sljit_compiler *compiler, int op,
+static __inline int sljit_emit_fop1_cmp(struct sljit_compiler *compiler, int op,
 	int src1, sljit_sw src1w,
 	int src2, sljit_sw src2w)
 {

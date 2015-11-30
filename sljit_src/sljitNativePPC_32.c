@@ -41,7 +41,7 @@ static int load_immediate(struct sljit_compiler *compiler, int reg, sljit_sw imm
 #define INS_CLEAR_LEFT(dst, src, from) \
 	(RLWINM | S(src) | A(dst) | ((from) << 6) | (31 << 1))
 
-static SLJIT_INLINE int emit_single_op(struct sljit_compiler *compiler, int op, int flags,
+static __inline int emit_single_op(struct sljit_compiler *compiler, int op, int flags,
 	int dst, int src1, int src2)
 {
 	switch (op) {
@@ -244,7 +244,7 @@ static SLJIT_INLINE int emit_single_op(struct sljit_compiler *compiler, int op, 
 	return SLJIT_SUCCESS;
 }
 
-static SLJIT_INLINE int emit_const(struct sljit_compiler *compiler, int reg, sljit_sw init_value)
+static __inline int emit_const(struct sljit_compiler *compiler, int reg, sljit_sw init_value)
 {
 	FAIL_IF(push_inst(compiler, ADDIS | D(reg) | A(0) | IMM(init_value >> 16)));
 	return push_inst(compiler, ORI | S(reg) | A(reg) | IMM(init_value));

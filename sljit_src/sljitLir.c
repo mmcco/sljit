@@ -523,7 +523,7 @@ void* sljit_alloc_memory(struct sljit_compiler *compiler, int size)
 	return ensure_abuf(compiler, size);
 }
 
-static SLJIT_INLINE void reverse_buf(struct sljit_compiler *compiler)
+static __inline void reverse_buf(struct sljit_compiler *compiler)
 {
 	struct sljit_memory_fragment *buf = compiler->buf;
 	struct sljit_memory_fragment *prev = NULL;
@@ -539,7 +539,7 @@ static SLJIT_INLINE void reverse_buf(struct sljit_compiler *compiler)
 	compiler->buf = prev;
 }
 
-static SLJIT_INLINE void set_emit_enter(struct sljit_compiler *compiler,
+static __inline void set_emit_enter(struct sljit_compiler *compiler,
 	int options, int args, int scratches, int saveds,
 	int fscratches, int fsaveds, int local_size)
 {
@@ -555,7 +555,7 @@ static SLJIT_INLINE void set_emit_enter(struct sljit_compiler *compiler,
 #endif
 }
 
-static SLJIT_INLINE void set_set_context(struct sljit_compiler *compiler,
+static __inline void set_set_context(struct sljit_compiler *compiler,
 	int options, int args, int scratches, int saveds,
 	int fscratches, int fsaveds, int local_size)
 {
@@ -571,7 +571,7 @@ static SLJIT_INLINE void set_set_context(struct sljit_compiler *compiler,
 #endif
 }
 
-static SLJIT_INLINE void set_label(struct sljit_label *label, struct sljit_compiler *compiler)
+static __inline void set_label(struct sljit_label *label, struct sljit_compiler *compiler)
 {
 	label->next = NULL;
 	label->size = compiler->size;
@@ -582,7 +582,7 @@ static SLJIT_INLINE void set_label(struct sljit_label *label, struct sljit_compi
 	compiler->last_label = label;
 }
 
-static SLJIT_INLINE void set_jump(struct sljit_jump *jump, struct sljit_compiler *compiler, int flags)
+static __inline void set_jump(struct sljit_jump *jump, struct sljit_compiler *compiler, int flags)
 {
 	jump->next = NULL;
 	jump->flags = flags;
@@ -593,7 +593,7 @@ static SLJIT_INLINE void set_jump(struct sljit_jump *jump, struct sljit_compiler
 	compiler->last_jump = jump;
 }
 
-static SLJIT_INLINE void set_const(struct sljit_const *const_, struct sljit_compiler *compiler)
+static __inline void set_const(struct sljit_const *const_, struct sljit_compiler *compiler)
 {
 	const_->next = NULL;
 	const_->addr = compiler->size;
@@ -886,7 +886,7 @@ static char* jump_names[] = {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS) \
 	|| (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_generate_code(struct sljit_compiler *compiler)
+static __inline CHECK_RETURN_TYPE check_sljit_generate_code(struct sljit_compiler *compiler)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	struct sljit_jump *jump;
@@ -906,7 +906,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_generate_code(struct sljit_com
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_enter(struct sljit_compiler *compiler,
+static __inline CHECK_RETURN_TYPE check_sljit_emit_enter(struct sljit_compiler *compiler,
 	int options, int args, int scratches, int saveds,
 	int fscratches, int fsaveds, int local_size)
 {
@@ -932,7 +932,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_enter(struct sljit_compil
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_set_context(struct sljit_compiler *compiler,
+static __inline CHECK_RETURN_TYPE check_sljit_set_context(struct sljit_compiler *compiler,
 	int options, int args, int scratches, int saveds,
 	int fscratches, int fsaveds, int local_size)
 {
@@ -961,7 +961,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_set_context(struct sljit_compi
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_return(struct sljit_compiler *compiler, int op, int src, sljit_sw srcw)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_return(struct sljit_compiler *compiler, int op, int src, sljit_sw srcw)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	CHECK_ARGUMENT(compiler->scratches >= 0);
@@ -986,7 +986,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_return(struct sljit_compi
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, sljit_sw dstw)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, sljit_sw dstw)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	FUNCTION_CHECK_DST(dst, dstw);
@@ -1001,7 +1001,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fast_enter(struct sljit_c
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fast_return(struct sljit_compiler *compiler, int src, sljit_sw srcw)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_fast_return(struct sljit_compiler *compiler, int src, sljit_sw srcw)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	FUNCTION_CHECK_SRC(src, srcw);
@@ -1016,7 +1016,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fast_return(struct sljit_
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op0(struct sljit_compiler *compiler, int op)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_op0(struct sljit_compiler *compiler, int op)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	CHECK_ARGUMENT((op >= SLJIT_BREAKPOINT && op <= SLJIT_LSMUL)
@@ -1030,7 +1030,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op0(struct sljit_compiler
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op1(struct sljit_compiler *compiler, int op,
+static __inline CHECK_RETURN_TYPE check_sljit_emit_op1(struct sljit_compiler *compiler, int op,
 	int dst, sljit_sw dstw,
 	int src, sljit_sw srcw)
 {
@@ -1060,7 +1060,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op1(struct sljit_compiler
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op2(struct sljit_compiler *compiler, int op,
+static __inline CHECK_RETURN_TYPE check_sljit_emit_op2(struct sljit_compiler *compiler, int op,
 	int dst, sljit_sw dstw,
 	int src1, sljit_sw src1w,
 	int src2, sljit_sw src2w)
@@ -1093,7 +1093,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op2(struct sljit_compiler
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_get_register_index(int reg)
+static __inline CHECK_RETURN_TYPE check_sljit_get_register_index(int reg)
 {
 	SLJIT_UNUSED_ARG(reg);
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
@@ -1102,7 +1102,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_get_register_index(int reg)
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_get_float_register_index(int reg)
+static __inline CHECK_RETURN_TYPE check_sljit_get_float_register_index(int reg)
 {
 	SLJIT_UNUSED_ARG(reg);
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
@@ -1111,7 +1111,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_get_float_register_index(int r
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op_custom(struct sljit_compiler *compiler,
+static __inline CHECK_RETURN_TYPE check_sljit_emit_op_custom(struct sljit_compiler *compiler,
 	void *instruction, int size)
 {
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
@@ -1143,7 +1143,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op_custom(struct sljit_co
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1(struct sljit_compiler *compiler, int op,
+static __inline CHECK_RETURN_TYPE check_sljit_emit_fop1(struct sljit_compiler *compiler, int op,
 	int dst, sljit_sw dstw,
 	int src, sljit_sw srcw)
 {
@@ -1177,7 +1177,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1(struct sljit_compile
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_cmp(struct sljit_compiler *compiler, int op,
+static __inline CHECK_RETURN_TYPE check_sljit_emit_fop1_cmp(struct sljit_compiler *compiler, int op,
 	int src1, sljit_sw src1w,
 	int src2, sljit_sw src2w)
 {
@@ -1206,7 +1206,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_cmp(struct sljit_com
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_convw_fromd(struct sljit_compiler *compiler, int op,
+static __inline CHECK_RETURN_TYPE check_sljit_emit_fop1_convw_fromd(struct sljit_compiler *compiler, int op,
 	int dst, sljit_sw dstw,
 	int src, sljit_sw srcw)
 {
@@ -1236,7 +1236,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_convw_fromd(struct s
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_convd_fromw(struct sljit_compiler *compiler, int op,
+static __inline CHECK_RETURN_TYPE check_sljit_emit_fop1_convd_fromw(struct sljit_compiler *compiler, int op,
 	int dst, sljit_sw dstw,
 	int src, sljit_sw srcw)
 {
@@ -1266,7 +1266,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop1_convd_fromw(struct s
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop2(struct sljit_compiler *compiler, int op,
+static __inline CHECK_RETURN_TYPE check_sljit_emit_fop2(struct sljit_compiler *compiler, int op,
 	int dst, sljit_sw dstw,
 	int src1, sljit_sw src1w,
 	int src2, sljit_sw src2w)
@@ -1293,7 +1293,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fop2(struct sljit_compile
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_label(struct sljit_compiler *compiler)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_label(struct sljit_compiler *compiler)
 {
 	SLJIT_UNUSED_ARG(compiler);
 
@@ -1304,7 +1304,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_label(struct sljit_compil
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_jump(struct sljit_compiler *compiler, int type)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_jump(struct sljit_compiler *compiler, int type)
 {
 	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
@@ -1324,7 +1324,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_jump(struct sljit_compile
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_cmp(struct sljit_compiler *compiler, int type,
+static __inline CHECK_RETURN_TYPE check_sljit_emit_cmp(struct sljit_compiler *compiler, int type,
 	int src1, sljit_sw src1w,
 	int src2, sljit_sw src2w)
 {
@@ -1347,7 +1347,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_cmp(struct sljit_compiler
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fcmp(struct sljit_compiler *compiler, int type,
+static __inline CHECK_RETURN_TYPE check_sljit_emit_fcmp(struct sljit_compiler *compiler, int type,
 	int src1, sljit_sw src1w,
 	int src2, sljit_sw src2w)
 {
@@ -1371,7 +1371,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_fcmp(struct sljit_compile
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, sljit_sw srcw)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, sljit_sw srcw)
 {
 	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
@@ -1392,7 +1392,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_ijump(struct sljit_compil
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op_flags(struct sljit_compiler *compiler, int op,
+static __inline CHECK_RETURN_TYPE check_sljit_emit_op_flags(struct sljit_compiler *compiler, int op,
 	int dst, sljit_sw dstw,
 	int src, sljit_sw srcw,
 	int type)
@@ -1427,7 +1427,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_op_flags(struct sljit_com
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_get_local_base(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw offset)
+static __inline CHECK_RETURN_TYPE check_sljit_get_local_base(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw offset)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	FUNCTION_CHECK_DST(dst, dstw);
@@ -1442,7 +1442,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_get_local_base(struct sljit_co
 	CHECK_RETURN_OK;
 }
 
-static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_const(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw init_value)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_const(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw init_value)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	FUNCTION_CHECK_DST(dst, dstw);
@@ -1484,7 +1484,7 @@ static SLJIT_INLINE CHECK_RETURN_TYPE check_sljit_emit_const(struct sljit_compil
 	ADJUST_LOCAL_OFFSET(dst, dstw); \
 	ADJUST_LOCAL_OFFSET(src, srcw);
 
-static SLJIT_INLINE int emit_mov_before_return(struct sljit_compiler *compiler, int op, int src, sljit_sw srcw)
+static __inline int emit_mov_before_return(struct sljit_compiler *compiler, int op, int src, sljit_sw srcw)
 {
 	/* Return if don't need to do anything. */
 	if (op == SLJIT_UNUSED)

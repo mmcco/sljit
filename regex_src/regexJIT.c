@@ -220,7 +220,7 @@ static void stack_destroy(struct stack *stack)
 	}
 }
 
-static SLJIT_INLINE struct stack_item* stack_top(struct stack *stack)
+static __inline struct stack_item* stack_top(struct stack *stack)
 {
 	SLJIT_ASSERT(stack->last);
 	return stack->last->items + stack->index;
@@ -282,7 +282,7 @@ static struct stack_item* stack_pop(struct stack *stack)
 	return ret;
 }
 
-static SLJIT_INLINE void stack_clone(struct stack *src, struct stack *dst)
+static __inline void stack_clone(struct stack *src, struct stack *dst)
 {
 	*dst = *src;
 }
@@ -1720,7 +1720,7 @@ static int compile_newline_check(struct compiler_common *compiler_common, sljit_
 	if (exp) \
 		return 0
 
-static SLJIT_INLINE void range_set_label(struct sljit_jump **range_jump_list, struct sljit_label *label)
+static __inline void range_set_label(struct sljit_jump **range_jump_list, struct sljit_label *label)
 {
 	while (*range_jump_list) {
 		sljit_set_label(*range_jump_list, label);

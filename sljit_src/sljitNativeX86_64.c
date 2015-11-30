@@ -554,7 +554,7 @@ static u_char* emit_x86_instruction(struct sljit_compiler *compiler, int size,
 /*  Call / return instructions                                           */
 /* --------------------------------------------------------------------- */
 
-static SLJIT_INLINE int call_with_args(struct sljit_compiler *compiler, int type)
+static __inline int call_with_args(struct sljit_compiler *compiler, int type)
 {
 	u_char *inst;
 

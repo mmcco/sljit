@@ -81,12 +81,12 @@
 
 #ifdef _WIN32
 
-static SLJIT_INLINE void* alloc_chunk(sljit_uw size)
+static __inline void* alloc_chunk(sljit_uw size)
 {
 	return VirtualAlloc(NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 }
 
-static SLJIT_INLINE void free_chunk(void* chunk, sljit_uw size)
+static __inline void free_chunk(void* chunk, sljit_uw size)
 {
 	SLJIT_UNUSED_ARG(size);
 	VirtualFree(chunk, 0, MEM_RELEASE);
@@ -94,7 +94,7 @@ static SLJIT_INLINE void free_chunk(void* chunk, sljit_uw size)
 
 #else
 
-static SLJIT_INLINE void* alloc_chunk(sljit_uw size)
+static __inline void* alloc_chunk(sljit_uw size)
 {
 	void* retval;
 
@@ -111,7 +111,7 @@ static SLJIT_INLINE void* alloc_chunk(sljit_uw size)
 	return (retval != MAP_FAILED) ? retval : NULL;
 }
 
-static SLJIT_INLINE void free_chunk(void* chunk, sljit_uw size)
+static __inline void free_chunk(void* chunk, sljit_uw size)
 {
 	munmap(chunk, size);
 }
@@ -147,7 +147,7 @@ static struct free_block* free_blocks;
 static sljit_uw allocated_size;
 static sljit_uw total_size;
 
-static SLJIT_INLINE void sljit_insert_free_block(struct free_block *free_block, sljit_uw size)
+static __inline void sljit_insert_free_block(struct free_block *free_block, sljit_uw size)
 {
 	free_block->header.size = 0;
 	free_block->size = size;
@@ -159,7 +159,7 @@ static SLJIT_INLINE void sljit_insert_free_block(struct free_block *free_block, 
 	free_blocks = free_block;
 }
 
-static SLJIT_INLINE void sljit_remove_free_block(struct free_block *free_block)
+static __inline void sljit_remove_free_block(struct free_block *free_block)
 {
 	if (free_block->next)
 		free_block->next->prev = free_block->prev;

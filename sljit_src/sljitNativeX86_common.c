@@ -579,7 +579,7 @@ static int emit_mov(struct sljit_compiler *compiler,
 	int dst, sljit_sw dstw,
 	int src, sljit_sw srcw);
 
-static SLJIT_INLINE int emit_save_flags(struct sljit_compiler *compiler)
+static __inline int emit_save_flags(struct sljit_compiler *compiler)
 {
 	u_char *inst;
 
@@ -602,7 +602,7 @@ static SLJIT_INLINE int emit_save_flags(struct sljit_compiler *compiler)
 	return SLJIT_SUCCESS;
 }
 
-static SLJIT_INLINE int emit_restore_flags(struct sljit_compiler *compiler, int keep_flags)
+static __inline int emit_restore_flags(struct sljit_compiler *compiler, int keep_flags)
 {
 	u_char *inst;
 
@@ -2297,19 +2297,19 @@ static int emit_sse2_logic(struct sljit_compiler *compiler, u_char opcode,
 	return SLJIT_SUCCESS;
 }
 
-static SLJIT_INLINE int emit_sse2_load(struct sljit_compiler *compiler,
+static __inline int emit_sse2_load(struct sljit_compiler *compiler,
 	int single, int dst, int src, sljit_sw srcw)
 {
 	return emit_sse2(compiler, MOVSD_x_xm, single, dst, src, srcw);
 }
 
-static SLJIT_INLINE int emit_sse2_store(struct sljit_compiler *compiler,
+static __inline int emit_sse2_store(struct sljit_compiler *compiler,
 	int single, int dst, sljit_sw dstw, int src)
 {
 	return emit_sse2(compiler, MOVSD_xm_x, single, src, dst, dstw);
 }
 
-static SLJIT_INLINE int sljit_emit_fop1_convw_fromd(struct sljit_compiler *compiler, int op,
+static __inline int sljit_emit_fop1_convw_fromd(struct sljit_compiler *compiler, int op,
 	int dst, sljit_sw dstw,
 	int src, sljit_sw srcw)
 {
@@ -2331,7 +2331,7 @@ static SLJIT_INLINE int sljit_emit_fop1_convw_fromd(struct sljit_compiler *compi
 	return SLJIT_SUCCESS;
 }
 
-static SLJIT_INLINE int sljit_emit_fop1_convd_fromw(struct sljit_compiler *compiler, int op,
+static __inline int sljit_emit_fop1_convd_fromw(struct sljit_compiler *compiler, int op,
 	int dst, sljit_sw dstw,
 	int src, sljit_sw srcw)
 {
@@ -2366,7 +2366,7 @@ static SLJIT_INLINE int sljit_emit_fop1_convd_fromw(struct sljit_compiler *compi
 	return SLJIT_SUCCESS;
 }
 
-static SLJIT_INLINE int sljit_emit_fop1_cmp(struct sljit_compiler *compiler, int op,
+static __inline int sljit_emit_fop1_cmp(struct sljit_compiler *compiler, int op,
 	int src1, sljit_sw src1w,
 	int src2, sljit_sw src2w)
 {

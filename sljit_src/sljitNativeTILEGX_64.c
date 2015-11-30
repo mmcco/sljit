@@ -900,7 +900,7 @@ static int push_jr_buffer(struct sljit_compiler *compiler, tilegx_mnemonic opc, 
 	return flush_buffer(compiler);
 }
 
-static SLJIT_INLINE sljit_ins * detect_jump_type(struct sljit_jump *jump, sljit_ins *code_ptr, sljit_ins *code)
+static __inline sljit_ins * detect_jump_type(struct sljit_jump *jump, sljit_ins *code_ptr, sljit_ins *code)
 {
 	sljit_sw diff;
 	sljit_uw target_addr;
@@ -1565,7 +1565,7 @@ static int getput_arg(struct sljit_compiler *compiler, int flags, int reg_ar, in
 		return PB2(data_transfer_insts[flags & MEM_MASK], tmp_ar, reg_ar);
 }
 
-static SLJIT_INLINE int emit_op_mem(struct sljit_compiler *compiler, int flags, int reg_ar, int arg, sljit_sw argw)
+static __inline int emit_op_mem(struct sljit_compiler *compiler, int flags, int reg_ar, int arg, sljit_sw argw)
 {
 	if (getput_arg_fast(compiler, flags, reg_ar, arg, argw))
 		return compiler->error;
@@ -1575,7 +1575,7 @@ static SLJIT_INLINE int emit_op_mem(struct sljit_compiler *compiler, int flags, 
 	return getput_arg(compiler, flags, reg_ar, arg, argw, 0, 0);
 }
 
-static SLJIT_INLINE int emit_op_mem2(struct sljit_compiler *compiler, int flags, int reg, int arg1, sljit_sw arg1w, int arg2, sljit_sw arg2w)
+static __inline int emit_op_mem2(struct sljit_compiler *compiler, int flags, int reg, int arg1, sljit_sw arg1w, int arg2, sljit_sw arg2w)
 {
 	if (getput_arg_fast(compiler, flags, reg, arg1, arg1w))
 		return compiler->error;
@@ -1617,7 +1617,7 @@ int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, sljit_sw sr
 	return JR(RA);
 }
 
-static SLJIT_INLINE int emit_single_op(struct sljit_compiler *compiler, int op, int flags, int dst, int src1, sljit_sw src2)
+static __inline int emit_single_op(struct sljit_compiler *compiler, int op, int flags, int dst, int src1, sljit_sw src2)
 {
 	int overflow_ra = 0;
 

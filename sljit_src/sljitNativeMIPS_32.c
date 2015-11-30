@@ -66,7 +66,7 @@ static int load_immediate(struct sljit_compiler *compiler, int dst_ar, sljit_sw 
 			FAIL_IF(push_inst(compiler, op_v | S(src2) | T(src1) | D(dst), DR(dst))); \
 	}
 
-static SLJIT_INLINE int emit_single_op(struct sljit_compiler *compiler, int op, int flags,
+static __inline int emit_single_op(struct sljit_compiler *compiler, int op, int flags,
 	int dst, int src1, sljit_sw src2)
 {
 	switch (GET_OPCODE(op)) {
@@ -341,7 +341,7 @@ static SLJIT_INLINE int emit_single_op(struct sljit_compiler *compiler, int op, 
 	return SLJIT_SUCCESS;
 }
 
-static SLJIT_INLINE int emit_const(struct sljit_compiler *compiler, int dst, sljit_sw init_value)
+static __inline int emit_const(struct sljit_compiler *compiler, int dst, sljit_sw init_value)
 {
 	FAIL_IF(push_inst(compiler, LUI | T(dst) | IMM(init_value >> 16), DR(dst)));
 	return push_inst(compiler, ORI | S(dst) | T(dst) | IMM(init_value), DR(dst));
