@@ -24,6 +24,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdint.h>
 #include <string.h>
 
 #include "sljitLir.h"
@@ -224,7 +225,7 @@
 #define GET_SAVED_REGISTERS_SIZE(scratches, saveds, extra) \
 	(((scratches < SLJIT_NUMBER_OF_SCRATCH_REGISTERS ? 0 : (scratches - SLJIT_NUMBER_OF_SCRATCH_REGISTERS)) + \
 		(saveds < SLJIT_NUMBER_OF_SAVED_REGISTERS ? saveds : SLJIT_NUMBER_OF_SAVED_REGISTERS) + \
-		extra) * sizeof(sljit_sw))
+		extra) * sizeof(long))
 
 #define ADJUST_LOCAL_OFFSET(p, i) \
 	if ((p) == (SLJIT_MEM1(SLJIT_SP))) \
@@ -332,10 +333,10 @@ struct sljit_compiler* sljit_create_compiler(void)
 		sizeof(s_char) == 1 && sizeof(u_char) == 1
 		&& sizeof(sljit_sh) == 2 && sizeof(sljit_uh) == 2
 		&& sizeof(int) == 4 && sizeof(unsigned int) == 4
-		&& (sizeof(sljit_p) == 4 || sizeof(sljit_p) == 8)
-		&& sizeof(sljit_p) <= sizeof(sljit_sw)
-		&& (sizeof(sljit_sw) == 4 || sizeof(sljit_sw) == 8)
-		&& (sizeof(sljit_uw) == 4 || sizeof(sljit_uw) == 8),
+		&& (sizeof(uintptr_t) == 4 || sizeof(uintptr_t) == 8)
+		&& sizeof(uintptr_t) <= sizeof(long)
+		&& (sizeof(long) == 4 || sizeof(long) == 8)
+		&& (sizeof(unsigned long) == 4 || sizeof(unsigned long) == 8),
 		invalid_integer_types);
 	SLJIT_COMPILE_ASSERT(SLJIT_INT_OP == SLJIT_SINGLE_OP,
 		int_op_and_single_op_must_be_the_same);
@@ -373,7 +374,7 @@ struct sljit_compiler* sljit_create_compiler(void)
 #endif
 
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5)
-	compiler->cpool = malloc(CPOOL_SIZE * sizeof(sljit_uw) + CPOOL_SIZE * sizeof(u_char));
+	compiler->cpool = malloc(CPOOL_SIZE * sizeof(unsigned long) + CPOOL_SIZE * sizeof(u_char));
 	if (!compiler->cpool) {
 		free(compiler->buf);
 		free(compiler->abuf);
@@ -431,13 +432,13 @@ void sljit_free_compiler(struct sljit_compiler *compiler)
 void sljit_free_code(void* code)
 {
 	/* Remove thumb mode flag. */
-	SLJIT_FREE_EXEC((void*)((sljit_uw)code & ~0x1));
+	SLJIT_FREE_EXEC((void*)((unsigned long)code & ~0x1));
 }
 #elif (defined SLJIT_INDIRECT_CALL && SLJIT_INDIRECT_CALL)
 void sljit_free_code(void* code)
 {
 	/* Resolve indirection. */
-	code = (void*)(*(sljit_uw*)code);
+	code = (void*)(*(unsigned long*)code);
 	SLJIT_FREE_EXEC(code);
 }
 #else
@@ -456,7 +457,7 @@ void sljit_set_label(struct sljit_jump *jump, struct sljit_label* label)
 	}
 }
 
-void sljit_set_target(struct sljit_jump *jump, sljit_uw target)
+void sljit_set_target(struct sljit_jump *jump, unsigned long target)
 {
 	if (!!jump) {
 		jump->flags &= ~JUMP_LABEL;
@@ -469,13 +470,13 @@ void sljit_set_target(struct sljit_jump *jump, sljit_uw target)
 /*  Private functions                                                    */
 /* --------------------------------------------------------------------- */
 
-static void* ensure_buf(struct sljit_compiler *compiler, sljit_uw size)
+static void* ensure_buf(struct sljit_compiler *compiler, unsigned long size)
 {
 	u_char *ret;
 	struct sljit_memory_fragment *new_frag;
 
 	SLJIT_ASSERT(size <= 256);
-	if (compiler->buf->used_size + size <= (BUF_SIZE - (sljit_uw)SLJIT_OFFSETOF(struct sljit_memory_fragment, memory))) {
+	if (compiler->buf->used_size + size <= (BUF_SIZE - (unsigned long)SLJIT_OFFSETOF(struct sljit_memory_fragment, memory))) {
 		ret = compiler->buf->memory + compiler->buf->used_size;
 		compiler->buf->used_size += size;
 		return ret;
@@ -488,13 +489,13 @@ static void* ensure_buf(struct sljit_compiler *compiler, sljit_uw size)
 	return new_frag->memory;
 }
 
-static void* ensure_abuf(struct sljit_compiler *compiler, sljit_uw size)
+static void* ensure_abuf(struct sljit_compiler *compiler, unsigned long size)
 {
 	u_char *ret;
 	struct sljit_memory_fragment *new_frag;
 
 	SLJIT_ASSERT(size <= 256);
-	if (compiler->abuf->used_size + size <= (ABUF_SIZE - (sljit_uw)SLJIT_OFFSETOF(struct sljit_memory_fragment, memory))) {
+	if (compiler->abuf->used_size + size <= (ABUF_SIZE - (unsigned long)SLJIT_OFFSETOF(struct sljit_memory_fragment, memory))) {
 		ret = compiler->abuf->memory + compiler->abuf->used_size;
 		compiler->abuf->used_size += size;
 		return ret;
@@ -961,7 +962,7 @@ static __inline CHECK_RETURN_TYPE check_sljit_set_context(struct sljit_compiler 
 	CHECK_RETURN_OK;
 }
 
-static __inline CHECK_RETURN_TYPE check_sljit_emit_return(struct sljit_compiler *compiler, int op, int src, sljit_sw srcw)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_return(struct sljit_compiler *compiler, int op, int src, long srcw)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	CHECK_ARGUMENT(compiler->scratches >= 0);
@@ -986,7 +987,7 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_return(struct sljit_compiler 
 	CHECK_RETURN_OK;
 }
 
-static __inline CHECK_RETURN_TYPE check_sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, sljit_sw dstw)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, long dstw)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	FUNCTION_CHECK_DST(dst, dstw);
@@ -1001,7 +1002,7 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_fast_enter(struct sljit_compi
 	CHECK_RETURN_OK;
 }
 
-static __inline CHECK_RETURN_TYPE check_sljit_emit_fast_return(struct sljit_compiler *compiler, int src, sljit_sw srcw)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_fast_return(struct sljit_compiler *compiler, int src, long srcw)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	FUNCTION_CHECK_SRC(src, srcw);
@@ -1031,8 +1032,8 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_op0(struct sljit_compiler *co
 }
 
 static __inline CHECK_RETURN_TYPE check_sljit_emit_op1(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src, sljit_sw srcw)
+	int dst, long dstw,
+	int src, long srcw)
 {
 	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
@@ -1061,9 +1062,9 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_op1(struct sljit_compiler *co
 }
 
 static __inline CHECK_RETURN_TYPE check_sljit_emit_op2(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w)
+	int dst, long dstw,
+	int src1, long src1w,
+	int src2, long src2w)
 {
 	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
@@ -1125,10 +1126,10 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_op_custom(struct sljit_compil
 #if (defined SLJIT_CONFIG_X86 && SLJIT_CONFIG_X86)
 	CHECK_ARGUMENT(size > 0 && size < 16);
 #elif (defined SLJIT_CONFIG_ARM_THUMB2 && SLJIT_CONFIG_ARM_THUMB2)
-	CHECK_ARGUMENT((size == 2 && (((sljit_sw)instruction) & 0x1) == 0)
-		|| (size == 4 && (((sljit_sw)instruction) & 0x3) == 0));
+	CHECK_ARGUMENT((size == 2 && (((long)instruction) & 0x1) == 0)
+		|| (size == 4 && (((long)instruction) & 0x3) == 0));
 #else
-	CHECK_ARGUMENT(size == 4 && (((sljit_sw)instruction) & 0x3) == 0);
+	CHECK_ARGUMENT(size == 4 && (((long)instruction) & 0x3) == 0);
 #endif
 
 #endif
@@ -1144,8 +1145,8 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_op_custom(struct sljit_compil
 }
 
 static __inline CHECK_RETURN_TYPE check_sljit_emit_fop1(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src, sljit_sw srcw)
+	int dst, long dstw,
+	int src, long srcw)
 {
 	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
@@ -1178,8 +1179,8 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_fop1(struct sljit_compiler *c
 }
 
 static __inline CHECK_RETURN_TYPE check_sljit_emit_fop1_cmp(struct sljit_compiler *compiler, int op,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w)
+	int src1, long src1w,
+	int src2, long src2w)
 {
 	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
@@ -1207,8 +1208,8 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_fop1_cmp(struct sljit_compile
 }
 
 static __inline CHECK_RETURN_TYPE check_sljit_emit_fop1_convw_fromd(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src, sljit_sw srcw)
+	int dst, long dstw,
+	int src, long srcw)
 {
 	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
@@ -1237,8 +1238,8 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_fop1_convw_fromd(struct sljit
 }
 
 static __inline CHECK_RETURN_TYPE check_sljit_emit_fop1_convd_fromw(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src, sljit_sw srcw)
+	int dst, long dstw,
+	int src, long srcw)
 {
 	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
@@ -1267,9 +1268,9 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_fop1_convd_fromw(struct sljit
 }
 
 static __inline CHECK_RETURN_TYPE check_sljit_emit_fop2(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w)
+	int dst, long dstw,
+	int src1, long src1w,
+	int src2, long src2w)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	CHECK_ARGUMENT(sljit_is_fpu_available());
@@ -1325,8 +1326,8 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_jump(struct sljit_compiler *c
 }
 
 static __inline CHECK_RETURN_TYPE check_sljit_emit_cmp(struct sljit_compiler *compiler, int type,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w)
+	int src1, long src1w,
+	int src2, long src2w)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	CHECK_ARGUMENT(!(type & ~(0xff | SLJIT_REWRITABLE_JUMP | SLJIT_INT_OP)));
@@ -1348,8 +1349,8 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_cmp(struct sljit_compiler *co
 }
 
 static __inline CHECK_RETURN_TYPE check_sljit_emit_fcmp(struct sljit_compiler *compiler, int type,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w)
+	int src1, long src1w,
+	int src2, long src2w)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	CHECK_ARGUMENT(sljit_is_fpu_available());
@@ -1371,7 +1372,7 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_fcmp(struct sljit_compiler *c
 	CHECK_RETURN_OK;
 }
 
-static __inline CHECK_RETURN_TYPE check_sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, sljit_sw srcw)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, long srcw)
 {
 	if (compiler->skip_checks) {
 		compiler->skip_checks = 0;
@@ -1393,8 +1394,8 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_ijump(struct sljit_compiler *
 }
 
 static __inline CHECK_RETURN_TYPE check_sljit_emit_op_flags(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src, sljit_sw srcw,
+	int dst, long dstw,
+	int src, long srcw,
 	int type)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
@@ -1427,7 +1428,7 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_op_flags(struct sljit_compile
 	CHECK_RETURN_OK;
 }
 
-static __inline CHECK_RETURN_TYPE check_sljit_get_local_base(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw offset)
+static __inline CHECK_RETURN_TYPE check_sljit_get_local_base(struct sljit_compiler *compiler, int dst, long dstw, long offset)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	FUNCTION_CHECK_DST(dst, dstw);
@@ -1442,7 +1443,7 @@ static __inline CHECK_RETURN_TYPE check_sljit_get_local_base(struct sljit_compil
 	CHECK_RETURN_OK;
 }
 
-static __inline CHECK_RETURN_TYPE check_sljit_emit_const(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw init_value)
+static __inline CHECK_RETURN_TYPE check_sljit_emit_const(struct sljit_compiler *compiler, int dst, long dstw, long init_value)
 {
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	FUNCTION_CHECK_DST(dst, dstw);
@@ -1484,14 +1485,14 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_const(struct sljit_compiler *
 	ADJUST_LOCAL_OFFSET(dst, dstw); \
 	ADJUST_LOCAL_OFFSET(src, srcw);
 
-static __inline int emit_mov_before_return(struct sljit_compiler *compiler, int op, int src, sljit_sw srcw)
+static __inline int emit_mov_before_return(struct sljit_compiler *compiler, int op, int src, long srcw)
 {
 	/* Return if don't need to do anything. */
 	if (op == SLJIT_UNUSED)
 		return SLJIT_SUCCESS;
 
 #if (defined SLJIT_64BIT_ARCHITECTURE && SLJIT_64BIT_ARCHITECTURE)
-	/* At the moment the pointer size is always equal to sljit_sw. May be changed in the future. */
+	/* At the moment the pointer size is always equal to long. May be changed in the future. */
 	if (src == SLJIT_RETURN_REG && (op == SLJIT_MOV || op == SLJIT_MOV_P))
 		return SLJIT_SUCCESS;
 #else
@@ -1555,12 +1556,12 @@ static __inline int emit_mov_before_return(struct sljit_compiler *compiler, int 
 #if !(defined SLJIT_CONFIG_MIPS && SLJIT_CONFIG_MIPS)
 
 struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, int type,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w)
+	int src1, long src1w,
+	int src2, long src2w)
 {
 	/* Default compare for most architectures. */
 	int flags, tmp_src, condition;
-	sljit_sw tmp_srcw;
+	long tmp_srcw;
 
 	CHECK_ERROR_PTR();
 	CHECK_PTR(check_sljit_emit_cmp(compiler, type, src1, src1w, src2, src2w));
@@ -1638,8 +1639,8 @@ struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, int type,
 }
 
 struct sljit_jump* sljit_emit_fcmp(struct sljit_compiler *compiler, int type,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w)
+	int src1, long src1w,
+	int src2, long src2w)
 {
 	int flags, condition;
 
@@ -1668,7 +1669,7 @@ struct sljit_jump* sljit_emit_fcmp(struct sljit_compiler *compiler, int type,
 
 #if !(defined SLJIT_CONFIG_X86 && SLJIT_CONFIG_X86)
 
-int sljit_get_local_base(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw offset)
+int sljit_get_local_base(struct sljit_compiler *compiler, int dst, long dstw, long offset)
 {
 	CHECK_ERROR();
 	CHECK(check_sljit_get_local_base(compiler, dst, dstw, offset));
@@ -1768,7 +1769,7 @@ int sljit_set_context(struct sljit_compiler *compiler,
 	return SLJIT_ERR_UNSUPPORTED;
 }
 
-int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, sljit_sw srcw)
+int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, long srcw)
 {
 	SLJIT_UNUSED_ARG(compiler);
 	SLJIT_UNUSED_ARG(op);
@@ -1778,7 +1779,7 @@ int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, sljit_sw
 	return SLJIT_ERR_UNSUPPORTED;
 }
 
-int sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, sljit_sw dstw)
+int sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, long dstw)
 {
 	SLJIT_UNUSED_ARG(compiler);
 	SLJIT_UNUSED_ARG(dst);
@@ -1787,7 +1788,7 @@ int sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, sljit_sw dst
 	return SLJIT_ERR_UNSUPPORTED;
 }
 
-int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, sljit_sw srcw)
+int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, long srcw)
 {
 	SLJIT_UNUSED_ARG(compiler);
 	SLJIT_UNUSED_ARG(src);
@@ -1805,8 +1806,8 @@ int sljit_emit_op0(struct sljit_compiler *compiler, int op)
 }
 
 int sljit_emit_op1(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src, sljit_sw srcw)
+	int dst, long dstw,
+	int src, long srcw)
 {
 	SLJIT_UNUSED_ARG(compiler);
 	SLJIT_UNUSED_ARG(op);
@@ -1819,9 +1820,9 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 }
 
 int sljit_emit_op2(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w)
+	int dst, long dstw,
+	int src1, long src1w,
+	int src2, long src2w)
 {
 	SLJIT_UNUSED_ARG(compiler);
 	SLJIT_UNUSED_ARG(op);
@@ -1858,8 +1859,8 @@ int sljit_is_fpu_available(void)
 }
 
 int sljit_emit_fop1(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src, sljit_sw srcw)
+	int dst, long dstw,
+	int src, long srcw)
 {
 	SLJIT_UNUSED_ARG(compiler);
 	SLJIT_UNUSED_ARG(op);
@@ -1872,9 +1873,9 @@ int sljit_emit_fop1(struct sljit_compiler *compiler, int op,
 }
 
 int sljit_emit_fop2(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w)
+	int dst, long dstw,
+	int src1, long src1w,
+	int src2, long src2w)
 {
 	SLJIT_UNUSED_ARG(compiler);
 	SLJIT_UNUSED_ARG(op);
@@ -1904,8 +1905,8 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, int type)
 }
 
 struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, int type,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w)
+	int src1, long src1w,
+	int src2, long src2w)
 {
 	SLJIT_UNUSED_ARG(compiler);
 	SLJIT_UNUSED_ARG(type);
@@ -1918,8 +1919,8 @@ struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, int type,
 }
 
 struct sljit_jump* sljit_emit_fcmp(struct sljit_compiler *compiler, int type,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w)
+	int src1, long src1w,
+	int src2, long src2w)
 {
 	SLJIT_UNUSED_ARG(compiler);
 	SLJIT_UNUSED_ARG(type);
@@ -1938,14 +1939,14 @@ void sljit_set_label(struct sljit_jump *jump, struct sljit_label* label)
 	SLJIT_ASSERT_STOP();
 }
 
-void sljit_set_target(struct sljit_jump *jump, sljit_uw target)
+void sljit_set_target(struct sljit_jump *jump, unsigned long target)
 {
 	SLJIT_UNUSED_ARG(jump);
 	SLJIT_UNUSED_ARG(target);
 	SLJIT_ASSERT_STOP();
 }
 
-int sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, sljit_sw srcw)
+int sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, long srcw)
 {
 	SLJIT_UNUSED_ARG(compiler);
 	SLJIT_UNUSED_ARG(type);
@@ -1956,8 +1957,8 @@ int sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, sljit_s
 }
 
 int sljit_emit_op_flags(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src, sljit_sw srcw,
+	int dst, long dstw,
+	int src, long srcw,
 	int type)
 {
 	SLJIT_UNUSED_ARG(compiler);
@@ -1971,7 +1972,7 @@ int sljit_emit_op_flags(struct sljit_compiler *compiler, int op,
 	return SLJIT_ERR_UNSUPPORTED;
 }
 
-int sljit_get_local_base(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw offset)
+int sljit_get_local_base(struct sljit_compiler *compiler, int dst, long dstw, long offset)
 {
 	SLJIT_UNUSED_ARG(compiler);
 	SLJIT_UNUSED_ARG(dst);
@@ -1981,7 +1982,7 @@ int sljit_get_local_base(struct sljit_compiler *compiler, int dst, sljit_sw dstw
 	return SLJIT_ERR_UNSUPPORTED;
 }
 
-struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw initval)
+struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, int dst, long dstw, long initval)
 {
 	SLJIT_UNUSED_ARG(compiler);
 	SLJIT_UNUSED_ARG(dst);
@@ -1991,14 +1992,14 @@ struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, int dst, s
 	return NULL;
 }
 
-void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr)
+void sljit_set_jump_addr(unsigned long addr, unsigned long new_addr)
 {
 	SLJIT_UNUSED_ARG(addr);
 	SLJIT_UNUSED_ARG(new_addr);
 	SLJIT_ASSERT_STOP();
 }
 
-void sljit_set_const(sljit_uw addr, sljit_sw new_constant)
+void sljit_set_const(unsigned long addr, long new_constant)
 {
 	SLJIT_UNUSED_ARG(addr);
 	SLJIT_UNUSED_ARG(new_constant);

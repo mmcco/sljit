@@ -198,14 +198,14 @@ static __inline int open_dev_zero(void)
 #if (defined SLJIT_UTIL_STACK && SLJIT_UTIL_STACK)
 
 /* Planning to make it even more clever in the future. */
-static sljit_sw sljit_page_align = 0;
+static long uintptr_tage_align = 0;
 
-struct sljit_stack* SLJIT_CALL sljit_allocate_stack(sljit_uw limit, sljit_uw max_limit)
+struct sljit_stack* SLJIT_CALL sljit_allocate_stack(unsigned long limit, unsigned long max_limit)
 {
 	struct sljit_stack *stack;
 	union {
 		void *ptr;
-		sljit_uw uw;
+		unsigned long uw;
 	} base;
 #ifdef _WIN32
 	SYSTEM_INFO si;
@@ -215,22 +215,22 @@ struct sljit_stack* SLJIT_CALL sljit_allocate_stack(sljit_uw limit, sljit_uw max
 		return NULL;
 
 #ifdef _WIN32
-	if (!sljit_page_align) {
+	if (!uintptr_tage_align) {
 		GetSystemInfo(&si);
-		sljit_page_align = si.dwPageSize - 1;
+		uintptr_tage_align = si.dwPageSize - 1;
 	}
 #else
-	if (!sljit_page_align) {
-		sljit_page_align = sysconf(_SC_PAGESIZE);
+	if (!uintptr_tage_align) {
+		uintptr_tage_align = sysconf(_SC_PAGESIZE);
 		/* Should never happen. */
-		if (sljit_page_align < 0)
-			sljit_page_align = 4096;
-		sljit_page_align--;
+		if (uintptr_tage_align < 0)
+			uintptr_tage_align = 4096;
+		uintptr_tage_align--;
 	}
 #endif
 
 	/* Align limit and max_limit. */
-	max_limit = (max_limit + sljit_page_align) & ~sljit_page_align;
+	max_limit = (max_limit + uintptr_tage_align) & ~uintptr_tage_align;
 
 	stack = malloc(sizeof(struct sljit_stack));
 	if (!stack)
@@ -285,16 +285,16 @@ void SLJIT_CALL sljit_free_stack(struct sljit_stack* stack)
 	free(stack);
 }
 
-sljit_sw SLJIT_CALL sljit_stack_resize(struct sljit_stack* stack, sljit_uw new_limit)
+long SLJIT_CALL sljit_stack_resize(struct sljit_stack* stack, unsigned long new_limit)
 {
-	sljit_uw aligned_old_limit;
-	sljit_uw aligned_new_limit;
+	unsigned long aligned_old_limit;
+	unsigned long aligned_new_limit;
 
 	if ((new_limit > stack->max_limit) || (new_limit < stack->base))
 		return -1;
 #ifdef _WIN32
-	aligned_new_limit = (new_limit + sljit_page_align) & ~sljit_page_align;
-	aligned_old_limit = (stack->limit + sljit_page_align) & ~sljit_page_align;
+	aligned_new_limit = (new_limit + uintptr_tage_align) & ~uintptr_tage_align;
+	aligned_old_limit = (stack->limit + uintptr_tage_align) & ~uintptr_tage_align;
 	if (aligned_new_limit != aligned_old_limit) {
 		if (aligned_new_limit > aligned_old_limit) {
 			if (!VirtualAlloc((void*)aligned_old_limit, aligned_new_limit - aligned_old_limit, MEM_COMMIT, PAGE_READWRITE))
@@ -312,8 +312,8 @@ sljit_sw SLJIT_CALL sljit_stack_resize(struct sljit_stack* stack, sljit_uw new_l
 		stack->limit = new_limit;
 		return 0;
 	}
-	aligned_new_limit = (new_limit + sljit_page_align) & ~sljit_page_align;
-	aligned_old_limit = (stack->limit + sljit_page_align) & ~sljit_page_align;
+	aligned_new_limit = (new_limit + uintptr_tage_align) & ~uintptr_tage_align;
+	aligned_old_limit = (stack->limit + uintptr_tage_align) & ~uintptr_tage_align;
 	/* If madvise is available, we release the unnecessary space. */
 #if defined(MADV_DONTNEED)
 	if (aligned_new_limit < aligned_old_limit)

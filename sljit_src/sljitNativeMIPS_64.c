@@ -26,13 +26,13 @@
 
 /* mips 64-bit arch dependent functions. */
 
-static int load_immediate(struct sljit_compiler *compiler, int dst_ar, sljit_sw imm)
+static int load_immediate(struct sljit_compiler *compiler, int dst_ar, long imm)
 {
 	int shift = 32;
 	int shift2;
 	int inv = 0;
 	sljit_ins ins;
-	sljit_uw uimm;
+	unsigned long uimm;
 
 	if (!(imm & ~0xffff))
 		return push_inst(compiler, ORI | SA(0) | TA(dst_ar) | IMM(imm), dst_ar);
@@ -67,7 +67,7 @@ static int load_immediate(struct sljit_compiler *compiler, int dst_ar, sljit_sw 
 		uimm <<= 2;
 	}
 
-	if ((sljit_sw)uimm < 0) {
+	if ((long)uimm < 0) {
 		uimm >>= 1;
 		shift += 1;
 	}
@@ -158,7 +158,7 @@ static int load_immediate(struct sljit_compiler *compiler, int dst_ar, sljit_sw 
 	}
 
 static __inline int emit_single_op(struct sljit_compiler *compiler, int op, int flags,
-	int dst, int src1, sljit_sw src2)
+	int dst, int src1, long src2)
 {
 	sljit_ins ins;
 
@@ -436,7 +436,7 @@ static __inline int emit_single_op(struct sljit_compiler *compiler, int op, int 
 	return SLJIT_SUCCESS;
 }
 
-static __inline int emit_const(struct sljit_compiler *compiler, int dst, sljit_sw init_value)
+static __inline int emit_const(struct sljit_compiler *compiler, int dst, long init_value)
 {
 	FAIL_IF(push_inst(compiler, LUI | T(dst) | IMM(init_value >> 48), DR(dst)));
 	FAIL_IF(push_inst(compiler, ORI | S(dst) | T(dst) | IMM(init_value >> 32), DR(dst)));
@@ -446,7 +446,7 @@ static __inline int emit_const(struct sljit_compiler *compiler, int dst, sljit_s
 	return push_inst(compiler, ORI | S(dst) | T(dst) | IMM(init_value), DR(dst));
 }
 
-void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr)
+void sljit_set_jump_addr(unsigned long addr, unsigned long new_addr)
 {
 	sljit_ins *inst = (sljit_ins*)addr;
 
@@ -457,7 +457,7 @@ void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr)
 	SLJIT_CACHE_FLUSH(inst, inst + 6);
 }
 
-void sljit_set_const(sljit_uw addr, sljit_sw new_constant)
+void sljit_set_const(unsigned long addr, long new_constant)
 {
 	sljit_ins *inst = (sljit_ins*)addr;
 

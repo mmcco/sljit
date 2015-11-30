@@ -26,7 +26,7 @@
 
 /* mips 32-bit arch dependent functions. */
 
-static int load_immediate(struct sljit_compiler *compiler, int dst_ar, sljit_sw imm)
+static int load_immediate(struct sljit_compiler *compiler, int dst_ar, long imm)
 {
 	if (!(imm & ~0xffff))
 		return push_inst(compiler, ORI | SA(0) | TA(dst_ar) | IMM(imm), dst_ar);
@@ -67,7 +67,7 @@ static int load_immediate(struct sljit_compiler *compiler, int dst_ar, sljit_sw 
 	}
 
 static __inline int emit_single_op(struct sljit_compiler *compiler, int op, int flags,
-	int dst, int src1, sljit_sw src2)
+	int dst, int src1, long src2)
 {
 	switch (GET_OPCODE(op)) {
 	case SLJIT_MOV:
@@ -341,13 +341,13 @@ static __inline int emit_single_op(struct sljit_compiler *compiler, int op, int 
 	return SLJIT_SUCCESS;
 }
 
-static __inline int emit_const(struct sljit_compiler *compiler, int dst, sljit_sw init_value)
+static __inline int emit_const(struct sljit_compiler *compiler, int dst, long init_value)
 {
 	FAIL_IF(push_inst(compiler, LUI | T(dst) | IMM(init_value >> 16), DR(dst)));
 	return push_inst(compiler, ORI | S(dst) | T(dst) | IMM(init_value), DR(dst));
 }
 
-void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr)
+void sljit_set_jump_addr(unsigned long addr, unsigned long new_addr)
 {
 	sljit_ins *inst = (sljit_ins*)addr;
 
@@ -356,7 +356,7 @@ void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr)
 	SLJIT_CACHE_FLUSH(inst, inst + 2);
 }
 
-void sljit_set_const(sljit_uw addr, sljit_sw new_constant)
+void sljit_set_const(unsigned long addr, long new_constant)
 {
 	sljit_ins *inst = (sljit_ins*)addr;
 

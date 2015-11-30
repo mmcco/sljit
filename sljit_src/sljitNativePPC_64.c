@@ -41,12 +41,12 @@
 #define PUSH_RLDICR(reg, shift) \
 	push_inst(compiler, RLDI(reg, reg, 63 - shift, shift, 1))
 
-static int load_immediate(struct sljit_compiler *compiler, int reg, sljit_sw imm)
+static int load_immediate(struct sljit_compiler *compiler, int reg, long imm)
 {
-	sljit_uw tmp;
-	sljit_uw shift;
-	sljit_uw tmp2;
-	sljit_uw shift2;
+	unsigned long tmp;
+	unsigned long shift;
+	unsigned long tmp2;
+	unsigned long shift2;
 
 	if (imm <= SIMM_MAX && imm >= SIMM_MIN)
 		return push_inst(compiler, ADDI | D(reg) | A(0) | IMM(imm));
@@ -389,7 +389,7 @@ static __inline int emit_single_op(struct sljit_compiler *compiler, int op, int 
 	return SLJIT_SUCCESS;
 }
 
-static __inline int emit_const(struct sljit_compiler *compiler, int reg, sljit_sw init_value)
+static __inline int emit_const(struct sljit_compiler *compiler, int reg, long init_value)
 {
 	FAIL_IF(push_inst(compiler, ADDIS | D(reg) | A(0) | IMM(init_value >> 48)));
 	FAIL_IF(push_inst(compiler, ORI | S(reg) | A(reg) | IMM(init_value >> 32)));
@@ -398,7 +398,7 @@ static __inline int emit_const(struct sljit_compiler *compiler, int reg, sljit_s
 	return push_inst(compiler, ORI | S(reg) | A(reg) | IMM(init_value));
 }
 
-void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr)
+void sljit_set_jump_addr(unsigned long addr, unsigned long new_addr)
 {
 	sljit_ins *inst = (sljit_ins*)addr;
 
@@ -409,7 +409,7 @@ void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr)
 	SLJIT_CACHE_FLUSH(inst, inst + 5);
 }
 
-void sljit_set_const(sljit_uw addr, sljit_sw new_constant)
+void sljit_set_const(unsigned long addr, long new_constant)
 {
 	sljit_ins *inst = (sljit_ins*)addr;
 

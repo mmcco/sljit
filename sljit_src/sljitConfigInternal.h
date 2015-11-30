@@ -30,14 +30,6 @@
 /*
    SLJIT defines the following architecture dependent types and macros:
 
-   Types:
-     sljit_sh, sljit_uh : signed and unsigned 16 bit half-word (short) type
-     sljit_sw, sljit_uw : signed and unsigned machine word, enough to store a pointer
-     sljit_p : unsgined pointer value (usually the same as sljit_uw, but
-               some 64 bit ABIs may use 32 bit pointers)
-     sljit_s : single precision floating point value
-     sljit_d : double precision floating point value
-
    Macros for feature detection (boolean):
      SLJIT_32BIT_ARCHITECTURE : 32 bit architecture
      SLJIT_64BIT_ARCHITECTURE : 64 bit architecture
@@ -53,7 +45,7 @@
      SLJIT_NUMBER_OF_FLOAT_REGISTERS : number of available floating point registers
      SLJIT_NUMBER_OF_SCRATCH_FLOAT_REGISTERS : number of available floating point scratch registers
      SLJIT_NUMBER_OF_SAVED_FLOAT_REGISTERS : number of available floating point saved registers
-     SLJIT_WORD_SHIFT : the shift required to apply when accessing a sljit_sw/sljit_uw array by index
+     SLJIT_WORD_SHIFT : the shift required to apply when accessing a long/unsigned long array by index
      SLJIT_DOUBLE_SHIFT : the shift required to apply when accessing
                           a double precision floating point array by index
      SLJIT_SINGLE_SHIFT : the shift required to apply when accessing
@@ -253,6 +245,10 @@ typedef signed char	s_char;
 /* Byte/half/int/word/single/double type definitions. */
 /******************************************************/
 
+#if !defined(_LP64) && !defined(__LP64__)
+#error "long must be size of pointer"
+#endif
+
 /* 16 bit half-word type. */
 typedef unsigned short int sljit_uh;
 typedef signed short int sljit_sh;
@@ -263,8 +259,6 @@ typedef signed short int sljit_sh;
 #if (defined SLJIT_CONFIG_UNSUPPORTED && SLJIT_CONFIG_UNSUPPORTED)
 /* Just to have something. */
 #define SLJIT_WORD_SHIFT 0
-typedef unsigned long int sljit_uw;
-typedef long int sljit_sw;
 #elif !(defined SLJIT_CONFIG_X86_64 && SLJIT_CONFIG_X86_64) \
 	&& !(defined SLJIT_CONFIG_ARM_64 && SLJIT_CONFIG_ARM_64) \
 	&& !(defined SLJIT_CONFIG_PPC_64 && SLJIT_CONFIG_PPC_64) \
@@ -272,21 +266,10 @@ typedef long int sljit_sw;
 	&& !(defined SLJIT_CONFIG_TILEGX && SLJIT_CONFIG_TILEGX)
 #define SLJIT_32BIT_ARCHITECTURE 1
 #define SLJIT_WORD_SHIFT 2
-typedef unsigned int sljit_uw;
-typedef int sljit_sw;
 #else
 #define SLJIT_64BIT_ARCHITECTURE 1
 #define SLJIT_WORD_SHIFT 3
-#ifdef _WIN32
-typedef unsigned __int64 sljit_uw;
-typedef __int64 sljit_sw;
-#else
-typedef unsigned long int sljit_uw;
-typedef long int sljit_sw;
 #endif
-#endif
-
-typedef sljit_uw sljit_p;
 
 /* Floating point types. */
 typedef float sljit_s;
@@ -436,7 +419,7 @@ determine the next executed instruction after return. */
 /***************************************************/
 
 #if (defined SLJIT_EXECUTABLE_ALLOCATOR && SLJIT_EXECUTABLE_ALLOCATOR)
-void* sljit_malloc_exec(sljit_uw size);
+void* sljit_malloc_exec(unsigned long size);
 void sljit_free_exec(void* ptr);
 void sljit_free_unused_memory_exec(void);
 #define SLJIT_MALLOC_EXEC(size) sljit_malloc_exec(size)
@@ -452,10 +435,10 @@ void sljit_free_unused_memory_exec(void);
 #define SLJIT_NUMBER_OF_REGISTERS 10
 #define SLJIT_NUMBER_OF_SAVED_REGISTERS 7
 #if (defined SLJIT_X86_32_FASTCALL && SLJIT_X86_32_FASTCALL)
-#define SLJIT_LOCALS_OFFSET_BASE ((2 + 4) * sizeof(sljit_sw))
+#define SLJIT_LOCALS_OFFSET_BASE ((2 + 4) * sizeof(long))
 #else
 /* Maximum 3 arguments are passed on the stack, +1 for double alignment. */
-#define SLJIT_LOCALS_OFFSET_BASE ((3 + 1 + 4) * sizeof(sljit_sw))
+#define SLJIT_LOCALS_OFFSET_BASE ((3 + 1 + 4) * sizeof(long))
 #endif /* SLJIT_X86_32_FASTCALL */
 
 #elif (defined SLJIT_CONFIG_X86_64 && SLJIT_CONFIG_X86_64)
@@ -463,11 +446,11 @@ void sljit_free_unused_memory_exec(void);
 #ifndef _WIN64
 #define SLJIT_NUMBER_OF_REGISTERS 12
 #define SLJIT_NUMBER_OF_SAVED_REGISTERS 6
-#define SLJIT_LOCALS_OFFSET_BASE (sizeof(sljit_sw))
+#define SLJIT_LOCALS_OFFSET_BASE (sizeof(long))
 #else
 #define SLJIT_NUMBER_OF_REGISTERS 12
 #define SLJIT_NUMBER_OF_SAVED_REGISTERS 8
-#define SLJIT_LOCALS_OFFSET_BASE ((4 + 2) * sizeof(sljit_sw))
+#define SLJIT_LOCALS_OFFSET_BASE ((4 + 2) * sizeof(long))
 #endif /* _WIN64 */
 
 #elif (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5) || (defined SLJIT_CONFIG_ARM_V7 && SLJIT_CONFIG_ARM_V7)
@@ -486,19 +469,19 @@ void sljit_free_unused_memory_exec(void);
 
 #define SLJIT_NUMBER_OF_REGISTERS 25
 #define SLJIT_NUMBER_OF_SAVED_REGISTERS 10
-#define SLJIT_LOCALS_OFFSET_BASE (2 * sizeof(sljit_sw))
+#define SLJIT_LOCALS_OFFSET_BASE (2 * sizeof(long))
 
 #elif (defined SLJIT_CONFIG_PPC && SLJIT_CONFIG_PPC)
 
 #define SLJIT_NUMBER_OF_REGISTERS 22
 #define SLJIT_NUMBER_OF_SAVED_REGISTERS 17
 #if (defined SLJIT_CONFIG_PPC_64 && SLJIT_CONFIG_PPC_64) || (defined _AIX)
-#define SLJIT_LOCALS_OFFSET_BASE ((6 + 8) * sizeof(sljit_sw))
+#define SLJIT_LOCALS_OFFSET_BASE ((6 + 8) * sizeof(long))
 #elif (defined SLJIT_CONFIG_PPC_32 && SLJIT_CONFIG_PPC_32)
 /* Add +1 for double alignment. */
-#define SLJIT_LOCALS_OFFSET_BASE ((3 + 1) * sizeof(sljit_sw))
+#define SLJIT_LOCALS_OFFSET_BASE ((3 + 1) * sizeof(long))
 #else
-#define SLJIT_LOCALS_OFFSET_BASE (3 * sizeof(sljit_sw))
+#define SLJIT_LOCALS_OFFSET_BASE (3 * sizeof(long))
 #endif /* SLJIT_CONFIG_PPC_64 || _AIX */
 
 #elif (defined SLJIT_CONFIG_MIPS && SLJIT_CONFIG_MIPS)
@@ -506,7 +489,7 @@ void sljit_free_unused_memory_exec(void);
 #define SLJIT_NUMBER_OF_REGISTERS 17
 #define SLJIT_NUMBER_OF_SAVED_REGISTERS 8
 #if (defined SLJIT_CONFIG_MIPS_32 && SLJIT_CONFIG_MIPS_32)
-#define SLJIT_LOCALS_OFFSET_BASE (4 * sizeof(sljit_sw))
+#define SLJIT_LOCALS_OFFSET_BASE (4 * sizeof(long))
 #else
 #define SLJIT_LOCALS_OFFSET_BASE 0
 #endif
@@ -517,7 +500,7 @@ void sljit_free_unused_memory_exec(void);
 #define SLJIT_NUMBER_OF_SAVED_REGISTERS 14
 #if (defined SLJIT_CONFIG_SPARC_32 && SLJIT_CONFIG_SPARC_32)
 /* Add +1 for double alignment. */
-#define SLJIT_LOCALS_OFFSET_BASE ((23 + 1) * sizeof(sljit_sw))
+#define SLJIT_LOCALS_OFFSET_BASE ((23 + 1) * sizeof(long))
 #endif
 
 #elif (defined SLJIT_CONFIG_UNSUPPORTED && SLJIT_CONFIG_UNSUPPORTED)

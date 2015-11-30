@@ -269,31 +269,31 @@ of sljitConfigInternal.h */
 
 struct sljit_memory_fragment {
 	struct sljit_memory_fragment *next;
-	sljit_uw used_size;
-	/* Must be aligned to sljit_sw. */
+	unsigned long used_size;
+	/* Must be aligned to long. */
 	u_char memory[1];
 };
 
 struct sljit_label {
 	struct sljit_label *next;
-	sljit_uw addr;
+	unsigned long addr;
 	/* The maximum size difference. */
-	sljit_uw size;
+	unsigned long size;
 };
 
 struct sljit_jump {
 	struct sljit_jump *next;
-	sljit_uw addr;
-	sljit_sw flags;
+	unsigned long addr;
+	long flags;
 	union {
-		sljit_uw target;
+		unsigned long target;
 		struct sljit_label* label;
 	} u;
 };
 
 struct sljit_const {
 	struct sljit_const *next;
-	sljit_uw addr;
+	unsigned long addr;
 };
 
 struct sljit_compiler {
@@ -321,9 +321,9 @@ struct sljit_compiler {
 	/* Local stack size. */
 	int local_size;
 	/* Code size. */
-	sljit_uw size;
+	unsigned long size;
 	/* For statistical purposes. */
-	sljit_uw executable_size;
+	unsigned long executable_size;
 
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 	int args;
@@ -339,53 +339,53 @@ struct sljit_compiler {
 
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5)
 	/* Constant pool handling. */
-	sljit_uw *cpool;
+	unsigned long *cpool;
 	u_char *cpool_unique;
-	sljit_uw cpool_diff;
-	sljit_uw cpool_fill;
+	unsigned long cpool_diff;
+	unsigned long cpool_fill;
 	/* Other members. */
 	/* Contains pointer, "ldr pc, [...]" pairs. */
-	sljit_uw patches;
+	unsigned long patches;
 #endif
 
 #if (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5) || (defined SLJIT_CONFIG_ARM_V7 && SLJIT_CONFIG_ARM_V7)
 	/* Temporary fields. */
-	sljit_uw shift_imm;
+	unsigned long shift_imm;
 	int cache_arg;
-	sljit_sw cache_argw;
+	long cache_argw;
 #endif
 
 #if (defined SLJIT_CONFIG_ARM_THUMB2 && SLJIT_CONFIG_ARM_THUMB2)
 	int cache_arg;
-	sljit_sw cache_argw;
+	long cache_argw;
 #endif
 
 #if (defined SLJIT_CONFIG_ARM_64 && SLJIT_CONFIG_ARM_64)
 	int cache_arg;
-	sljit_sw cache_argw;
+	long cache_argw;
 #endif
 
 #if (defined SLJIT_CONFIG_PPC && SLJIT_CONFIG_PPC)
-	sljit_sw imm;
+	long imm;
 	int cache_arg;
-	sljit_sw cache_argw;
+	long cache_argw;
 #endif
 
 #if (defined SLJIT_CONFIG_MIPS && SLJIT_CONFIG_MIPS)
 	int delay_slot;
 	int cache_arg;
-	sljit_sw cache_argw;
+	long cache_argw;
 #endif
 
 #if (defined SLJIT_CONFIG_SPARC_32 && SLJIT_CONFIG_SPARC_32)
 	int delay_slot;
 	int cache_arg;
-	sljit_sw cache_argw;
+	long cache_argw;
 #endif
 
 #if (defined SLJIT_CONFIG_TILEGX && SLJIT_CONFIG_TILEGX)
 	int cache_arg;
-	sljit_sw cache_argw;
+	long cache_argw;
 #endif
 
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
@@ -427,7 +427,7 @@ static __inline int sljit_get_compiler_error(struct sljit_compiler *compiler) { 
    Allocate a small amount of memory. The size must be <= 64 bytes on 32 bit,
    and <= 128 bytes on 64 bit architectures. The memory area is owned by the
    compiler, and freed by sljit_free_compiler. The returned pointer is
-   sizeof(sljit_sw) aligned. Excellent for allocating small blocks during
+   sizeof(long) aligned. Excellent for allocating small blocks during
    the compiling, and no need to worry about freeing them. The size is
    enough to contain at most 16 pointers. If the size is outside of the range,
    the function will return with NULL. However, this return value does not
@@ -452,7 +452,7 @@ void sljit_free_code(void* code);
 
    Before a successful code generation, this function returns with 0.
 */
-static __inline sljit_uw sljit_get_generated_code_size(struct sljit_compiler *compiler) { return compiler->executable_size; }
+static __inline unsigned long sljit_get_generated_code_size(struct sljit_compiler *compiler) { return compiler->executable_size; }
 
 /* Instruction generation. Returns with any error code. If there is no
    error, they return with SLJIT_SUCCESS. */
@@ -468,7 +468,7 @@ static __inline sljit_uw sljit_get_generated_code_size(struct sljit_compiler *co
    can be used to pass configuration options to the compiler. The
    available options are listed before sljit_emit_enter.
 
-   The number of sljit_sw arguments passed to the generated function
+   The number of long arguments passed to the generated function
    are specified in the "args" parameter. The number of arguments must
    be less than or equal to 3. The first argument goes to SLJIT_S0,
    the second goes to SLJIT_S1 and so on. The register set used by
@@ -498,7 +498,7 @@ static __inline sljit_uw sljit_get_generated_code_size(struct sljit_compiler *co
 */
 
 /* The absolute address returned by sljit_get_local_base with
-offset 0 is aligned to sljit_d. Otherwise it is aligned to sljit_uw. */
+offset 0 is aligned to sljit_d. Otherwise it is aligned to unsigned long. */
 #define SLJIT_DOUBLE_ALIGNMENT 0x00000001
 
 /* The local_size must be >= 0 and <= SLJIT_MAX_LOCAL_SIZE. */
@@ -529,12 +529,12 @@ int sljit_set_context(struct sljit_compiler *compiler,
    destination arguments. */
 
 int sljit_emit_return(struct sljit_compiler *compiler, int op,
-	int src, sljit_sw srcw);
+	int src, long srcw);
 
 /* Fast calling mechanism for utility functions (see SLJIT_FAST_CALL). All registers and
    even the stack frame is passed to the callee. The return address is preserved in
    dst/dstw by sljit_emit_fast_enter (the type of the value stored by this function
-   is sljit_p), and sljit_emit_fast_return can use this as a return value later. */
+   is uintptr_t), and sljit_emit_fast_return can use this as a return value later. */
 
 /* Note: only for sljit specific, non ABI compilant calls. Fast, since only a few machine
    instructions are needed. Excellent for small uility functions, where saving registers
@@ -546,8 +546,8 @@ int sljit_emit_return(struct sljit_compiler *compiler, int op,
 /* Note: although sljit_emit_fast_return could be replaced by an ijump, it is not suggested,
    since many architectures do clever branch prediction on call / return instruction pairs. */
 
-int sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, sljit_sw dstw);
-int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, sljit_sw srcw);
+int sljit_emit_fast_enter(struct sljit_compiler *compiler, int dst, long dstw);
+int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, long srcw);
 
 /*
    Source and destination values for arithmetical instructions
@@ -556,7 +556,7 @@ int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, sljit_sw sr
     [imm]            - absolute immediate memory address
     [reg+imm]        - indirect memory address
     [reg+(reg<<imm)] - indirect indexed memory address (shift must be between 0 and 3)
-                       useful for (byte, half, int, sljit_sw) array access
+                       useful for (byte, half, int, long) array access
                        (fully supported by both x86 and ARM architectures, and cheap operation on others)
 */
 
@@ -571,7 +571,7 @@ int sljit_emit_fast_return(struct sljit_compiler *compiler, int src, sljit_sw sr
      int    | 4 byte (physical_address & 0x3 == 0)
      word   | 4 byte if SLJIT_32BIT_ARCHITECTURE is defined and its value is 1
             | 8 byte if SLJIT_64BIT_ARCHITECTURE is defined and its value is 1
-    pointer | size of sljit_p type (4 byte on 32 bit machines, 4 or 8 byte
+    pointer | size of uintptr_t type (4 byte on 32 bit machines, 4 or 8 byte
             | on 64 bit machines)
 
    Note:   Different architectures have different addressing limitations.
@@ -715,7 +715,7 @@ int sljit_emit_op0(struct sljit_compiler *compiler, int op);
    SH = signed half (16 bit)
    UI = unsigned int (32 bit)
    SI = signed int (32 bit)
-   P  = pointer (sljit_p) size */
+   P  = pointer (uintptr_t) size */
 
 /* Flags: - (never set any flags) */
 #define SLJIT_MOV			(SLJIT_OP1_BASE + 0)
@@ -779,8 +779,8 @@ int sljit_emit_op0(struct sljit_compiler *compiler, int op);
 #define SLJIT_ICLZ			(SLJIT_CLZ | SLJIT_INT_OP)
 
 int sljit_emit_op1(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src, sljit_sw srcw);
+	int dst, long dstw,
+	int src, long srcw);
 
 /* Starting index of opcodes for sljit_emit_op2. */
 #define SLJIT_OP2_BASE			96
@@ -833,9 +833,9 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 #define SLJIT_IASHR			(SLJIT_ASHR | SLJIT_INT_OP)
 
 int sljit_emit_op2(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w);
+	int dst, long dstw,
+	int src1, long src1w,
+	int src2, long src2w);
 
 /* The following function is a helper function for sljit_emit_op_custom.
    It returns with the real machine register index ( >=0 ) of any SLJIT_R,
@@ -907,8 +907,8 @@ int sljit_is_fpu_available(void);
 #define SLJIT_SABS			(SLJIT_DABS | SLJIT_SINGLE_OP)
 
 int sljit_emit_fop1(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src, sljit_sw srcw);
+	int dst, long dstw,
+	int src, long srcw);
 
 /* Starting index of opcodes for sljit_emit_fop2. */
 #define SLJIT_FOP2_BASE			160
@@ -927,9 +927,9 @@ int sljit_emit_fop1(struct sljit_compiler *compiler, int op,
 #define SLJIT_SDIV			(SLJIT_DDIV | SLJIT_SINGLE_OP)
 
 int sljit_emit_fop2(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w);
+	int dst, long dstw,
+	int src1, long src1w,
+	int src2, long src2w);
 
 /* Label and jump instructions. */
 
@@ -1021,8 +1021,8 @@ struct sljit_jump* sljit_emit_jump(struct sljit_compiler *compiler, int type);
     type can be combined (or'ed) with SLJIT_REWRITABLE_JUMP
    Flags: destroy flags. */
 struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, int type,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w);
+	int src1, long src1w,
+	int src2, long src2w);
 
 /* Basic floating point comparison. In most architectures it is implemented as
    an SLJIT_FCMP operation (setting appropriate flags) followed by a
@@ -1035,13 +1035,13 @@ struct sljit_jump* sljit_emit_cmp(struct sljit_compiler *compiler, int type,
    Note: if either operand is NaN, the behaviour is undefined for
          types up to SLJIT_S_LESS_EQUAL. */
 struct sljit_jump* sljit_emit_fcmp(struct sljit_compiler *compiler, int type,
-	int src1, sljit_sw src1w,
-	int src2, sljit_sw src2w);
+	int src1, long src1w,
+	int src2, long src2w);
 
 /* Set the destination of the jump to this label. */
 void sljit_set_label(struct sljit_jump *jump, struct sljit_label* label);
 /* Set the destination address of the jump to this label. */
-void sljit_set_target(struct sljit_jump *jump, sljit_uw target);
+void sljit_set_target(struct sljit_jump *jump, unsigned long target);
 
 /* Call function or jump anywhere. Both direct and indirect form
     type must be between SLJIT_JUMP and SLJIT_CALL3
@@ -1049,7 +1049,7 @@ void sljit_set_target(struct sljit_jump *jump, sljit_uw target);
     Indirect form: any other valid addressing mode
    Flags: - (never set any flags) for unconditional jumps.
    Flags: destroy all flags for calls. */
-int sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, sljit_sw srcw);
+int sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, long srcw);
 
 /* Perform the operation using the conditional flags as the second argument.
    Type must always be between SLJIT_EQUAL and SLJIT_S_ORDERED. The value
@@ -1067,28 +1067,28 @@ int sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, sljit_s
      Flags: I | E | K
    Note: sljit_emit_op_flags does nothing, if dst is SLJIT_UNUSED (regardless of op). */
 int sljit_emit_op_flags(struct sljit_compiler *compiler, int op,
-	int dst, sljit_sw dstw,
-	int src, sljit_sw srcw,
+	int dst, long dstw,
+	int src, long srcw,
 	int type);
 
 /* Copies the base address of SLJIT_SP + offset to dst.
    Flags: - (never set any flags) */
-int sljit_get_local_base(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw offset);
+int sljit_get_local_base(struct sljit_compiler *compiler, int dst, long dstw, long offset);
 
 /* The constant can be changed runtime (see: sljit_set_const)
    Flags: - (never set any flags) */
-struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, int dst, sljit_sw dstw, sljit_sw init_value);
+struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, int dst, long dstw, long init_value);
 
 /* After the code generation the address for label, jump and const instructions
    are computed. Since these structures are freed by sljit_free_compiler, the
    addresses must be preserved by the user program elsewere. */
-static __inline sljit_uw sljit_get_label_addr(struct sljit_label *label) { return label->addr; }
-static __inline sljit_uw sljit_get_jump_addr(struct sljit_jump *jump) { return jump->addr; }
-static __inline sljit_uw sljit_get_const_addr(struct sljit_const *const_) { return const_->addr; }
+static __inline unsigned long sljit_get_label_addr(struct sljit_label *label) { return label->addr; }
+static __inline unsigned long sljit_get_jump_addr(struct sljit_jump *jump) { return jump->addr; }
+static __inline unsigned long sljit_get_const_addr(struct sljit_const *const_) { return const_->addr; }
 
 /* Only the address is required to rewrite the code. */
-void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr);
-void sljit_set_const(sljit_uw addr, sljit_sw new_constant);
+void sljit_set_jump_addr(unsigned long addr, unsigned long new_addr);
+void sljit_set_const(unsigned long addr, long new_constant);
 
 /* --------------------------------------------------------------------- */
 /*  Miscellaneous utility functions                                      */
@@ -1103,7 +1103,7 @@ void sljit_set_const(sljit_uw addr, sljit_sw new_constant);
 const char* sljit_get_platform_name(void);
 
 /* Portable helper function to get an offset of a member. */
-#define SLJIT_OFFSETOF(base, member) ((sljit_sw)(&((base*)0x10)->member) - 0x10)
+#define SLJIT_OFFSETOF(base, member) ((long)(&((base*)0x10)->member) - 0x10)
 
 #if (defined SLJIT_UTIL_GLOBAL_LOCK && SLJIT_UTIL_GLOBAL_LOCK)
 /* This global lock is useful to compile common functions. */
@@ -1133,17 +1133,17 @@ void SLJIT_CALL sljit_release_lock(void);
 struct sljit_stack {
 	/* User data, anything can be stored here.
 	   Starting with the same value as base. */
-	sljit_uw top;
+	unsigned long top;
 	/* These members are read only. */
-	sljit_uw base;
-	sljit_uw limit;
-	sljit_uw max_limit;
+	unsigned long base;
+	unsigned long limit;
+	unsigned long max_limit;
 };
 
 /* Returns NULL if unsuccessful.
    Note: limit and max_limit contains the size for stack allocation
    Note: the top field is initialized to base. */
-struct sljit_stack* SLJIT_CALL sljit_allocate_stack(sljit_uw limit, sljit_uw max_limit);
+struct sljit_stack* SLJIT_CALL sljit_allocate_stack(unsigned long limit, unsigned long max_limit);
 void SLJIT_CALL sljit_free_stack(struct sljit_stack* stack);
 
 /* Can be used to increase (allocate) or decrease (free) the memory area.
@@ -1152,32 +1152,32 @@ void SLJIT_CALL sljit_free_stack(struct sljit_stack* stack);
    since the growth ratio can be added to the current limit, and sljit_stack_resize
    will do all the necessary checks. The fields of the stack are not changed if
    sljit_stack_resize fails. */
-sljit_sw SLJIT_CALL sljit_stack_resize(struct sljit_stack* stack, sljit_uw new_limit);
+long SLJIT_CALL sljit_stack_resize(struct sljit_stack* stack, unsigned long new_limit);
 
 #endif /* (defined SLJIT_UTIL_STACK && SLJIT_UTIL_STACK) */
 
 #if !(defined SLJIT_INDIRECT_CALL && SLJIT_INDIRECT_CALL)
 
 /* Get the entry address of a given function. */
-#define SLJIT_FUNC_OFFSET(func_name)	((sljit_sw)func_name)
+#define SLJIT_FUNC_OFFSET(func_name)	((long)func_name)
 
 #else /* !(defined SLJIT_INDIRECT_CALL && SLJIT_INDIRECT_CALL) */
 
 /* All JIT related code should be placed in the same context (library, binary, etc.). */
 
-#define SLJIT_FUNC_OFFSET(func_name)	(*(sljit_sw*)(void*)func_name)
+#define SLJIT_FUNC_OFFSET(func_name)	(*(long*)(void*)func_name)
 
 /* For powerpc64, the function pointers point to a context descriptor. */
 struct sljit_function_context {
-	sljit_sw addr;
-	sljit_sw r2;
-	sljit_sw r11;
+	long addr;
+	long r2;
+	long r11;
 };
 
 /* Fill the context arguments using the addr and the function.
    If func_ptr is NULL, it will not be set to the address of context
    If addr is NULL, the function address also comes from the func pointer. */
-void sljit_set_function_context(void** func_ptr, struct sljit_function_context* context, sljit_sw addr, void* func);
+void sljit_set_function_context(void** func_ptr, struct sljit_function_context* context, long addr, void* func);
 
 #endif /* !(defined SLJIT_INDIRECT_CALL && SLJIT_INDIRECT_CALL) */
 

@@ -81,12 +81,12 @@
 
 #ifdef _WIN32
 
-static __inline void* alloc_chunk(sljit_uw size)
+static __inline void* alloc_chunk(unsigned long size)
 {
 	return VirtualAlloc(NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 }
 
-static __inline void free_chunk(void* chunk, sljit_uw size)
+static __inline void free_chunk(void* chunk, unsigned long size)
 {
 	SLJIT_UNUSED_ARG(size);
 	VirtualFree(chunk, 0, MEM_RELEASE);
@@ -94,7 +94,7 @@ static __inline void free_chunk(void* chunk, sljit_uw size)
 
 #else
 
-static __inline void* alloc_chunk(sljit_uw size)
+static __inline void* alloc_chunk(unsigned long size)
 {
 	void* retval;
 
@@ -111,7 +111,7 @@ static __inline void* alloc_chunk(sljit_uw size)
 	return (retval != MAP_FAILED) ? retval : NULL;
 }
 
-static __inline void free_chunk(void* chunk, sljit_uw size)
+static __inline void free_chunk(void* chunk, unsigned long size)
 {
 	munmap(chunk, size);
 }
@@ -125,15 +125,15 @@ static __inline void free_chunk(void* chunk, sljit_uw size)
 #define CHUNK_MASK	(~(CHUNK_SIZE - 1))
 
 struct block_header {
-	sljit_uw size;
-	sljit_uw prev_size;
+	unsigned long size;
+	unsigned long prev_size;
 };
 
 struct free_block {
 	struct block_header header;
 	struct free_block *next;
 	struct free_block *prev;
-	sljit_uw size;
+	unsigned long size;
 };
 
 #define AS_BLOCK_HEADER(base, offset) \
@@ -144,10 +144,10 @@ struct free_block {
 #define ALIGN_SIZE(size)	(((size) + sizeof(struct block_header) + 7) & ~7)
 
 static struct free_block* free_blocks;
-static sljit_uw allocated_size;
-static sljit_uw total_size;
+static unsigned long allocated_size;
+static unsigned long total_size;
 
-static __inline void sljit_insert_free_block(struct free_block *free_block, sljit_uw size)
+static __inline void sljit_insert_free_block(struct free_block *free_block, unsigned long size)
 {
 	free_block->header.size = 0;
 	free_block->size = size;
@@ -172,12 +172,12 @@ static __inline void sljit_remove_free_block(struct free_block *free_block)
 	}
 }
 
-void* sljit_malloc_exec(sljit_uw size)
+void* sljit_malloc_exec(unsigned long size)
 {
 	struct block_header *header;
 	struct block_header *next_header;
 	struct free_block *free_block;
-	sljit_uw chunk_size;
+	unsigned long chunk_size;
 
 	allocator_grab_lock();
 	if (size < sizeof(struct free_block))
@@ -249,14 +249,14 @@ void sljit_free_exec(void* ptr)
 	struct free_block* free_block;
 
 	allocator_grab_lock();
-	header = AS_BLOCK_HEADER(ptr, -(sljit_sw)sizeof(struct block_header));
+	header = AS_BLOCK_HEADER(ptr, -(long)sizeof(struct block_header));
 	allocated_size -= header->size;
 
 	/* Connecting free blocks together if possible. */
 
 	/* If header->prev_size == 0, free_block will equal to header.
 	   In this case, free_block->header.size will be > 0. */
-	free_block = AS_FREE_BLOCK(header, -(sljit_sw)header->prev_size);
+	free_block = AS_FREE_BLOCK(header, -(long)header->prev_size);
 	if (!free_block->header.size) {
 		free_block->size += header->size;
 		header = AS_BLOCK_HEADER(free_block, free_block->size);
