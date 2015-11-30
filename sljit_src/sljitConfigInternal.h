@@ -264,10 +264,6 @@ typedef signed char	s_char;
 #define SLJIT_WORD_SHIFT 3
 #endif
 
-/* Floating point types. */
-typedef float sljit_s;
-typedef double sljit_d;
-
 /* Shift for pointer sized data. */
 #define SLJIT_POINTER_SHIFT SLJIT_WORD_SHIFT
 
