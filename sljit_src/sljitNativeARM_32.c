@@ -325,7 +325,7 @@ static SLJIT_INLINE int resolve_const_pool_index(struct future_patch **first_pat
 		value = (int)cpool_start_address[cpool_current_index];
 	else {
 		curr_patch = *first_patch;
-		prev_patch = 0;
+		prev_patch = NULL;
 		while (1) {
 			if (!curr_patch) {
 				value = (int)cpool_start_address[cpool_current_index];
