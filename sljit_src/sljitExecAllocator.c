@@ -88,7 +88,7 @@ static __inline void* alloc_chunk(unsigned long size)
 
 static __inline void free_chunk(void* chunk, unsigned long size)
 {
-	SLJIT_UNUSED_ARG(size);
+	(void)size;
 	VirtualFree(chunk, 0, MEM_RELEASE);
 }
 

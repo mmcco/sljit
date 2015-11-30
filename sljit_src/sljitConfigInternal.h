@@ -177,11 +177,6 @@
 /* Compiler helper macros. */
 /***************************/
 
-#ifndef SLJIT_UNUSED_ARG
-/* Unused arguments. */
-#define SLJIT_UNUSED_ARG(arg) (void)arg
-#endif
-
 /*********************************/
 /* Type of public API functions. */
 /*********************************/
