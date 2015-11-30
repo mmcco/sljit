@@ -228,7 +228,7 @@ void sljit_set_function_context(void** func_ptr, struct sljit_function_context* 
 {
 	sljit_sw* ptrs;
 	if (func_ptr)
-		*func_ptr = (void*)context;
+		*func_ptr = context;
 	ptrs = (sljit_sw*)func;
 	context->addr = addr ? addr : ptrs[0];
 	context->r2 = ptrs[1];

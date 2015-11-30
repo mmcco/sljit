@@ -556,7 +556,7 @@ void* sljit_generate_code(struct sljit_compiler *compiler)
 	SLJIT_ASSERT(code_ptr <= code + compiler->size);
 	compiler->error = SLJIT_ERR_COMPILED;
 	compiler->executable_size = code_ptr - code;
-	return (void*)code;
+	return code;
 }
 
 /* --------------------------------------------------------------------- */
