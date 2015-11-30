@@ -26,16 +26,11 @@
 
 #include "sljitLir.h"
 
+#include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 void sljit_test(int argc, char* argv[]);
-
-void error(const char* str)
-{
-	printf("An error occured: %s\n", str);
-	exit(-1);
-}
 
 union executable_code {
 	void* code;
@@ -51,7 +46,7 @@ void devel(void)
 	long buf[4];
 
 	if (!compiler)
-		error("Not enough of memory");
+		errx(-1, "out of memory");
 	buf[0] = 5;
 	buf[1] = 12;
 	buf[2] = 0;
