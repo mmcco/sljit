@@ -64,9 +64,9 @@ const char* sljit_get_platform_name(void)
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 
 /* Last register + 1. */
-#define TMP_REG1	(SLJIT_NUMBER_OF_REGISTERS + 2)
+#define TMP_REG1	(SLJIT_NUM_REGS + 2)
 
-static const u_char reg_map[SLJIT_NUMBER_OF_REGISTERS + 3] = {
+static const u_char reg_map[SLJIT_NUM_REGS + 3] = {
 	0, 0, 2, 1, 0, 0, 0, 0, 7, 6, 3, 4, 5
 };
 
@@ -80,29 +80,29 @@ static const u_char reg_map[SLJIT_NUMBER_OF_REGISTERS + 3] = {
 #else /* SLJIT_CONFIG_X86_32 */
 
 /* Last register + 1. */
-#define TMP_REG1	(SLJIT_NUMBER_OF_REGISTERS + 2)
-#define TMP_REG2	(SLJIT_NUMBER_OF_REGISTERS + 3)
-#define TMP_REG3	(SLJIT_NUMBER_OF_REGISTERS + 4)
+#define TMP_REG1	(SLJIT_NUM_REGS + 2)
+#define TMP_REG2	(SLJIT_NUM_REGS + 3)
+#define TMP_REG3	(SLJIT_NUM_REGS + 4)
 
 /* Note: r12 & 0x7 == 0b100, which decoded as SIB byte present
    Note: avoid to use r12 and r13 for memory addessing
    therefore r12 is better for SAVED_EREG than SAVED_REG. */
 #ifndef _WIN64
 /* 1st passed in rdi, 2nd argument passed in rsi, 3rd in rdx. */
-static const u_char reg_map[SLJIT_NUMBER_OF_REGISTERS + 5] = {
+static const u_char reg_map[SLJIT_NUM_REGS + 5] = {
 	0, 0, 6, 1, 8, 11, 10, 12, 5, 13, 14, 15, 3, 4, 2, 7, 9
 };
 /* low-map. reg_map & 0x7. */
-static const u_char reg_lmap[SLJIT_NUMBER_OF_REGISTERS + 5] = {
+static const u_char reg_lmap[SLJIT_NUM_REGS + 5] = {
 	0, 0, 6, 1, 0, 3,  2,  4,  5,  5,  6,  7, 3, 4, 2, 7, 1
 };
 #else
 /* 1st passed in rcx, 2nd argument passed in rdx, 3rd in r8. */
-static const u_char reg_map[SLJIT_NUMBER_OF_REGISTERS + 5] = {
+static const u_char reg_map[SLJIT_NUM_REGS + 5] = {
 	0, 0, 2, 1, 11, 12, 5, 13, 14, 15, 7, 6, 3, 4, 10, 8, 9
 };
 /* low-map. reg_map & 0x7. */
-static const u_char reg_lmap[SLJIT_NUMBER_OF_REGISTERS + 5] = {
+static const u_char reg_lmap[SLJIT_NUM_REGS + 5] = {
 	0, 0, 2, 1, 3,  4,  5,  5, 6,  7,  7, 6, 3, 4, 2,  0, 1
 };
 #endif

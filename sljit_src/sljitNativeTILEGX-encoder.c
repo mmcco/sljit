@@ -216,7 +216,7 @@ enum
     (1 << TILEGX_LOG2_BUNDLE_ALIGNMENT_IN_BYTES),
 
   /* Number of registers (some are magic, such as network I/O). */
-  TILEGX_NUM_REGISTERS = 64,
+  TILEGX_NUM_REGS = 64,
 };
 
 /* Make a few "tile_" variables to simplify common code between
@@ -233,7 +233,7 @@ typedef tilegx_bundle_bits tile_bundle_bits;
 
 typedef enum
 {
-  TILEGX_OP_TYPE_REGISTER,
+  TILEGX_OP_TYPE_REG,
   TILEGX_OP_TYPE_IMMEDIATE,
   TILEGX_OP_TYPE_ADDRESS,
   TILEGX_OP_TYPE_SPR
@@ -9348,72 +9348,72 @@ const struct tilegx_operand tilegx_operands[35] =
     create_Imm16_X1, get_Imm16_X1
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 0, 1, 0, 0,
     create_Dest_X1, get_Dest_X1
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcA_X1, get_SrcA_X1
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 0, 1, 0, 0,
     create_Dest_X0, get_Dest_X0
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcA_X0, get_SrcA_X0
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 0, 1, 0, 0,
     create_Dest_Y0, get_Dest_Y0
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcA_Y0, get_SrcA_Y0
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 0, 1, 0, 0,
     create_Dest_Y1, get_Dest_Y1
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcA_Y1, get_SrcA_Y1
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcA_Y2, get_SrcA_Y2
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 1, 0, 0,
     create_SrcA_X1, get_SrcA_X1
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcB_X0, get_SrcB_X0
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcB_X1, get_SrcB_X1
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcB_Y0, get_SrcB_Y0
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcB_Y1, get_SrcB_Y1
   },
@@ -9433,12 +9433,12 @@ const struct tilegx_operand tilegx_operands[35] =
     create_BFEnd_X0, get_BFEnd_X0
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 1, 0, 0,
     create_Dest_X0, get_Dest_X0
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 1, 0, 0,
     create_Dest_Y0, get_Dest_Y0
   },
@@ -9448,7 +9448,7 @@ const struct tilegx_operand tilegx_operands[35] =
     create_JumpOff_X1, get_JumpOff_X1
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 0, 1, 0, 0,
     create_SrcBDest_Y2, get_SrcBDest_Y2
   },
@@ -9483,7 +9483,7 @@ const struct tilegx_operand tilegx_operands[35] =
     create_ShAmt_Y1, get_ShAmt_Y1
   },
   {
-    TILEGX_OP_TYPE_REGISTER, BFD_RELOC(NONE),
+    TILEGX_OP_TYPE_REG, BFD_RELOC(NONE),
     6, 0, 1, 0, 0, 0,
     create_SrcBDest_Y2, get_SrcBDest_Y2
   },
@@ -10132,7 +10132,7 @@ print_insn_tilegx (unsigned char * memaddr)
       op = decoded[i].operands[j];
       switch (op->type)
       {
-      case TILEGX_OP_TYPE_REGISTER:
+      case TILEGX_OP_TYPE_REG:
         printf ("%s", tilegx_register_names[(int)num]);
         break;
       case TILEGX_OP_TYPE_SPR:

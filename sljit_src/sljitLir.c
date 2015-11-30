@@ -222,9 +222,9 @@
 
 /* Stack management. */
 
-#define GET_SAVED_REGISTERS_SIZE(scratches, saveds, extra) \
-	(((scratches < SLJIT_NUMBER_OF_SCRATCH_REGISTERS ? 0 : (scratches - SLJIT_NUMBER_OF_SCRATCH_REGISTERS)) + \
-		(saveds < SLJIT_NUMBER_OF_SAVED_REGISTERS ? saveds : SLJIT_NUMBER_OF_SAVED_REGISTERS) + \
+#define GET_SAVED_REGS_SIZE(scratches, saveds, extra) \
+	(((scratches < SLJIT_NUM_SCRATCH_REGS ? 0 : (scratches - SLJIT_NUM_SCRATCH_REGS)) + \
+		(saveds < SLJIT_NUM_SAVED_REGS ? saveds : SLJIT_NUM_SAVED_REGS) + \
 		extra) * sizeof(long))
 
 #define ADJUST_LOCAL_OFFSET(p, i) \
@@ -679,10 +679,10 @@ static __inline void set_const(struct sljit_const *const_, struct sljit_compiler
 	((r) > (SLJIT_S0 - compiler->saveds) && (r) <= SLJIT_S0))
 
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
-#define CHECK_NOT_VIRTUAL_REGISTER(p) \
+#define CHECK_NOT_VIRTUAL_REG(p) \
 	CHECK_ARGUMENT((p) < SLJIT_R3 || (p) > SLJIT_R6);
 #else
-#define CHECK_NOT_VIRTUAL_REGISTER(p)
+#define CHECK_NOT_VIRTUAL_REG(p)
 #endif
 
 #define FUNCTION_CHECK_SRC(p, i) \
@@ -696,11 +696,11 @@ static __inline void set_const(struct sljit_const *const_, struct sljit_compiler
 	else { \
 		CHECK_ARGUMENT((p) & SLJIT_MEM); \
 		CHECK_ARGUMENT(FUNCTION_CHECK_IS_REG_OR_UNUSED((p) & REG_MASK)); \
-		CHECK_NOT_VIRTUAL_REGISTER((p) & REG_MASK); \
+		CHECK_NOT_VIRTUAL_REG((p) & REG_MASK); \
 		if ((p) & OFFS_REG_MASK) { \
 			CHECK_ARGUMENT(((p) & REG_MASK) != SLJIT_UNUSED); \
 			CHECK_ARGUMENT(FUNCTION_CHECK_IS_REG(OFFS_REG(p))); \
-			CHECK_NOT_VIRTUAL_REGISTER(OFFS_REG(p)); \
+			CHECK_NOT_VIRTUAL_REG(OFFS_REG(p)); \
 			CHECK_ARGUMENT(!((i) & ~0x3)); \
 		} \
 		CHECK_ARGUMENT(!((p) & ~(SLJIT_MEM | SLJIT_IMM | REG_MASK | OFFS_REG_MASK))); \
@@ -715,11 +715,11 @@ static __inline void set_const(struct sljit_const *const_, struct sljit_compiler
 	else { \
 		CHECK_ARGUMENT((p) & SLJIT_MEM); \
 		CHECK_ARGUMENT(FUNCTION_CHECK_IS_REG_OR_UNUSED((p) & REG_MASK)); \
-		CHECK_NOT_VIRTUAL_REGISTER((p) & REG_MASK); \
+		CHECK_NOT_VIRTUAL_REG((p) & REG_MASK); \
 		if ((p) & OFFS_REG_MASK) { \
 			CHECK_ARGUMENT(((p) & REG_MASK) != SLJIT_UNUSED); \
 			CHECK_ARGUMENT(FUNCTION_CHECK_IS_REG(OFFS_REG(p))); \
-			CHECK_NOT_VIRTUAL_REGISTER(OFFS_REG(p)); \
+			CHECK_NOT_VIRTUAL_REG(OFFS_REG(p)); \
 			CHECK_ARGUMENT(!((i) & ~0x3)); \
 		} \
 		CHECK_ARGUMENT(!((p) & ~(SLJIT_MEM | SLJIT_IMM | REG_MASK | OFFS_REG_MASK))); \
@@ -735,11 +735,11 @@ static __inline void set_const(struct sljit_const *const_, struct sljit_compiler
 	else { \
 		CHECK_ARGUMENT((p) & SLJIT_MEM); \
 		CHECK_ARGUMENT(FUNCTION_CHECK_IS_REG_OR_UNUSED((p) & REG_MASK)); \
-		CHECK_NOT_VIRTUAL_REGISTER((p) & REG_MASK); \
+		CHECK_NOT_VIRTUAL_REG((p) & REG_MASK); \
 		if ((p) & OFFS_REG_MASK) { \
 			CHECK_ARGUMENT(((p) & REG_MASK) != SLJIT_UNUSED); \
 			CHECK_ARGUMENT(FUNCTION_CHECK_IS_REG(OFFS_REG(p))); \
-			CHECK_NOT_VIRTUAL_REGISTER(OFFS_REG(p)); \
+			CHECK_NOT_VIRTUAL_REG(OFFS_REG(p)); \
 			CHECK_ARGUMENT(((p) & OFFS_REG_MASK) != TO_OFFS_REG(SLJIT_SP) && !(i & ~0x3)); \
 		} \
 		CHECK_ARGUMENT(!((p) & ~(SLJIT_MEM | SLJIT_IMM | REG_MASK | OFFS_REG_MASK))); \
@@ -777,7 +777,7 @@ void sljit_compiler_verbose(struct sljit_compiler *compiler, FILE* verbose)
 		if ((r) < (SLJIT_R0 + compiler->scratches)) \
 			fprintf(compiler->verbose, "r%d", (r) - SLJIT_R0); \
 		else \
-			fprintf(compiler->verbose, "s%d", SLJIT_NUMBER_OF_REGISTERS - (r)); \
+			fprintf(compiler->verbose, "s%d", SLJIT_NUM_REGS - (r)); \
 	} while (0)
 
 #define sljit_verbose_param(compiler, p, i) \
@@ -826,7 +826,7 @@ void sljit_compiler_verbose(struct sljit_compiler *compiler, FILE* verbose)
 		if ((p) < (SLJIT_FR0 + compiler->fscratches)) \
 			fprintf(compiler->verbose, "fr%d", (p) - SLJIT_FR0); \
 		else \
-			fprintf(compiler->verbose, "fs%d", SLJIT_NUMBER_OF_FLOAT_REGISTERS - (p)); \
+			fprintf(compiler->verbose, "fs%d", SLJIT_NUM_FLOAT_REGS - (p)); \
 	}
 
 static const char* op0_names[] = {
@@ -916,13 +916,13 @@ static __inline CHECK_RETURN_TYPE check_sljit_emit_enter(struct sljit_compiler *
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	CHECK_ARGUMENT(!(options & ~SLJIT_DOUBLE_ALIGNMENT));
 	CHECK_ARGUMENT(args >= 0 && args <= 3);
-	CHECK_ARGUMENT(scratches >= 0 && scratches <= SLJIT_NUMBER_OF_REGISTERS);
-	CHECK_ARGUMENT(saveds >= 0 && saveds <= SLJIT_NUMBER_OF_REGISTERS);
-	CHECK_ARGUMENT(scratches + saveds <= SLJIT_NUMBER_OF_REGISTERS);
+	CHECK_ARGUMENT(scratches >= 0 && scratches <= SLJIT_NUM_REGS);
+	CHECK_ARGUMENT(saveds >= 0 && saveds <= SLJIT_NUM_REGS);
+	CHECK_ARGUMENT(scratches + saveds <= SLJIT_NUM_REGS);
 	CHECK_ARGUMENT(args <= saveds);
-	CHECK_ARGUMENT(fscratches >= 0 && fscratches <= SLJIT_NUMBER_OF_FLOAT_REGISTERS);
-	CHECK_ARGUMENT(fsaveds >= 0 && fsaveds <= SLJIT_NUMBER_OF_FLOAT_REGISTERS);
-	CHECK_ARGUMENT(fscratches + fsaveds <= SLJIT_NUMBER_OF_FLOAT_REGISTERS);
+	CHECK_ARGUMENT(fscratches >= 0 && fscratches <= SLJIT_NUM_FLOAT_REGS);
+	CHECK_ARGUMENT(fsaveds >= 0 && fsaveds <= SLJIT_NUM_FLOAT_REGS);
+	CHECK_ARGUMENT(fscratches + fsaveds <= SLJIT_NUM_FLOAT_REGS);
 	CHECK_ARGUMENT(local_size >= 0 && local_size <= SLJIT_MAX_LOCAL_SIZE);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
@@ -945,13 +945,13 @@ static __inline CHECK_RETURN_TYPE check_sljit_set_context(struct sljit_compiler 
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
 	CHECK_ARGUMENT(!(options & ~SLJIT_DOUBLE_ALIGNMENT));
 	CHECK_ARGUMENT(args >= 0 && args <= 3);
-	CHECK_ARGUMENT(scratches >= 0 && scratches <= SLJIT_NUMBER_OF_REGISTERS);
-	CHECK_ARGUMENT(saveds >= 0 && saveds <= SLJIT_NUMBER_OF_REGISTERS);
-	CHECK_ARGUMENT(scratches + saveds <= SLJIT_NUMBER_OF_REGISTERS);
+	CHECK_ARGUMENT(scratches >= 0 && scratches <= SLJIT_NUM_REGS);
+	CHECK_ARGUMENT(saveds >= 0 && saveds <= SLJIT_NUM_REGS);
+	CHECK_ARGUMENT(scratches + saveds <= SLJIT_NUM_REGS);
 	CHECK_ARGUMENT(args <= saveds);
-	CHECK_ARGUMENT(fscratches >= 0 && fscratches <= SLJIT_NUMBER_OF_FLOAT_REGISTERS);
-	CHECK_ARGUMENT(fsaveds >= 0 && fsaveds <= SLJIT_NUMBER_OF_FLOAT_REGISTERS);
-	CHECK_ARGUMENT(fscratches + fsaveds <= SLJIT_NUMBER_OF_FLOAT_REGISTERS);
+	CHECK_ARGUMENT(fscratches >= 0 && fscratches <= SLJIT_NUM_FLOAT_REGS);
+	CHECK_ARGUMENT(fsaveds >= 0 && fsaveds <= SLJIT_NUM_FLOAT_REGS);
+	CHECK_ARGUMENT(fscratches + fsaveds <= SLJIT_NUM_FLOAT_REGS);
 	CHECK_ARGUMENT(local_size >= 0 && local_size <= SLJIT_MAX_LOCAL_SIZE);
 #endif
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
@@ -1098,7 +1098,7 @@ static __inline CHECK_RETURN_TYPE check_sljit_get_register_index(int reg)
 {
 	(void)reg;
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
-	CHECK_ARGUMENT(reg > 0 && reg <= SLJIT_NUMBER_OF_REGISTERS);
+	CHECK_ARGUMENT(reg > 0 && reg <= SLJIT_NUM_REGS);
 #endif
 	CHECK_RETURN_OK;
 }
@@ -1107,7 +1107,7 @@ static __inline CHECK_RETURN_TYPE check_sljit_get_float_register_index(int reg)
 {
 	(void)reg;
 #if (defined SLJIT_ARGUMENT_CHECKS && SLJIT_ARGUMENT_CHECKS)
-	CHECK_ARGUMENT(reg > 0 && reg <= SLJIT_NUMBER_OF_FLOAT_REGISTERS);
+	CHECK_ARGUMENT(reg > 0 && reg <= SLJIT_NUM_FLOAT_REGS);
 #endif
 	CHECK_RETURN_OK;
 }

@@ -87,21 +87,21 @@ static void ppc_cache_flush(sljit_ins *from, sljit_ins *to)
 #endif /* _AIX */
 }
 
-#define TMP_REG1	(SLJIT_NUMBER_OF_REGISTERS + 2)
-#define TMP_REG2	(SLJIT_NUMBER_OF_REGISTERS + 3)
-#define TMP_REG3	(SLJIT_NUMBER_OF_REGISTERS + 4)
-#define TMP_ZERO	(SLJIT_NUMBER_OF_REGISTERS + 5)
+#define TMP_REG1	(SLJIT_NUM_REGS + 2)
+#define TMP_REG2	(SLJIT_NUM_REGS + 3)
+#define TMP_REG3	(SLJIT_NUM_REGS + 4)
+#define TMP_ZERO	(SLJIT_NUM_REGS + 5)
 
 #if (defined SLJIT_PASS_ENTRY_ADDR_TO_CALL && SLJIT_PASS_ENTRY_ADDR_TO_CALL)
-#define TMP_CALL_REG	(SLJIT_NUMBER_OF_REGISTERS + 6)
+#define TMP_CALL_REG	(SLJIT_NUM_REGS + 6)
 #else
 #define TMP_CALL_REG	TMP_REG2
 #endif
 
 #define TMP_FREG1	(0)
-#define TMP_FREG2	(SLJIT_NUMBER_OF_FLOAT_REGISTERS + 1)
+#define TMP_FREG2	(SLJIT_NUM_FLOAT_REGS + 1)
 
-static const u_char reg_map[SLJIT_NUMBER_OF_REGISTERS + 7] = {
+static const u_char reg_map[SLJIT_NUM_REGS + 7] = {
 	0, 3, 4, 5, 6, 7, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 1, 8, 9, 10, 31, 12
 };
 
@@ -585,7 +585,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 	offs = -(int)(sizeof(long));
 	FAIL_IF(push_inst(compiler, STACK_STORE | S(TMP_ZERO) | A(SLJIT_SP) | IMM(offs)));
 
-	tmp = saveds < SLJIT_NUMBER_OF_SAVED_REGISTERS ? (SLJIT_S0 + 1 - saveds) : SLJIT_FIRST_SAVED_REG;
+	tmp = saveds < SLJIT_NUM_SAVED_REGS ? (SLJIT_S0 + 1 - saveds) : SLJIT_FIRST_SAVED_REG;
 	for (i = SLJIT_S0; i >= tmp; i--) {
 		offs -= (int)(sizeof(long));
 		FAIL_IF(push_inst(compiler, STACK_STORE | S(i) | A(SLJIT_SP) | IMM(offs)));
@@ -596,7 +596,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 		FAIL_IF(push_inst(compiler, STACK_STORE | S(i) | A(SLJIT_SP) | IMM(offs)));
 	}
 
-	SLJIT_ASSERT(offs == -(int)GET_SAVED_REGISTERS_SIZE(compiler->scratches, compiler->saveds, 1));
+	SLJIT_ASSERT(offs == -(int)GET_SAVED_REGS_SIZE(compiler->scratches, compiler->saveds, 1));
 
 #if (defined SLJIT_PPC_STACK_FRAME_V2 && SLJIT_PPC_STACK_FRAME_V2)
 	FAIL_IF(push_inst(compiler, STACK_STORE | S(0) | A(SLJIT_SP) | IMM(2 * sizeof(long))));
@@ -612,7 +612,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 	if (args >= 3)
 		FAIL_IF(push_inst(compiler, OR | S(SLJIT_R2) | A(SLJIT_S2) | B(SLJIT_R2)));
 
-	local_size += GET_SAVED_REGISTERS_SIZE(scratches, saveds, 1) + SLJIT_LOCALS_OFFSET;
+	local_size += GET_SAVED_REGS_SIZE(scratches, saveds, 1) + SLJIT_LOCALS_OFFSET;
 	local_size = (local_size + 15) & ~0xf;
 	compiler->local_size = local_size;
 
@@ -643,7 +643,7 @@ int sljit_set_context(struct sljit_compiler *compiler,
 	CHECK(check_sljit_set_context(compiler, options, args, scratches, saveds, fscratches, fsaveds, local_size));
 	set_set_context(compiler, options, args, scratches, saveds, fscratches, fsaveds, local_size);
 
-	local_size += GET_SAVED_REGISTERS_SIZE(scratches, saveds, 1) + SLJIT_LOCALS_OFFSET;
+	local_size += GET_SAVED_REGS_SIZE(scratches, saveds, 1) + SLJIT_LOCALS_OFFSET;
 	compiler->local_size = (local_size + 15) & ~0xf;
 	return SLJIT_SUCCESS;
 }
@@ -670,7 +670,7 @@ int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, long src
 	FAIL_IF(push_inst(compiler, STACK_LOAD | D(0) | A(SLJIT_SP) | IMM(sizeof(long))));
 #endif
 
-	offs = -(int)GET_SAVED_REGISTERS_SIZE(compiler->scratches, compiler->saveds, 1);
+	offs = -(int)GET_SAVED_REGS_SIZE(compiler->scratches, compiler->saveds, 1);
 
 	tmp = compiler->scratches;
 	for (i = SLJIT_FIRST_SAVED_REG; i <= tmp; i++) {
@@ -678,7 +678,7 @@ int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, long src
 		offs += (int)(sizeof(long));
 	}
 
-	tmp = compiler->saveds < SLJIT_NUMBER_OF_SAVED_REGISTERS ? (SLJIT_S0 + 1 - compiler->saveds) : SLJIT_FIRST_SAVED_REG;
+	tmp = compiler->saveds < SLJIT_NUM_SAVED_REGS ? (SLJIT_S0 + 1 - compiler->saveds) : SLJIT_FIRST_SAVED_REG;
 	for (i = tmp; i <= SLJIT_S0; i++) {
 		FAIL_IF(push_inst(compiler, STACK_LOAD | D(i) | A(SLJIT_SP) | IMM(offs)));
 		offs += (int)(sizeof(long));

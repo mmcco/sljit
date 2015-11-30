@@ -83,15 +83,15 @@ static void sparc_cache_flush(sljit_ins *from, sljit_ins *to)
 }
 
 /* TMP_REG2 is not used by getput_arg */
-#define TMP_REG1	(SLJIT_NUMBER_OF_REGISTERS + 2)
-#define TMP_REG2	(SLJIT_NUMBER_OF_REGISTERS + 3)
-#define TMP_REG3	(SLJIT_NUMBER_OF_REGISTERS + 4)
-#define TMP_LINK	(SLJIT_NUMBER_OF_REGISTERS + 5)
+#define TMP_REG1	(SLJIT_NUM_REGS + 2)
+#define TMP_REG2	(SLJIT_NUM_REGS + 3)
+#define TMP_REG3	(SLJIT_NUM_REGS + 4)
+#define TMP_LINK	(SLJIT_NUM_REGS + 5)
 
 #define TMP_FREG1	(0)
-#define TMP_FREG2	((SLJIT_NUMBER_OF_FLOAT_REGISTERS + 1) << 1)
+#define TMP_FREG2	((SLJIT_NUM_FLOAT_REGS + 1) << 1)
 
-static const u_char reg_map[SLJIT_NUMBER_OF_REGISTERS + 6] = {
+static const u_char reg_map[SLJIT_NUM_REGS + 6] = {
 	0, 8, 9, 10, 13, 29, 28, 27, 23, 22, 21, 20, 19, 18, 17, 16, 26, 25, 24, 14, 1, 11, 12, 15
 };
 

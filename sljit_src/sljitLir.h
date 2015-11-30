@@ -124,11 +124,11 @@ of sljitConfigInternal.h */
     [R3]  |   S1   |   R3 and S1 represent the same physical register
     [R4]  |   S0   |   R4 and S0 represent the same physical register
 
-  Note: SLJIT_NUMBER_OF_SCRATCH_REGISTERS would be 2 and
-        SLJIT_NUMBER_OF_SAVED_REGISTERS would be 3 for this architecture.
+  Note: SLJIT_NUM_SCRATCH_REGS would be 2 and
+        SLJIT_NUM_SAVED_REGS would be 3 for this architecture.
 
-  Note: On all supported architectures SLJIT_NUMBER_OF_REGISTERS >= 10
-        and SLJIT_NUMBER_OF_SAVED_REGISTERS >= 5. However, 4 registers
+  Note: On all supported architectures SLJIT_NUM_REGS >= 10
+        and SLJIT_NUM_SAVED_REGS >= 5. However, 4 registers
         are virtual on x86-32. See below.
 
   The purpose of this definition is convenience. Although a register
@@ -178,37 +178,37 @@ of sljitConfigInternal.h */
 #define SLJIT_R8	9
 #define SLJIT_R9	10
 /* All R registers provided by the architecture can be accessed by SLJIT_R(i)
-   The i parameter must be >= 0 and < SLJIT_NUMBER_OF_REGISTERS. */
+   The i parameter must be >= 0 and < SLJIT_NUM_REGS. */
 #define SLJIT_R(i)	(1 + (i))
 
 /* Saved registers. */
-#define SLJIT_S0	(SLJIT_NUMBER_OF_REGISTERS)
-#define SLJIT_S1	(SLJIT_NUMBER_OF_REGISTERS - 1)
-#define SLJIT_S2	(SLJIT_NUMBER_OF_REGISTERS - 2)
+#define SLJIT_S0	(SLJIT_NUM_REGS)
+#define SLJIT_S1	(SLJIT_NUM_REGS - 1)
+#define SLJIT_S2	(SLJIT_NUM_REGS - 2)
 /* Note: on x86-32, S3 - S6 (same as R3 - R6) are emulated (they
    are allocated on the stack). These registers are called virtual
    and cannot be used for memory addressing (cannot be part of
    any SLJIT_MEM1, SLJIT_MEM2 construct). There is no such
    limitation on other CPUs. See sljit_get_register_index(). */
-#define SLJIT_S3	(SLJIT_NUMBER_OF_REGISTERS - 3)
-#define SLJIT_S4	(SLJIT_NUMBER_OF_REGISTERS - 4)
-#define SLJIT_S5	(SLJIT_NUMBER_OF_REGISTERS - 5)
-#define SLJIT_S6	(SLJIT_NUMBER_OF_REGISTERS - 6)
-#define SLJIT_S7	(SLJIT_NUMBER_OF_REGISTERS - 7)
-#define SLJIT_S8	(SLJIT_NUMBER_OF_REGISTERS - 8)
-#define SLJIT_S9	(SLJIT_NUMBER_OF_REGISTERS - 9)
+#define SLJIT_S3	(SLJIT_NUM_REGS - 3)
+#define SLJIT_S4	(SLJIT_NUM_REGS - 4)
+#define SLJIT_S5	(SLJIT_NUM_REGS - 5)
+#define SLJIT_S6	(SLJIT_NUM_REGS - 6)
+#define SLJIT_S7	(SLJIT_NUM_REGS - 7)
+#define SLJIT_S8	(SLJIT_NUM_REGS - 8)
+#define SLJIT_S9	(SLJIT_NUM_REGS - 9)
 /* All S registers provided by the architecture can be accessed by SLJIT_S(i)
-   The i parameter must be >= 0 and < SLJIT_NUMBER_OF_SAVED_REGISTERS. */
-#define SLJIT_S(i)	(SLJIT_NUMBER_OF_REGISTERS - (i))
+   The i parameter must be >= 0 and < SLJIT_NUM_SAVED_REGS. */
+#define SLJIT_S(i)	(SLJIT_NUM_REGS - (i))
 
 /* Registers >= SLJIT_FIRST_SAVED_REG are saved registers. */
-#define SLJIT_FIRST_SAVED_REG (SLJIT_S0 - SLJIT_NUMBER_OF_SAVED_REGISTERS + 1)
+#define SLJIT_FIRST_SAVED_REG (SLJIT_S0 - SLJIT_NUM_SAVED_REGS + 1)
 
 /* The SLJIT_SP provides direct access to the linear stack space allocated by
    sljit_emit_enter. It can only be used in the following form: SLJIT_MEM1(SLJIT_SP).
    The immediate offset is extended by the relative stack offset automatically.
    The sljit_get_local_base can be used to obtain the absolute offset. */
-#define SLJIT_SP	(SLJIT_NUMBER_OF_REGISTERS + 1)
+#define SLJIT_SP	(SLJIT_NUM_REGS + 1)
 
 /* Return with machine word. */
 
@@ -241,22 +241,22 @@ of sljitConfigInternal.h */
 #define SLJIT_FR4	5
 #define SLJIT_FR5	6
 /* All FR registers provided by the architecture can be accessed by SLJIT_FR(i)
-   The i parameter must be >= 0 and < SLJIT_NUMBER_OF_FLOAT_REGISTERS. */
+   The i parameter must be >= 0 and < SLJIT_NUM_FLOAT_REGS. */
 #define SLJIT_FR(i)	(1 + (i))
 
 /* Floating point saved registers. */
-#define SLJIT_FS0	(SLJIT_NUMBER_OF_FLOAT_REGISTERS)
-#define SLJIT_FS1	(SLJIT_NUMBER_OF_FLOAT_REGISTERS - 1)
-#define SLJIT_FS2	(SLJIT_NUMBER_OF_FLOAT_REGISTERS - 2)
-#define SLJIT_FS3	(SLJIT_NUMBER_OF_FLOAT_REGISTERS - 3)
-#define SLJIT_FS4	(SLJIT_NUMBER_OF_FLOAT_REGISTERS - 4)
-#define SLJIT_FS5	(SLJIT_NUMBER_OF_FLOAT_REGISTERS - 5)
+#define SLJIT_FS0	(SLJIT_NUM_FLOAT_REGS)
+#define SLJIT_FS1	(SLJIT_NUM_FLOAT_REGS - 1)
+#define SLJIT_FS2	(SLJIT_NUM_FLOAT_REGS - 2)
+#define SLJIT_FS3	(SLJIT_NUM_FLOAT_REGS - 3)
+#define SLJIT_FS4	(SLJIT_NUM_FLOAT_REGS - 4)
+#define SLJIT_FS5	(SLJIT_NUM_FLOAT_REGS - 5)
 /* All S registers provided by the architecture can be accessed by SLJIT_FS(i)
-   The i parameter must be >= 0 and < SLJIT_NUMBER_OF_SAVED_FLOAT_REGISTERS. */
-#define SLJIT_FS(i)	(SLJIT_NUMBER_OF_FLOAT_REGISTERS - (i))
+   The i parameter must be >= 0 and < SLJIT_NUM_SAVED_FLOAT_REGS. */
+#define SLJIT_FS(i)	(SLJIT_NUM_FLOAT_REGS - (i))
 
 /* Float registers >= SLJIT_FIRST_SAVED_FLOAT_REG are saved registers. */
-#define SLJIT_FIRST_SAVED_FLOAT_REG (SLJIT_FS0 - SLJIT_NUMBER_OF_SAVED_FLOAT_REGISTERS + 1)
+#define SLJIT_FIRST_SAVED_FLOAT_REG (SLJIT_FS0 - SLJIT_NUM_SAVED_FLOAT_REGS + 1)
 
 /* --------------------------------------------------------------------- */
 /*  Main structures and functions                                        */
@@ -486,12 +486,12 @@ static __inline unsigned long sljit_get_generated_code_size(struct sljit_compile
    the function returns. The stack space is not initialized.
 
    Note: the following conditions must met:
-         0 <= scratches <= SLJIT_NUMBER_OF_REGISTERS
-         0 <= saveds <= SLJIT_NUMBER_OF_REGISTERS
-         scratches + saveds <= SLJIT_NUMBER_OF_REGISTERS
-         0 <= fscratches <= SLJIT_NUMBER_OF_FLOAT_REGISTERS
-         0 <= fsaveds <= SLJIT_NUMBER_OF_FLOAT_REGISTERS
-         fscratches + fsaveds <= SLJIT_NUMBER_OF_FLOAT_REGISTERS
+         0 <= scratches <= SLJIT_NUM_REGS
+         0 <= saveds <= SLJIT_NUM_REGS
+         scratches + saveds <= SLJIT_NUM_REGS
+         0 <= fscratches <= SLJIT_NUM_FLOAT_REGS
+         0 <= fsaveds <= SLJIT_NUM_FLOAT_REGS
+         fscratches + fsaveds <= SLJIT_NUM_FLOAT_REGS
 
    Note: every call of sljit_emit_enter and sljit_set_context
          overwrites the previous context.

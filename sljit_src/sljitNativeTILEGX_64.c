@@ -43,13 +43,13 @@
 
 #define UIMM_16BIT_MAX (0xffff)
 
-#define TMP_REG1 (SLJIT_NO_REGISTERS + 1)
-#define TMP_REG2 (SLJIT_NO_REGISTERS + 2)
-#define TMP_REG3 (SLJIT_NO_REGISTERS + 3)
-#define ADDR_TMP (SLJIT_NO_REGISTERS + 4)
+#define TMP_REG1 (SLJIT_NO_REGS + 1)
+#define TMP_REG2 (SLJIT_NO_REGS + 2)
+#define TMP_REG3 (SLJIT_NO_REGS + 3)
+#define ADDR_TMP (SLJIT_NO_REGS + 4)
 #define PIC_ADDR_REG TMP_REG2
 
-static const u_char reg_map[SLJIT_NO_REGISTERS + 5] = {
+static const u_char reg_map[SLJIT_NO_REGS + 5] = {
 	63, 0, 1, 2, 3, 4, 30, 31, 32, 33, 34, 54, 5, 16, 6, 7
 };
 

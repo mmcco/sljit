@@ -33,16 +33,16 @@ const char* sljit_get_platform_name(void)
 typedef unsigned int sljit_ins;
 
 /* Last register + 1. */
-#define TMP_REG1	(SLJIT_NUMBER_OF_REGISTERS + 2)
-#define TMP_REG2	(SLJIT_NUMBER_OF_REGISTERS + 3)
-#define TMP_REG3	(SLJIT_NUMBER_OF_REGISTERS + 4)
-#define TMP_PC		(SLJIT_NUMBER_OF_REGISTERS + 5)
+#define TMP_REG1	(SLJIT_NUM_REGS + 2)
+#define TMP_REG2	(SLJIT_NUM_REGS + 3)
+#define TMP_REG3	(SLJIT_NUM_REGS + 4)
+#define TMP_PC		(SLJIT_NUM_REGS + 5)
 
 #define TMP_FREG1	(0)
-#define TMP_FREG2	(SLJIT_NUMBER_OF_FLOAT_REGISTERS + 1)
+#define TMP_FREG2	(SLJIT_NUM_FLOAT_REGS + 1)
 
 /* See sljit_emit_enter and sljit_emit_op0 if you want to change them. */
-static const u_char reg_map[SLJIT_NUMBER_OF_REGISTERS + 6] = {
+static const u_char reg_map[SLJIT_NUM_REGS + 6] = {
 	0, 0, 1, 2, 12, 11, 10, 9, 8, 7, 6, 5, 13, 3, 4, 14, 15
 };
 
@@ -1140,7 +1140,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 
 	push = (1 << 4);
 
-	tmp = saveds < SLJIT_NUMBER_OF_SAVED_REGISTERS ? (SLJIT_S0 + 1 - saveds) : SLJIT_FIRST_SAVED_REG;
+	tmp = saveds < SLJIT_NUM_SAVED_REGS ? (SLJIT_S0 + 1 - saveds) : SLJIT_FIRST_SAVED_REG;
 	for (i = SLJIT_S0; i >= tmp; i--)
 		push |= 1 << reg_map[i];
 
@@ -1152,7 +1152,7 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 		: push_inst16(compiler, PUSH | (1 << 8) | push));
 
 	/* Stack must be aligned to 8 bytes: (LR, R4) */
-	size = GET_SAVED_REGISTERS_SIZE(scratches, saveds, 2);
+	size = GET_SAVED_REGS_SIZE(scratches, saveds, 2);
 	local_size = ((size + local_size + 7) & ~7) - size;
 	compiler->local_size = local_size;
 	if (local_size > 0) {
@@ -1182,7 +1182,7 @@ int sljit_set_context(struct sljit_compiler *compiler,
 	CHECK(check_sljit_set_context(compiler, options, args, scratches, saveds, fscratches, fsaveds, local_size));
 	set_set_context(compiler, options, args, scratches, saveds, fscratches, fsaveds, local_size);
 
-	size = GET_SAVED_REGISTERS_SIZE(scratches, saveds, 2);
+	size = GET_SAVED_REGS_SIZE(scratches, saveds, 2);
 	compiler->local_size = ((size + local_size + 7) & ~7) - size;
 	return SLJIT_SUCCESS;
 }
@@ -1206,7 +1206,7 @@ int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, long src
 
 	pop = (1 << 4);
 
-	tmp = compiler->saveds < SLJIT_NUMBER_OF_SAVED_REGISTERS ? (SLJIT_S0 + 1 - compiler->saveds) : SLJIT_FIRST_SAVED_REG;
+	tmp = compiler->saveds < SLJIT_NUM_SAVED_REGS ? (SLJIT_S0 + 1 - compiler->saveds) : SLJIT_FIRST_SAVED_REG;
 	for (i = SLJIT_S0; i >= tmp; i--)
 		pop |= 1 << reg_map[i];
 

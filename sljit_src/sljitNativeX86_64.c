@@ -101,9 +101,9 @@ int sljit_emit_enter(struct sljit_compiler *compiler,
 	compiler->flags_saved = 0;
 
 	/* Including the return address saved by the call instruction. */
-	saved_register_size = GET_SAVED_REGISTERS_SIZE(scratches, saveds, 1);
+	saved_register_size = GET_SAVED_REGS_SIZE(scratches, saveds, 1);
 
-	tmp = saveds < SLJIT_NUMBER_OF_SAVED_REGISTERS ? (SLJIT_S0 + 1 - saveds) : SLJIT_FIRST_SAVED_REG;
+	tmp = saveds < SLJIT_NUM_SAVED_REGS ? (SLJIT_S0 + 1 - saveds) : SLJIT_FIRST_SAVED_REG;
 	for (i = SLJIT_S0; i >= tmp; i--) {
 		size = reg_map[i] >= 8 ? 2 : 1;
 		inst = ensure_buf(compiler, 1 + size);
@@ -248,7 +248,7 @@ int sljit_set_context(struct sljit_compiler *compiler,
 	set_set_context(compiler, options, args, scratches, saveds, fscratches, fsaveds, local_size);
 
 	/* Including the return address saved by the call instruction. */
-	saved_register_size = GET_SAVED_REGISTERS_SIZE(scratches, saveds, 1);
+	saved_register_size = GET_SAVED_REGS_SIZE(scratches, saveds, 1);
 	compiler->local_size = ((local_size + SLJIT_LOCALS_OFFSET + saved_register_size + 15) & ~15) - saved_register_size;
 	return SLJIT_SUCCESS;
 }
@@ -306,7 +306,7 @@ int sljit_emit_return(struct sljit_compiler *compiler, int op, int src, long src
 		POP_REG(reg_lmap[i]);
 	}
 
-	tmp = compiler->saveds < SLJIT_NUMBER_OF_SAVED_REGISTERS ? (SLJIT_S0 + 1 - compiler->saveds) : SLJIT_FIRST_SAVED_REG;
+	tmp = compiler->saveds < SLJIT_NUM_SAVED_REGS ? (SLJIT_S0 + 1 - compiler->saveds) : SLJIT_FIRST_SAVED_REG;
 	for (i = tmp; i <= SLJIT_S0; i++) {
 		size = reg_map[i] >= 8 ? 2 : 1;
 		inst = ensure_buf(compiler, 1 + size);

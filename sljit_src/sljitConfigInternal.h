@@ -39,12 +39,12 @@
      SLJIT_INDIRECT_CALL : see SLJIT_FUNC_OFFSET() for more information
 
    Constants:
-     SLJIT_NUMBER_OF_REGISTERS : number of available registers
-     SLJIT_NUMBER_OF_SCRATCH_REGISTERS : number of available scratch registers
-     SLJIT_NUMBER_OF_SAVED_REGISTERS : number of available saved registers
-     SLJIT_NUMBER_OF_FLOAT_REGISTERS : number of available floating point registers
-     SLJIT_NUMBER_OF_SCRATCH_FLOAT_REGISTERS : number of available floating point scratch registers
-     SLJIT_NUMBER_OF_SAVED_FLOAT_REGISTERS : number of available floating point saved registers
+     SLJIT_NUM_REGS : number of available registers
+     SLJIT_NUM_SCRATCH_REGS : number of available scratch registers
+     SLJIT_NUM_SAVED_REGS : number of available saved registers
+     SLJIT_NUM_FLOAT_REGS : number of available floating point registers
+     SLJIT_NUM_SCRATCH_FLOAT_REGS : number of available floating point scratch registers
+     SLJIT_NUM_SAVED_FLOAT_REGS : number of available floating point saved registers
      SLJIT_WORD_SHIFT : the shift required to apply when accessing a long/unsigned long array by index
      SLJIT_DOUBLE_SHIFT : the shift required to apply when accessing
                           a double precision floating point array by index
@@ -416,8 +416,8 @@ void sljit_free_unused_memory_exec(void);
 
 #if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 
-#define SLJIT_NUMBER_OF_REGISTERS 10
-#define SLJIT_NUMBER_OF_SAVED_REGISTERS 7
+#define SLJIT_NUM_REGS 10
+#define SLJIT_NUM_SAVED_REGS 7
 #if (defined SLJIT_X86_32_FASTCALL && SLJIT_X86_32_FASTCALL)
 #define SLJIT_LOCALS_OFFSET_BASE ((2 + 4) * sizeof(long))
 #else
@@ -428,37 +428,37 @@ void sljit_free_unused_memory_exec(void);
 #elif (defined SLJIT_CONFIG_X86_64 && SLJIT_CONFIG_X86_64)
 
 #ifndef _WIN64
-#define SLJIT_NUMBER_OF_REGISTERS 12
-#define SLJIT_NUMBER_OF_SAVED_REGISTERS 6
+#define SLJIT_NUM_REGS 12
+#define SLJIT_NUM_SAVED_REGS 6
 #define SLJIT_LOCALS_OFFSET_BASE (sizeof(long))
 #else
-#define SLJIT_NUMBER_OF_REGISTERS 12
-#define SLJIT_NUMBER_OF_SAVED_REGISTERS 8
+#define SLJIT_NUM_REGS 12
+#define SLJIT_NUM_SAVED_REGS 8
 #define SLJIT_LOCALS_OFFSET_BASE ((4 + 2) * sizeof(long))
 #endif /* _WIN64 */
 
 #elif (defined SLJIT_CONFIG_ARM_V5 && SLJIT_CONFIG_ARM_V5) || (defined SLJIT_CONFIG_ARM_V7 && SLJIT_CONFIG_ARM_V7)
 
-#define SLJIT_NUMBER_OF_REGISTERS 11
-#define SLJIT_NUMBER_OF_SAVED_REGISTERS 8
+#define SLJIT_NUM_REGS 11
+#define SLJIT_NUM_SAVED_REGS 8
 #define SLJIT_LOCALS_OFFSET_BASE 0
 
 #elif (defined SLJIT_CONFIG_ARM_THUMB2 && SLJIT_CONFIG_ARM_THUMB2)
 
-#define SLJIT_NUMBER_OF_REGISTERS 11
-#define SLJIT_NUMBER_OF_SAVED_REGISTERS 7
+#define SLJIT_NUM_REGS 11
+#define SLJIT_NUM_SAVED_REGS 7
 #define SLJIT_LOCALS_OFFSET_BASE 0
 
 #elif (defined SLJIT_CONFIG_ARM_64 && SLJIT_CONFIG_ARM_64)
 
-#define SLJIT_NUMBER_OF_REGISTERS 25
-#define SLJIT_NUMBER_OF_SAVED_REGISTERS 10
+#define SLJIT_NUM_REGS 25
+#define SLJIT_NUM_SAVED_REGS 10
 #define SLJIT_LOCALS_OFFSET_BASE (2 * sizeof(long))
 
 #elif (defined SLJIT_CONFIG_PPC && SLJIT_CONFIG_PPC)
 
-#define SLJIT_NUMBER_OF_REGISTERS 22
-#define SLJIT_NUMBER_OF_SAVED_REGISTERS 17
+#define SLJIT_NUM_REGS 22
+#define SLJIT_NUM_SAVED_REGS 17
 #if (defined SLJIT_CONFIG_PPC_64 && SLJIT_CONFIG_PPC_64) || (defined _AIX)
 #define SLJIT_LOCALS_OFFSET_BASE ((6 + 8) * sizeof(long))
 #elif (defined SLJIT_CONFIG_PPC_32 && SLJIT_CONFIG_PPC_32)
@@ -470,8 +470,8 @@ void sljit_free_unused_memory_exec(void);
 
 #elif (defined SLJIT_CONFIG_MIPS && SLJIT_CONFIG_MIPS)
 
-#define SLJIT_NUMBER_OF_REGISTERS 17
-#define SLJIT_NUMBER_OF_SAVED_REGISTERS 8
+#define SLJIT_NUM_REGS 17
+#define SLJIT_NUM_SAVED_REGS 8
 #if (defined SLJIT_CONFIG_MIPS_32 && SLJIT_CONFIG_MIPS_32)
 #define SLJIT_LOCALS_OFFSET_BASE (4 * sizeof(long))
 #else
@@ -480,8 +480,8 @@ void sljit_free_unused_memory_exec(void);
 
 #elif (defined SLJIT_CONFIG_SPARC && SLJIT_CONFIG_SPARC)
 
-#define SLJIT_NUMBER_OF_REGISTERS 18
-#define SLJIT_NUMBER_OF_SAVED_REGISTERS 14
+#define SLJIT_NUM_REGS 18
+#define SLJIT_NUM_SAVED_REGS 14
 #if (defined SLJIT_CONFIG_SPARC_32 && SLJIT_CONFIG_SPARC_32)
 /* Add +1 for double alignment. */
 #define SLJIT_LOCALS_OFFSET_BASE ((23 + 1) * sizeof(long))
@@ -489,26 +489,26 @@ void sljit_free_unused_memory_exec(void);
 
 #elif (defined SLJIT_CONFIG_UNSUPPORTED && SLJIT_CONFIG_UNSUPPORTED)
 
-#define SLJIT_NUMBER_OF_REGISTERS 0
-#define SLJIT_NUMBER_OF_SAVED_REGISTERS 0
+#define SLJIT_NUM_REGS 0
+#define SLJIT_NUM_SAVED_REGS 0
 #define SLJIT_LOCALS_OFFSET_BASE 0
 
 #endif
 
 #define SLJIT_LOCALS_OFFSET (SLJIT_LOCALS_OFFSET_BASE)
 
-#define SLJIT_NUMBER_OF_SCRATCH_REGISTERS \
-	(SLJIT_NUMBER_OF_REGISTERS - SLJIT_NUMBER_OF_SAVED_REGISTERS)
+#define SLJIT_NUM_SCRATCH_REGS \
+	(SLJIT_NUM_REGS - SLJIT_NUM_SAVED_REGS)
 
-#define SLJIT_NUMBER_OF_FLOAT_REGISTERS 6
+#define SLJIT_NUM_FLOAT_REGS 6
 #if (defined SLJIT_CONFIG_X86_64 && SLJIT_CONFIG_X86_64) && (defined _WIN64)
-#define SLJIT_NUMBER_OF_SAVED_FLOAT_REGISTERS 1
+#define SLJIT_NUM_SAVED_FLOAT_REGS 1
 #else
-#define SLJIT_NUMBER_OF_SAVED_FLOAT_REGISTERS 0
+#define SLJIT_NUM_SAVED_FLOAT_REGS 0
 #endif
 
-#define SLJIT_NUMBER_OF_SCRATCH_FLOAT_REGISTERS \
-	(SLJIT_NUMBER_OF_FLOAT_REGISTERS - SLJIT_NUMBER_OF_SAVED_FLOAT_REGISTERS)
+#define SLJIT_NUM_SCRATCH_FLOAT_REGS \
+	(SLJIT_NUM_FLOAT_REGS - SLJIT_NUM_SAVED_FLOAT_REGS)
 
 /*************************************/
 /* Debug and verbose related macros. */
