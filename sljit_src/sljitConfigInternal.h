@@ -249,13 +249,6 @@ typedef signed char	s_char;
 #error "long must be size of pointer"
 #endif
 
-/* 16 bit half-word type. */
-typedef unsigned short int sljit_uh;
-typedef signed short int sljit_sh;
-
-/* Machine word type. Enough for storing a pointer.
-     32 bit for 32 bit machines.
-     64 bit for 64 bit machines. */
 #if (defined SLJIT_CONFIG_UNSUPPORTED && SLJIT_CONFIG_UNSUPPORTED)
 /* Just to have something. */
 #define SLJIT_WORD_SHIFT 0

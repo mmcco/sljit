@@ -1307,10 +1307,10 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 				srcw = (s_char)srcw;
 				break;
 			case SLJIT_MOV_UH:
-				srcw = (sljit_uh)srcw;
+				srcw = (unsigned char)srcw;
 				break;
 			case SLJIT_MOV_SH:
-				srcw = (sljit_sh)srcw;
+				srcw = (short)srcw;
 				break;
 #if (defined SLJIT_CONFIG_X86_64 && SLJIT_CONFIG_X86_64)
 			case SLJIT_MOV_UI:

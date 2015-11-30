@@ -1631,7 +1631,7 @@ static void test22(void)
 	executable_code code;
 	struct sljit_compiler* compiler = sljit_create_compiler();
 	long buf[9];
-	sljit_sh sbuf[7];
+	short sbuf[7];
 	s_char bbuf[5];
 
 	if (verbose)
@@ -1678,20 +1678,20 @@ static void test22(void)
 	sljit_emit_op1(compiler, SLJIT_MOVU, SLJIT_MEM2(SLJIT_R1, SLJIT_R0), SLJIT_WORD_SHIFT, SLJIT_R1, 0);
 
 	sljit_emit_op1(compiler, SLJIT_MOV_SH, SLJIT_MEM1(SLJIT_S1), 0, SLJIT_IMM, -13);
-	sljit_emit_op1(compiler, SLJIT_MOVU_UH, SLJIT_MEM1(SLJIT_S1), sizeof(sljit_sh), SLJIT_IMM, 0x1234);
-	sljit_emit_op1(compiler, SLJIT_MOVU_SH, SLJIT_R0, 0, SLJIT_MEM1(SLJIT_S1), sizeof(sljit_sh));
+	sljit_emit_op1(compiler, SLJIT_MOVU_UH, SLJIT_MEM1(SLJIT_S1), sizeof(short), SLJIT_IMM, 0x1234);
+	sljit_emit_op1(compiler, SLJIT_MOVU_SH, SLJIT_R0, 0, SLJIT_MEM1(SLJIT_S1), sizeof(short));
 	sljit_emit_op1(compiler, SLJIT_MOV, SLJIT_MEM1(SLJIT_S0), 7 * sizeof(long), SLJIT_R0, 0);
-	sljit_emit_op1(compiler, SLJIT_MOV_UH, SLJIT_MEM1(SLJIT_S1), sizeof(sljit_sh), SLJIT_MEM1(SLJIT_S1), -(long)sizeof(sljit_sh));
+	sljit_emit_op1(compiler, SLJIT_MOV_UH, SLJIT_MEM1(SLJIT_S1), sizeof(short), SLJIT_MEM1(SLJIT_S1), -(long)sizeof(short));
 	sljit_emit_op1(compiler, SLJIT_MOV, SLJIT_R0, 0, SLJIT_IMM, 0xff0000 + 8000);
 	sljit_emit_op1(compiler, SLJIT_MOV, SLJIT_R1, 0, SLJIT_IMM, 2);
 	sljit_emit_op1(compiler, SLJIT_MOV_SH, SLJIT_MEM2(SLJIT_S1, SLJIT_R1), 1, SLJIT_R0, 0);
 	sljit_emit_op1(compiler, SLJIT_MOV, SLJIT_R1, 0, SLJIT_IMM, 3);
 	sljit_emit_op1(compiler, SLJIT_MOVU_SH, SLJIT_MEM2(SLJIT_S1, SLJIT_R1), 1, SLJIT_R0, 0);
 	sljit_emit_op1(compiler, SLJIT_MOV_SH, SLJIT_MEM1(SLJIT_S1), 0, SLJIT_IMM, -9317);
-	sljit_emit_op2(compiler, SLJIT_ADD, SLJIT_R1, 0, SLJIT_S1, 0, SLJIT_IMM, 5 * sizeof(sljit_sh));
+	sljit_emit_op2(compiler, SLJIT_ADD, SLJIT_R1, 0, SLJIT_S1, 0, SLJIT_IMM, 5 * sizeof(short));
 	sljit_emit_op1(compiler, SLJIT_MOV, SLJIT_R0, 0, SLJIT_IMM, -5);
 	sljit_emit_op1(compiler, SLJIT_MOV_UH, SLJIT_R1, 0, SLJIT_MEM2(SLJIT_R1, SLJIT_R0), 1);
-	sljit_emit_op1(compiler, SLJIT_MOV_UH, SLJIT_MEM1(SLJIT_S1), sizeof(sljit_sh), SLJIT_R1, 0);
+	sljit_emit_op1(compiler, SLJIT_MOV_UH, SLJIT_MEM1(SLJIT_S1), sizeof(short), SLJIT_R1, 0);
 
 	sljit_emit_op1(compiler, SLJIT_MOV_SB, SLJIT_MEM1(SLJIT_S2), 0, SLJIT_IMM, -45);
 	sljit_emit_op1(compiler, SLJIT_MOVU_UB, SLJIT_MEM1(SLJIT_S2), sizeof(s_char), SLJIT_IMM, 0x12);
@@ -1851,7 +1851,7 @@ static void test24(void)
 	executable_code code;
 	struct sljit_compiler* compiler = sljit_create_compiler();
 	long buf[9];
-	sljit_sh sbuf[5];
+	short sbuf[5];
 	s_char bbuf[7];
 
 	if (verbose)
@@ -1899,7 +1899,7 @@ static void test24(void)
 	sljit_emit_op1(compiler, SLJIT_MOVU_UB, SLJIT_MEM1(SLJIT_R0), (long)&bbuf[1], SLJIT_MEM1(SLJIT_R1), (long)&bbuf[0]);
 	sljit_emit_op1(compiler, SLJIT_MOVU_UB, SLJIT_MEM1(SLJIT_R0), 0, SLJIT_MEM1(SLJIT_R1), 2 * sizeof(s_char));
 
-	sljit_emit_op1(compiler, SLJIT_MOV, SLJIT_R1, 0, SLJIT_IMM, sizeof(sljit_sh));
+	sljit_emit_op1(compiler, SLJIT_MOV, SLJIT_R1, 0, SLJIT_IMM, sizeof(short));
 	sljit_emit_op1(compiler, SLJIT_MOV_SH, SLJIT_MEM1(SLJIT_R1), (long)&sbuf[3], SLJIT_R1, 0);
 
 	sljit_emit_op1(compiler, SLJIT_MOV, SLJIT_R0, 0, SLJIT_IMM, 3);
@@ -1948,7 +1948,7 @@ static void test24(void)
 
 	FAILED(sbuf[1] != 30000, "test24 case 8 failed\n");
 	FAILED(sbuf[2] != -12345, "test24 case 9 failed\n");
-	FAILED(sbuf[4] != sizeof(sljit_sh), "test24 case 10 failed\n");
+	FAILED(sbuf[4] != sizeof(short), "test24 case 10 failed\n");
 
 	FAILED(bbuf[1] != -128, "test24 case 11 failed\n");
 	FAILED(bbuf[2] != 99, "test24 case 12 failed\n");
