@@ -331,7 +331,7 @@ struct sljit_compiler* sljit_create_compiler(void)
 
 	SLJIT_COMPILE_ASSERT(
 		sizeof(s_char) == 1 && sizeof(u_char) == 1
-		&& sizeof(short) == 2 && sizeof(unsigned char) == 2
+		&& sizeof(short) == 2 && sizeof(unsigned short) == 2
 		&& sizeof(int) == 4 && sizeof(unsigned int) == 4
 		&& (sizeof(uintptr_t) == 4 || sizeof(uintptr_t) == 8)
 		&& sizeof(uintptr_t) <= sizeof(long)

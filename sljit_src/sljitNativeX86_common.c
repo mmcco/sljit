@@ -1307,7 +1307,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 				srcw = (s_char)srcw;
 				break;
 			case SLJIT_MOV_UH:
-				srcw = (unsigned char)srcw;
+				srcw = (unsigned short)srcw;
 				break;
 			case SLJIT_MOV_SH:
 				srcw = (short)srcw;

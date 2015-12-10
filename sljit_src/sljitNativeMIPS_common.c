@@ -1125,7 +1125,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 		return emit_op(compiler, SLJIT_MOV_SB, BYTE_DATA | SIGNED_DATA, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (s_char)srcw : srcw);
 
 	case SLJIT_MOV_UH:
-		return emit_op(compiler, SLJIT_MOV_UH, HALF_DATA, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (unsigned char)srcw : srcw);
+		return emit_op(compiler, SLJIT_MOV_UH, HALF_DATA, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (unsigned short)srcw : srcw);
 
 	case SLJIT_MOV_SH:
 		return emit_op(compiler, SLJIT_MOV_SH, HALF_DATA | SIGNED_DATA, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (short)srcw : srcw);
@@ -1155,7 +1155,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 		return emit_op(compiler, SLJIT_MOV_SB, BYTE_DATA | SIGNED_DATA | WRITE_BACK, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (s_char)srcw : srcw);
 
 	case SLJIT_MOVU_UH:
-		return emit_op(compiler, SLJIT_MOV_UH, HALF_DATA | WRITE_BACK, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (unsigned char)srcw : srcw);
+		return emit_op(compiler, SLJIT_MOV_UH, HALF_DATA | WRITE_BACK, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (unsigned short)srcw : srcw);
 
 	case SLJIT_MOVU_SH:
 		return emit_op(compiler, SLJIT_MOV_SH, HALF_DATA | SIGNED_DATA | WRITE_BACK, dst, dstw, TMP_REG1, 0, src, (src & SLJIT_IMM) ? (short)srcw : srcw);

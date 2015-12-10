@@ -1281,7 +1281,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 		case SLJIT_MOV_UH:
 			flags = HALF_SIZE;
 			if (src & SLJIT_IMM)
-				srcw = (unsigned char)srcw;
+				srcw = (unsigned short)srcw;
 			break;
 		case SLJIT_MOV_SH:
 			flags = HALF_SIZE | SIGNED;
@@ -1315,7 +1315,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 		case SLJIT_MOVU_UH:
 			flags = HALF_SIZE | UPDATE;
 			if (src & SLJIT_IMM)
-				srcw = (unsigned char)srcw;
+				srcw = (unsigned short)srcw;
 			break;
 		case SLJIT_MOVU_SH:
 			flags = HALF_SIZE | SIGNED | UPDATE;

@@ -183,10 +183,10 @@ static const u_char reg_map[SLJIT_NUM_REGS + 6] = {
 
 static int push_inst16(struct sljit_compiler *compiler, sljit_ins inst)
 {
-	unsigned char *ptr;
+	unsigned short *ptr;
 	SLJIT_ASSERT(!(inst & 0xffff0000));
 
-	ptr = ensure_buf(compiler, sizeof(unsigned char));
+	ptr = ensure_buf(compiler, sizeof(unsigned short));
 	FAIL_IF(!ptr);
 	*ptr = inst;
 	compiler->size++;
@@ -195,7 +195,7 @@ static int push_inst16(struct sljit_compiler *compiler, sljit_ins inst)
 
 static int push_inst32(struct sljit_compiler *compiler, sljit_ins inst)
 {
-	unsigned char *ptr = ensure_buf(compiler, sizeof(sljit_ins));
+	unsigned short *ptr = ensure_buf(compiler, sizeof(sljit_ins));
 	FAIL_IF(!ptr);
 	*ptr++ = inst >> 16;
 	*ptr = inst;
@@ -211,7 +211,7 @@ static __inline int emit_imm32_const(struct sljit_compiler *compiler, int dst, u
 		COPY_BITS(imm, 12 + 16, 16, 4) | COPY_BITS(imm, 11 + 16, 26, 1) | COPY_BITS(imm, 8 + 16, 12, 3) | ((imm & 0xff0000) >> 16));
 }
 
-static __inline void modify_imm32_const(unsigned char *inst, unsigned long new_imm)
+static __inline void modify_imm32_const(unsigned short *inst, unsigned long new_imm)
 {
 	int dst = inst[1] & 0x0f00;
 	SLJIT_ASSERT(((inst[0] & 0xfbf0) == (MOVW >> 16)) && ((inst[2] & 0xfbf0) == (MOVT >> 16)) && dst == (inst[3] & 0x0f00));
@@ -221,7 +221,7 @@ static __inline void modify_imm32_const(unsigned char *inst, unsigned long new_i
 	inst[3] = dst | COPY_BITS(new_imm, 8 + 16, 12, 3) | ((new_imm & 0xff0000) >> 16);
 }
 
-static __inline int detect_jump_type(struct sljit_jump *jump, unsigned char *code_ptr, unsigned char *code)
+static __inline int detect_jump_type(struct sljit_jump *jump, unsigned short *code_ptr, unsigned short *code)
 {
 	long diff;
 
@@ -280,11 +280,11 @@ static __inline void set_jump_instruction(struct sljit_jump *jump)
 {
 	int type = (jump->flags >> 4) & 0xf;
 	long diff;
-	unsigned char *jump_inst;
+	unsigned short *jump_inst;
 	int s, j1, j2;
 
 	if (type == 0) {
-		modify_imm32_const((unsigned char*)jump->addr, (jump->flags & JUMP_LABEL) ? jump->u.label->addr : jump->u.target);
+		modify_imm32_const((unsigned short*)jump->addr, (jump->flags & JUMP_LABEL) ? jump->u.label->addr : jump->u.target);
 		return;
 	}
 
@@ -294,7 +294,7 @@ static __inline void set_jump_instruction(struct sljit_jump *jump)
 	}
 	else
 		diff = ((long)(jump->u.label->addr) - (long)(jump->addr + 4)) >> 1;
-	jump_inst = (unsigned char*)jump->addr;
+	jump_inst = (unsigned short*)jump->addr;
 
 	switch (type) {
 	case 1:
@@ -342,10 +342,10 @@ static __inline void set_jump_instruction(struct sljit_jump *jump)
 void* sljit_generate_code(struct sljit_compiler *compiler)
 {
 	struct sljit_memory_fragment *buf;
-	unsigned char *code;
-	unsigned char *code_ptr;
-	unsigned char *buf_ptr;
-	unsigned char *buf_end;
+	unsigned short *code;
+	unsigned short *code_ptr;
+	unsigned short *buf_ptr;
+	unsigned short *buf_end;
 	unsigned long half_count;
 
 	struct sljit_label *label;
@@ -356,7 +356,7 @@ void* sljit_generate_code(struct sljit_compiler *compiler)
 	CHECK_PTR(check_sljit_generate_code(compiler));
 	reverse_buf(compiler);
 
-	code = (unsigned char*)SLJIT_MALLOC_EXEC(compiler->size * sizeof(unsigned char));
+	code = (unsigned short*)SLJIT_MALLOC_EXEC(compiler->size * sizeof(unsigned short));
 	PTR_FAIL_WITH_EXEC_IF(code);
 	buf = compiler->buf;
 
@@ -367,7 +367,7 @@ void* sljit_generate_code(struct sljit_compiler *compiler)
 	const_ = compiler->consts;
 
 	do {
-		buf_ptr = (unsigned char*)buf->memory;
+		buf_ptr = (unsigned short*)buf->memory;
 		buf_end = buf_ptr + (buf->used_size >> 1);
 		do {
 			*code_ptr = *buf_ptr++;
@@ -414,7 +414,7 @@ void* sljit_generate_code(struct sljit_compiler *compiler)
 	}
 
 	compiler->error = SLJIT_ERR_COMPILED;
-	compiler->executable_size = (code_ptr - code) * sizeof(unsigned char);
+	compiler->executable_size = (code_ptr - code) * sizeof(unsigned short);
 	SLJIT_CACHE_FLUSH(code, code_ptr);
 	/* Set thumb mode flag. */
 	return (void*)((unsigned long)code | 0x1);
@@ -1318,7 +1318,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 		case SLJIT_MOV_UH:
 			flags = HALF_SIZE;
 			if (src & SLJIT_IMM)
-				srcw = (unsigned char)srcw;
+				srcw = (unsigned short)srcw;
 			break;
 		case SLJIT_MOV_SH:
 			flags = HALF_SIZE | SIGNED;
@@ -1344,7 +1344,7 @@ int sljit_emit_op1(struct sljit_compiler *compiler, int op,
 		case SLJIT_MOVU_UH:
 			flags = HALF_SIZE | UPDATE;
 			if (src & SLJIT_IMM)
-				srcw = (unsigned char)srcw;
+				srcw = (unsigned short)srcw;
 			break;
 		case SLJIT_MOVU_SH:
 			flags = HALF_SIZE | SIGNED | UPDATE;
@@ -1510,7 +1510,7 @@ int sljit_emit_op_custom(struct sljit_compiler *compiler,
 	CHECK(check_sljit_emit_op_custom(compiler, instruction, size));
 
 	if (size == 2)
-		return push_inst16(compiler, *(unsigned char*)instruction);
+		return push_inst16(compiler, *(unsigned short*)instruction);
 	return push_inst32(compiler, *(sljit_ins*)instruction);
 }
 
@@ -2054,14 +2054,14 @@ struct sljit_const* sljit_emit_const(struct sljit_compiler *compiler, int dst, l
 
 void sljit_set_jump_addr(unsigned long addr, unsigned long new_addr)
 {
-	unsigned char *inst = (unsigned char*)addr;
+	unsigned short *inst = (unsigned short*)addr;
 	modify_imm32_const(inst, new_addr);
 	SLJIT_CACHE_FLUSH(inst, inst + 4);
 }
 
 void sljit_set_const(unsigned long addr, long new_constant)
 {
-	unsigned char *inst = (unsigned char*)addr;
+	unsigned short *inst = (unsigned short*)addr;
 	modify_imm32_const(inst, new_constant);
 	SLJIT_CACHE_FLUSH(inst, inst + 4);
 }
