@@ -268,9 +268,7 @@ static const u_char reg_lmap[SLJIT_NUM_REGS + 5] = {
 /* Multithreading does not affect these static variables, since they store
    built-in CPU features. Therefore they can be overwritten by different threads
    if they detect the CPU features in the same time. */
-#if (defined SLJIT_DETECT_SSE2 && SLJIT_DETECT_SSE2)
 static int cpu_has_sse2 = -1;
-#endif
 static int cpu_has_cmov = -1;
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
@@ -322,8 +320,10 @@ static void get_cpu_features(void)
 
 #endif /* _MSC_VER && _MSC_VER >= 1400 */
 
-#if (defined SLJIT_DETECT_SSE2 && SLJIT_DETECT_SSE2)
+#if (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 	cpu_has_sse2 = (features >> 26) & 0x1;
+#else
+	cpu_has_sse2 = true;
 #endif
 	cpu_has_cmov = (features >> 15) & 0x1;
 }
@@ -2260,16 +2260,16 @@ static void init_compiler(void)
 	sse2_buffer[13] = 0x7fffffff;
 }
 
-int sljit_is_fpu_available(void)
+bool sljit_is_fpu_available(void)
 {
 #ifdef SLJIT_IS_FPU_AVAILABLE
 	return SLJIT_IS_FPU_AVAILABLE;
-#elif (defined SLJIT_DETECT_SSE2 && SLJIT_DETECT_SSE2)
+#elif (defined SLJIT_CONFIG_X86_32 && SLJIT_CONFIG_X86_32)
 	if (cpu_has_sse2 == -1)
 		get_cpu_features();
 	return cpu_has_sse2;
 #else /* SLJIT_DETECT_SSE2 */
-	return 1;
+	return true;
 #endif /* SLJIT_DETECT_SSE2 */
 }
 

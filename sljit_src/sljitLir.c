@@ -24,6 +24,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -1844,7 +1845,7 @@ int sljit_emit_op_custom(struct sljit_compiler *compiler,
 	return SLJIT_ERR_UNSUPPORTED;
 }
 
-int sljit_is_fpu_available(void)
+bool sljit_is_fpu_available(void)
 {
 	SLJIT_ASSERT_STOP();
 	return 0;

@@ -24,12 +24,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "sljitLir.h"
-#include "regexJIT.h"
-
 #ifdef REGEX_MATCH_VERBOSE
 #include <stdio.h>
 #endif
+
+#include <stdbool.h>
+
+#include "sljitLir.h"
+#include "regexJIT.h"
 
 /* Extra, hidden flags:
    {id!} where id > 0 found in the code. */

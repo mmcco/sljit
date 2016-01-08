@@ -24,13 +24,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* Must be the first one. Must not depend on any other include. */
-#include "sljitLir.h"
-
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "sljitLir.h"
 
 #if defined _WIN32 || defined _WIN64
 #define COLOR_RED

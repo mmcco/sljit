@@ -865,9 +865,10 @@ int sljit_get_float_reg_index(int reg);
 int sljit_emit_op_custom(struct sljit_compiler *compiler,
 	void *instruction, int size);
 
-/* Returns with non-zero if fpu is available. */
-
-int sljit_is_fpu_available(void);
+/*
+ * Returns with non-zero if fpu is available.
+ */
+bool sljit_is_fpu_available(void);
 
 /* Starting index of opcodes for sljit_emit_fop1. */
 #define SLJIT_FOP1_BASE			128
