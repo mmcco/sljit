@@ -47,14 +47,6 @@
 			return compiler->error; \
 	} while (0)
 
-#define FAIL_IF_NULL(ptr) \
-	do { \
-		if (!(ptr)) { \
-			compiler->error = SLJIT_ERR_ALLOC_FAILED; \
-			return SLJIT_ERR_ALLOC_FAILED; \
-		} \
-	} while (0)
-
 #define PTR_FAIL_IF_NULL(ptr) \
 	do { \
 		if (!(ptr)) { \
@@ -409,14 +401,14 @@ void sljit_free_compiler(struct sljit_compiler *compiler)
 	struct sljit_memory_fragment *curr;
 
 	buf = compiler->buf;
-	while (buf) {
+	while (buf != NULL) {
 		curr = buf;
 		buf = buf->next;
 		free(curr);
 	}
 
 	buf = compiler->abuf;
-	while (buf) {
+	while (buf != NULL) {
 		curr = buf;
 		buf = buf->next;
 		free(curr);
@@ -515,11 +507,11 @@ void* sljit_alloc_memory(struct sljit_compiler *compiler, int size)
 #if (defined SLJIT_64BIT_ARCHITECTURE && SLJIT_64BIT_ARCHITECTURE)
 	if (size <= 0 || size > 128)
 		return NULL;
-	size = (size + 7) & ~7;
+	size = (size + 7) & ~0x111;
 #else
 	if (size <= 0 || size > 64)
 		return NULL;
-	size = (size + 3) & ~3;
+	size = (size + 3) & ~0x11;
 #endif
 	return ensure_abuf(compiler, size);
 }

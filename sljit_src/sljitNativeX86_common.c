@@ -2622,7 +2622,10 @@ int sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, long sr
 
 	if (src == SLJIT_IMM) {
 		jump = ensure_abuf(compiler, sizeof(struct sljit_jump));
-		FAIL_IF_NULL(jump);
+		if (jump == NULL) {
+			compiler->error = SLJIT_ERR_ALLOC_FAILED;
+			return SLJIT_ERR_ALLOC_FAILED;
+		}
 		set_jump(jump, compiler, JUMP_ADDR);
 		jump->u.target = srcw;
 
@@ -2634,7 +2637,10 @@ int sljit_emit_ijump(struct sljit_compiler *compiler, int type, int src, long sr
 #endif
 
 		inst = ensure_buf(compiler, 2);
-		FAIL_IF_NULL(inst);
+		if (inst == NULL) {
+			compiler->error = SLJIT_ERR_ALLOC_FAILED;
+			return SLJIT_ERR_ALLOC_FAILED;
+		}
 
 		*inst++ = 0;
 		*inst++ = type + 4;
