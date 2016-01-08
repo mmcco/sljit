@@ -41,16 +41,11 @@ typedef union executable_code executable_code;
 void devel(void)
 {
 	executable_code code;
+	struct sljit_compiler *compiler;
+	long buf[4] = {5, 12, 0, 0};
 
-	struct sljit_compiler *compiler = sljit_create_compiler();
-	long buf[4];
-
-	if (!compiler)
+	if ((compiler = sljit_create_compiler()) == NULL)
 		errx(-1, "out of memory");
-	buf[0] = 5;
-	buf[1] = 12;
-	buf[2] = 0;
-	buf[3] = 0;
 
 #if (defined SLJIT_VERBOSE && SLJIT_VERBOSE)
 	sljit_compiler_verbose(compiler, stdout);
